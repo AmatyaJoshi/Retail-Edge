@@ -1,0 +1,266 @@
+[
+  {
+    "id": "rx-001",
+    "userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "date": "2024-03-01T00:00:00Z",
+    "expiryDate": "2025-03-01T00:00:00Z",
+    "rightEye": {
+      "sphere": -2.5,
+      "cylinder": -0.75,
+      "axis": 180,
+      "add": 2.0,
+      "pd": 32
+    },
+    "leftEye": {
+      "sphere": -2.25,
+      "cylinder": -0.5,
+      "axis": 175,
+      "add": 2.0,
+      "pd": 32
+    },
+    "doctor": "Dr. Rajesh Kumar",
+    "notes": "Progressive lenses recommended"
+  },
+  {
+    "id": "rx-002",
+    "userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "date": "2023-03-01T00:00:00Z",
+    "expiryDate": "2024-03-01T00:00:00Z",
+    "rightEye": {
+      "sphere": -2.25,
+      "cylinder": -0.5,
+      "axis": 175,
+      "add": 1.75,
+      "pd": 32
+    },
+    "leftEye": {
+      "sphere": -2.0,
+      "cylinder": -0.25,
+      "axis": 170,
+      "add": 1.75,
+      "pd": 32
+    },
+    "doctor": "Dr. Rajesh Kumar",
+    "notes": "Regular checkup in 6 months"
+  },
+  {
+    "id": "rx-003",
+    "userId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "date": "2024-02-15T00:00:00Z",
+    "expiryDate": "2025-02-15T00:00:00Z",
+    "rightEye": {
+      "sphere": -1.75,
+      "cylinder": -0.25,
+      "axis": 90,
+      "add": 1.5,
+      "pd": 30
+    },
+    "leftEye": {
+      "sphere": -1.5,
+      "cylinder": -0.25,
+      "axis": 85,
+      "add": 1.5,
+      "pd": 30
+    },
+    "doctor": "Dr. Meera Kapoor",
+    "notes": "Blue light blocking recommended"
+  },
+  {
+    "id": "rx-004",
+    "userId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "date": "2024-01-20T00:00:00Z",
+    "expiryDate": "2025-01-20T00:00:00Z",
+    "rightEye": {
+      "sphere": -3.0,
+      "cylinder": -1.0,
+      "axis": 170,
+      "add": 2.5,
+      "pd": 33
+    },
+    "leftEye": {
+      "sphere": -3.25,
+      "cylinder": -1.25,
+      "axis": 165,
+      "add": 2.5,
+      "pd": 33
+    },
+    "doctor": "Dr. Amit Choudhary",
+    "notes": "High myopia, regular checkup recommended"
+  },
+  {
+    "id": "rx-005",
+    "userId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "date": "2023-01-20T00:00:00Z",
+    "expiryDate": "2024-01-20T00:00:00Z",
+    "rightEye": {
+      "sphere": -2.75,
+      "cylinder": -0.75,
+      "axis": 165,
+      "add": 2.25,
+      "pd": 33
+    },
+    "leftEye": {
+      "sphere": -3.0,
+      "cylinder": -1.0,
+      "axis": 160,
+      "add": 2.25,
+      "pd": 33
+    },
+    "doctor": "Dr. Amit Choudhary",
+    "notes": "Previous prescription"
+  },
+  {
+    "id": "rx-006",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "date": "2024-03-10T00:00:00Z",
+    "expiryDate": "2025-03-10T00:00:00Z",
+    "rightEye": {
+      "sphere": -1.25,
+      "cylinder": -0.5,
+      "axis": 95,
+      "add": 1.75,
+      "pd": 31
+    },
+    "leftEye": {
+      "sphere": -1.0,
+      "cylinder": -0.5,
+      "axis": 90,
+      "add": 1.75,
+      "pd": 31
+    },
+    "doctor": "Dr. Sneha Iyer",
+    "notes": "Computer glasses recommended"
+  },
+  {
+    "id": "rx-007",
+    "userId": "22c29051-d301-4cc2-86dd-c19695408adb",
+    "date": "2024-02-01T00:00:00Z",
+    "expiryDate": "2025-02-01T00:00:00Z",
+    "rightEye": {
+      "sphere": -2.0,
+      "cylinder": -0.75,
+      "axis": 175,
+      "add": 2.25,
+      "pd": 32
+    },
+    "leftEye": {
+      "sphere": -2.25,
+      "cylinder": -0.75,
+      "axis": 170,
+      "add": 2.25,
+      "pd": 32
+    },
+    "doctor": "Dr. Karthik Joshi",
+    "notes": "Photochromic lenses recommended"
+  },
+  {
+    "id": "rx-008",
+    "userId": "22c29051-d301-4cc2-86dd-c19695408adb",
+    "date": "2023-02-01T00:00:00Z",
+    "expiryDate": "2024-02-01T00:00:00Z",
+    "rightEye": {
+      "sphere": -1.75,
+      "cylinder": -0.5,
+      "axis": 170,
+      "add": 2.0,
+      "pd": 32
+    },
+    "leftEye": {
+      "sphere": -2.0,
+      "cylinder": -0.5,
+      "axis": 165,
+      "add": 2.0,
+      "pd": 32
+    },
+    "doctor": "Dr. Karthik Joshi",
+    "notes": "Previous prescription"
+  },
+  {
+    "id": "rx-009",
+    "userId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "date": "2024-03-15T00:00:00Z",
+    "expiryDate": "2025-03-15T00:00:00Z",
+    "rightEye": {
+      "sphere": -1.5,
+      "cylinder": -0.25,
+      "axis": 85,
+      "add": 1.5,
+      "pd": 30
+    },
+    "leftEye": {
+      "sphere": -1.75,
+      "cylinder": -0.25,
+      "axis": 80,
+      "add": 1.5,
+      "pd": 30
+    },
+    "doctor": "Dr. Bhavya Shah",
+    "notes": "Regular checkup in 6 months"
+  },
+  {
+    "id": "rx-010",
+    "userId": "552c1c73-e324-47ee-bf7f-b0dfbeb59788",
+    "date": "2024-03-20T00:00:00Z",
+    "expiryDate": "2025-03-20T00:00:00Z",
+    "rightEye": {
+      "sphere": -2.25,
+      "cylinder": -0.5,
+      "axis": 175,
+      "add": 2.0,
+      "pd": 31
+    },
+    "leftEye": {
+      "sphere": -2.0,
+      "cylinder": -0.5,
+      "axis": 170,
+      "add": 2.0,
+      "pd": 31
+    },
+    "doctor": "Dr. Nisha Agarwal",
+    "notes": "Progressive lenses with blue light filter"
+  },
+  {
+    "id": "rx-011",
+    "userId": "962c8a6b-c914-4aa4-93bc-2b91188a1a58",
+    "date": "2024-03-25T00:00:00Z",
+    "expiryDate": "2025-03-25T00:00:00Z",
+    "rightEye": {
+      "sphere": -1.75,
+      "cylinder": -0.25,
+      "axis": 90,
+      "add": 1.75,
+      "pd": 30
+    },
+    "leftEye": {
+      "sphere": -1.5,
+      "cylinder": -0.25,
+      "axis": 85,
+      "add": 1.75,
+      "pd": 30
+    },
+    "doctor": "Dr. Lakshmi Menon",
+    "notes": "Computer glasses with anti-glare"
+  },
+  {
+    "id": "rx-012",
+    "userId": "962c8a6b-c914-4aa4-93bc-2b91188a1a58",
+    "date": "2023-03-25T00:00:00Z",
+    "expiryDate": "2024-03-25T00:00:00Z",
+    "rightEye": {
+      "sphere": -1.5,
+      "cylinder": -0.25,
+      "axis": 85,
+      "add": 1.5,
+      "pd": 30
+    },
+    "leftEye": {
+      "sphere": -1.25,
+      "cylinder": -0.25,
+      "axis": 80,
+      "add": 1.5,
+      "pd": 30
+    },
+    "doctor": "Dr. Lakshmi Menon",
+    "notes": "Previous prescription"
+  }
+] 

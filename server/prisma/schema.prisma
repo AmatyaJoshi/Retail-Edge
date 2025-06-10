@@ -1,0 +1,230 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customers {
+  customerId String @id @map("userId")
+  name   String
+  email  String? @unique
+  phone  String
+  joinedDate DateTime
+  prescriptions Prescriptions[]
+  sales         Sales[]
+
+  @@map("Customers")
+}
+
+model Prescriptions {
+  id          String   @id @default(uuid())
+  userId      String
+  date        DateTime
+  expiryDate  DateTime
+  rightEye    Json
+  leftEye     Json
+  doctor      String
+  notes       String?
+  customer    Customers    @relation(fields: [userId], references: [customerId])
+
+  @@map("Prescriptions")
+}
+
+model Products {
+  productId     String      @id
+  name          String @unique
+  price         Float
+  rating        Float?
+  stockQuantity Int
+  category      String
+  brand         String?
+  sku           String? @unique
+  description   String?
+  imageUrl      String?
+  Sales         Sales[]
+  Purchases     Purchases[]
+  purchaseOrders PurchaseOrder[]
+}
+
+model Sales {
+  saleId      String   @id
+  productId   String
+  customerId  String?
+  timestamp   DateTime
+  quantity    Int
+  unitPrice   Float
+  totalAmount Float
+  paymentMethod String @default("CARD")
+  status      String   @default("COMPLETED")
+  product     Products @relation(fields: [productId], references: [productId])
+  customer    Customers?   @relation(fields: [customerId], references: [customerId])
+}
+
+model Purchases {
+  purchaseId String   @id
+  productId  String
+  timestamp  DateTime
+  quantity   Int
+  unitCost   Float
+  totalCost  Float
+  product    Products @relation(fields: [productId], references: [productId])
+}
+
+model Expenses {
+  expenseId   String   @id
+  category    String
+  amount      Float
+  timestamp   DateTime
+  description String?
+}
+
+model SalesSummary {
+  salesSummaryId   String   @id
+  totalValue       Float
+  changePercentage Float?
+  date             DateTime
+}
+
+model PurchaseSummary {
+  purchaseSummaryId String   @id
+  totalPurchased    Float
+  changePercentage  Float?
+  date              DateTime
+}
+
+model ExpenseSummary {
+  expenseSummaryId  String              @id
+  totalExpenses     Float
+  date              DateTime
+  ExpenseByCategory ExpenseByCategory[]
+}
+
+model ExpenseByCategory {
+  expenseByCategoryId String         @id
+  expenseSummaryId    String
+  category            String
+  amount              BigInt
+  date                DateTime
+  expenseSummary      ExpenseSummary @relation(fields: [expenseSummaryId], references: [expenseSummaryId])
+}
+
+model PurchaseOrder {
+  id                  String    @id @default(uuid())
+  productId          String
+  product            Products   @relation(fields: [productId], references: [productId])
+  quantity           Int
+  supplier           String
+  expectedDeliveryDate DateTime
+  status             String    @default("PENDING") // PENDING, ORDERED, RECEIVED, CANCELLED
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Persona {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER")
+  firebaseUid String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PartnerType {
+  SUPPLIER
+  BUYER
+  BOTH
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum CommunicationType {
+  EMAIL
+  MEETING
+  CALL
+  NOTE
+}
+
+model Associate {
+  id                String               @id @default(cuid())
+  type              PartnerType
+  name              String
+  email             String?
+  phone             String
+  address           String
+  taxId            String?
+  creditLimit      Float?               @default(0)
+  currentBalance   Float                @default(0)
+  joinedDate       DateTime             @default(now())
+  isActive         Boolean              @default(true)
+  notes            String?
+  transactions     AssociateTransaction[]
+  contacts        AssociateContact[]
+  communications  AssociateCommunication[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@map("BusinessPartner") // Keep the old table name for data consistency
+}
+
+model AssociateTransaction {
+  id              String            @id @default(cuid())
+  partnerId       String
+  partner         Associate         @relation(fields: [partnerId], references: [id])
+  type            String            // "PURCHASE" or "SALE"
+  amount          Float
+  status          TransactionStatus @default(PENDING)
+  date            DateTime          @default(now())
+  dueDate         DateTime?
+  description     String?
+  reference       String?           // PO number, invoice number, etc.
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@map("BusinessTransaction") // Keep the old table name for data consistency
+}
+
+model AssociateContact {
+  id              String      @id @default(cuid())
+  associateId     String
+  associate       Associate   @relation(fields: [associateId], references: [id])
+  name            String
+  role            String
+  email           String?
+  phone           String?
+  isPrimary       Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("BusinessPartnerContact")
+}
+
+model AssociateCommunication {
+  id              String             @id @default(cuid())
+  associateId     String
+  associate       Associate          @relation(fields: [associateId], references: [id])
+  type            CommunicationType
+  subject         String
+  content         String
+  date            DateTime
+  createdBy       String            // Reference to the user who created this entry
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@map("BusinessPartnerCommunication")
+}

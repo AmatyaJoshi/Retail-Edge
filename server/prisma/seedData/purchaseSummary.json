@@ -1,0 +1,170 @@
+[
+    {
+      "purchaseSummaryId": "c452c304-0f7e-474f-b750-43c542df3412",
+      "totalPurchased": 89990,
+      "changePercentage": 0,
+      "date": "2023-09-28T13:56:51Z"
+    },
+    {
+      "purchaseSummaryId": "1206e83e-0e1b-42e5-8ec5-35cd1080f09d",
+      "totalPurchased": 179985,
+      "changePercentage": 100,
+      "date": "2023-10-15T13:04:43Z"
+    },
+    {
+      "purchaseSummaryId": "21491665-4761-4dea-b5f1-16b04d9f57bb",
+      "totalPurchased": 37475,
+      "changePercentage": -79.18,
+      "date": "2023-11-22T19:38:20Z"
+    },
+    {
+      "purchaseSummaryId": "a8ae9a24-a851-4a75-be59-a16834827bb8",
+      "totalPurchased": 55992,
+      "changePercentage": 49.42,
+      "date": "2023-12-25T13:30:58Z"
+    },
+    {
+      "purchaseSummaryId": "2de46932-fab9-41f6-87ca-8c06083a66f2",
+      "totalPurchased": 71988,
+      "changePercentage": 28.57,
+      "date": "2024-01-15T12:54:41Z"
+    },
+    {
+      "purchaseSummaryId": "63409896-65aa-4f06-9bb6-fd0b6336eeb5",
+      "totalPurchased": 59970,
+      "changePercentage": -16.69,
+      "date": "2024-02-01T01:13:31Z"
+    },
+    {
+      "purchaseSummaryId": "ab29178e-21a0-407f-8cef-8f99f5bd140c",
+      "totalPurchased": 99995,
+      "changePercentage": 66.77,
+      "date": "2024-02-15T23:49:33Z"
+    },
+    {
+      "purchaseSummaryId": "1475b96b-0d32-4679-b8dc-050e446f8cf8",
+      "totalPurchased": 103992,
+      "changePercentage": 4,
+      "date": "2024-03-01T08:53:44Z"
+    },
+    {
+      "purchaseSummaryId": "cd22c91d-af7a-4334-843c-0d9b3bd90bf8",
+      "totalPurchased": 59980,
+      "changePercentage": -42.32,
+      "date": "2024-03-10T13:02:55Z"
+    },
+    {
+      "purchaseSummaryId": "b9952c34-ef74-41f8-9c44-76e0516dc7b9",
+      "totalPurchased": 62475,
+      "changePercentage": 4.16,
+      "date": "2024-03-15T16:41:13Z"
+    },
+    {
+      "purchaseSummaryId": "677b220c-96b8-46b8-b367-be71b8a2fbb2",
+      "totalPurchased": 95994,
+      "changePercentage": 53.67,
+      "date": "2024-03-20T16:37:41Z"
+    },
+    {
+      "purchaseSummaryId": "584fec60-a573-4445-b23e-fd9d46eebcab",
+      "totalPurchased": 104993,
+      "changePercentage": 9.37,
+      "date": "2024-03-25T16:18:59Z"
+    },
+    {
+      "purchaseSummaryId": "124d1a24-3fd2-415d-9a6d-11737c319082",
+      "totalPurchased": 95988,
+      "changePercentage": -8.57,
+      "date": "2024-03-28T10:50:55Z"
+    },
+    {
+      "purchaseSummaryId": "fd8bfb7f-a97c-4dd3-a3b3-d838c6dcc753",
+      "totalPurchased": 94995,
+      "changePercentage": -1.03,
+      "date": "2024-03-30T18:41:49Z"
+    },
+    {
+      "purchaseSummaryId": "61d68449-e3ed-4fc7-b8f3-603c5c099ad0",
+      "totalPurchased": 37485,
+      "changePercentage": -60.54,
+      "date": "2024-04-01T06:28:48Z"
+    },
+    {
+      "purchaseSummaryId": "a9c42568-3668-4750-93a4-b8798471acde",
+      "totalPurchased": 91996,
+      "changePercentage": 145.45,
+      "date": "2024-04-05T12:52:02Z"
+    },
+    {
+      "purchaseSummaryId": "79d7b45a-ba98-437f-95b0-aa21c071709c",
+      "totalPurchased": 65997,
+      "changePercentage": -28.26,
+      "date": "2024-04-10T17:09:07Z"
+    },
+    {
+      "purchaseSummaryId": "71fe4534-87fc-439f-b6c8-3022aa5e7d4b",
+      "totalPurchased": 39960,
+      "changePercentage": -39.45,
+      "date": "2024-04-15T15:28:13Z"
+    },
+    {
+      "purchaseSummaryId": "5c0a56c3-5140-447d-b992-a7d7c44d472d",
+      "totalPurchased": 113994,
+      "changePercentage": 185.27,
+      "date": "2024-04-20T21:20:02Z"
+    },
+    {
+      "purchaseSummaryId": "bd1cf049-4f69-4180-a5d1-72f37beef632",
+      "totalPurchased": 44970,
+      "changePercentage": -60.55,
+      "date": "2024-04-25T02:34:59Z"
+    },
+    {
+      "purchaseSummaryId": "6f24990f-336d-460e-84ad-810d159bad88",
+      "totalPurchased": 249950,
+      "changePercentage": 455.77,
+      "date": "2024-04-28T10:15:22Z"
+    },
+    {
+      "purchaseSummaryId": "37e2ae04-638f-41cc-b838-4f7ebdd5f60b",
+      "totalPurchased": 224975,
+      "changePercentage": -9.99,
+      "date": "2024-04-29T14:30:45Z"
+    },
+    {
+      "purchaseSummaryId": "a498409d-df59-46da-8065-ecaabc4e9225",
+      "totalPurchased": 224925,
+      "changePercentage": -0.02,
+      "date": "2024-04-30T09:45:12Z"
+    },
+    {
+      "purchaseSummaryId": "b1972f5c-50d3-4c8e-b3d2-d2ad12c86277",
+      "totalPurchased": 279960,
+      "changePercentage": 24.47,
+      "date": "2024-05-01T11:20:33Z"
+    },
+    {
+      "purchaseSummaryId": "d9d14c29-f07f-4cb5-8271-0330825e8159",
+      "totalPurchased": 49900,
+      "changePercentage": -82.18,
+      "date": "2024-05-02T15:40:18Z"
+    },
+    {
+      "purchaseSummaryId": "4fc51811-2e51-4776-b9b5-181e5f422f6a",
+      "totalPurchased": 44850,
+      "changePercentage": -10.13,
+      "date": "2024-05-03T13:25:47Z"
+    },
+    {
+      "purchaseSummaryId": "ccfd8bd5-c2a1-4d13-bec1-74157854773a",
+      "totalPurchased": 29980,
+      "changePercentage": -33.15,
+      "date": "2024-05-04T16:55:29Z"
+    },
+    {
+      "purchaseSummaryId": "c2ecb47d-7b26-4e78-8b48-96a436c434bd",
+      "totalPurchased": 29925,
+      "changePercentage": -0.18,
+      "date": "2024-05-05T10:10:55Z"
+    }
+  ]

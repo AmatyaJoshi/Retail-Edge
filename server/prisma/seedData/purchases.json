@@ -1,0 +1,226 @@
+[
+    {
+      "purchaseId": "5035f91e-4a29-411a-8779-17f6105675f1",
+      "productId": "d35623ee-bef6-42b2-8776-2f99f8bb4782",
+      "timestamp": "2023-09-28T13:56:51Z",
+      "quantity": 10,
+      "unitCost": 8999,
+      "totalCost": 89990
+    },
+    {
+      "purchaseId": "85841cb5-2132-40f2-b923-9769ee3c199b",
+      "productId": "8ac1ac77-7358-425e-be16-0bdde9f02e59",
+      "timestamp": "2023-10-15T13:04:43Z",
+      "quantity": 15,
+      "unitCost": 11999,
+      "totalCost": 179985
+    },
+    {
+      "purchaseId": "de384851-f898-4495-99b8-73448bb470bf",
+      "productId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
+      "timestamp": "2023-11-22T19:38:20Z",
+      "quantity": 25,
+      "unitCost": 1499,
+      "totalCost": 37475
+    },
+    {
+      "purchaseId": "e0b0486c-6396-42b7-9a84-e21bd3a88600",
+      "productId": "af84cc12-4fea-4f58-aece-f2ce92ca9580",
+      "timestamp": "2023-12-25T13:30:58Z",
+      "quantity": 8,
+      "unitCost": 6999,
+      "totalCost": 55992
+    },
+    {
+      "purchaseId": "822e6025-e582-4e8c-b143-dc5ebad4c18c",
+      "productId": "86e3bb1c-2f5d-4774-98f3-4df7cddd0a0f",
+      "timestamp": "2024-01-15T12:54:41Z",
+      "quantity": 12,
+      "unitCost": 5999,
+      "totalCost": 71988
+    },
+    {
+      "purchaseId": "dd6d3a14-92d5-40f4-9bf4-92fb4043882c",
+      "productId": "26b017c6-06d8-443f-9b4a-d6b1cee6f4c0",
+      "timestamp": "2024-02-01T01:13:31Z",
+      "quantity": 30,
+      "unitCost": 1999,
+      "totalCost": 59970
+    },
+    {
+      "purchaseId": "434e5415-cb23-4170-b1e7-bc85737dc8c7",
+      "productId": "440c9e80-6bf8-4eb3-b2d2-f81936d67de3",
+      "timestamp": "2024-02-15T23:49:33Z",
+      "quantity": 5,
+      "unitCost": 19999,
+      "totalCost": 99995
+    },
+    {
+      "purchaseId": "963a92ab-e092-4f3d-8b6a-5ab803550d78",
+      "productId": "98255f4e-40a6-470f-89a5-0792729f8947",
+      "timestamp": "2024-03-01T08:53:44Z",
+      "quantity": 8,
+      "unitCost": 12999,
+      "totalCost": 103992
+    },
+    {
+      "purchaseId": "b4aebfdc-bce9-4e90-89fc-5098447d687a",
+      "productId": "2a339fb2-f9f3-43bc-a85a-b217a0a38f12",
+      "timestamp": "2024-03-10T13:02:55Z",
+      "quantity": 20,
+      "unitCost": 2999,
+      "totalCost": 59980
+    },
+    {
+      "purchaseId": "de2ba6a2-c291-4a60-aad1-23d5749c5847",
+      "productId": "8a8391b2-b4ac-4847-b652-66ffd8d65875",
+      "timestamp": "2024-03-15T16:41:13Z",
+      "quantity": 25,
+      "unitCost": 2499,
+      "totalCost": 62475
+    },
+    {
+      "purchaseId": "78ea5f20-8fcc-4b6c-836f-e4b7a58d7479",
+      "productId": "be2157fb-7454-405e-9511-bf7ba81b7726",
+      "timestamp": "2024-03-20T16:37:41Z",
+      "quantity": 6,
+      "unitCost": 15999,
+      "totalCost": 95994
+    },
+    {
+      "purchaseId": "61ba57e9-81fe-4d04-85b5-6aab219ced9d",
+      "productId": "fdf1ba3d-fa06-4ce5-90ff-d081c5d37176",
+      "timestamp": "2024-03-25T16:18:59Z",
+      "quantity": 7,
+      "unitCost": 14999,
+      "totalCost": 104993
+    },
+    {
+      "purchaseId": "012d028b-4d6b-43bf-8d69-edf296133c9e",
+      "productId": "afded6df-058f-477d-9878-e0e0b1d3dff3",
+      "timestamp": "2024-03-28T10:50:55Z",
+      "quantity": 12,
+      "unitCost": 7999,
+      "totalCost": 95988
+    },
+    {
+      "purchaseId": "8155b76c-3da2-4fb4-ba18-68bf8a2cec1b",
+      "productId": "daa29167-82a7-474b-9687-b8b903e7ec69",
+      "timestamp": "2024-03-30T18:41:49Z",
+      "quantity": 5,
+      "unitCost": 18999,
+      "totalCost": 94995
+    },
+    {
+      "purchaseId": "4d449c76-ee8a-473e-8135-f74875a31964",
+      "productId": "ccb83982-71f3-4497-bad8-7e64c6920dc6",
+      "timestamp": "2024-04-01T06:28:48Z",
+      "quantity": 15,
+      "unitCost": 2499,
+      "totalCost": 37485
+    },
+    {
+      "purchaseId": "115c6e6c-e6d0-418f-990e-1730f9e4b02e",
+      "productId": "1936d406-e89e-40e4-bff7-1827532269d4",
+      "timestamp": "2024-04-05T12:52:02Z",
+      "quantity": 4,
+      "unitCost": 22999,
+      "totalCost": 91996
+    },
+    {
+      "purchaseId": "7b898dfe-79e0-472c-a19e-d75d6a2719fd",
+      "productId": "c849a535-5f8b-47e3-889c-015693a644ac",
+      "timestamp": "2024-04-10T17:09:07Z",
+      "quantity": 3,
+      "unitCost": 21999,
+      "totalCost": 65997
+    },
+    {
+      "purchaseId": "cb3000e8-df2e-4e8b-99ed-4ceb35077404",
+      "productId": "0c3e80ee-59b3-4fc4-b760-8b07acc2d3ae",
+      "timestamp": "2024-04-15T15:28:13Z",
+      "quantity": 40,
+      "unitCost": 999,
+      "totalCost": 39960
+    },
+    {
+      "purchaseId": "8b709837-e51b-493a-8720-89e64f9888e2",
+      "productId": "d8f5bee3-f3eb-4071-a124-6b857e0fd798",
+      "timestamp": "2024-04-20T21:20:02Z",
+      "quantity": 6,
+      "unitCost": 18999,
+      "totalCost": 113994
+    },
+    {
+      "purchaseId": "8ee49368-1e96-41ed-bc53-7ba90ed537a4",
+      "productId": "8d15de86-0e4a-4414-9166-7a33610202d3",
+      "timestamp": "2024-04-25T02:34:59Z",
+      "quantity": 30,
+      "unitCost": 1499,
+      "totalCost": 44970
+    },
+    {
+      "purchaseId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+      "productId": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
+      "timestamp": "2024-04-28T10:15:22Z",
+      "quantity": 50,
+      "unitCost": 4999,
+      "totalCost": 249950
+    },
+    {
+      "purchaseId": "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
+      "productId": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+      "timestamp": "2024-04-29T14:30:45Z",
+      "quantity": 25,
+      "unitCost": 8999,
+      "totalCost": 224975
+    },
+    {
+      "purchaseId": "c3d4e5f6-g7h8-i9j0-k1l2-m3n4o5p6q7r8",
+      "productId": "d3e4f5g6-h7i8-j9k0-l1m2-n3o4p5q6r7s8",
+      "timestamp": "2024-04-30T09:45:12Z",
+      "quantity": 75,
+      "unitCost": 2999,
+      "totalCost": 224925
+    },
+    {
+      "purchaseId": "d4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s9",
+      "productId": "e4f5g6h7-i8j9-k0l1-m2n3-o4p5q6r7s8t9",
+      "timestamp": "2024-05-01T11:20:33Z",
+      "quantity": 40,
+      "unitCost": 6999,
+      "totalCost": 279960
+    },
+    {
+      "purchaseId": "e5f6g7h8-i9j0-k1l2-m3n4-o5p6q7r8s9t0",
+      "productId": "f5g6h7i8-j9k0-l1m2-n3o4-p5q6r7s8t9u0",
+      "timestamp": "2024-05-02T15:40:18Z",
+      "quantity": 100,
+      "unitCost": 499,
+      "totalCost": 49900
+    },
+    {
+      "purchaseId": "f6g7h8i9-j0k1-l2m3-n4o5-p6q7r8s9t0u1",
+      "productId": "g6h7i8j9-k0l1-m2n3-o4p5-q6r7s8t9u0v1",
+      "timestamp": "2024-05-03T13:25:47Z",
+      "quantity": 150,
+      "unitCost": 299,
+      "totalCost": 44850
+    },
+    {
+      "purchaseId": "g7h8i9j0-k1l2-m3n4-o5p6-q7r8s9t0u1v2",
+      "productId": "h7i8j9k0-l1m2-n3o4-p5q6-r7s8t9u0v1w2",
+      "timestamp": "2024-05-04T16:55:29Z",
+      "quantity": 20,
+      "unitCost": 1499,
+      "totalCost": 29980
+    },
+    {
+      "purchaseId": "h8i9j0k1-l2m3-n4o5-p6q7-r8s9t0u1v2w3",
+      "productId": "i8j9k0l1-m2n3-o4p5-q6r7-s8t9u0v1w2x3",
+      "timestamp": "2024-05-05T10:10:55Z",
+      "quantity": 75,
+      "unitCost": 399,
+      "totalCost": 29925
+    }
+  ]

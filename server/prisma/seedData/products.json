@@ -1,0 +1,242 @@
+[
+    {
+      "productId": "d35623ee-bef6-42b2-8776-2f99f8bb4782",
+      "name": "Ray-Ban RB3025 Aviator",
+      "price": 12999,
+      "rating": 4.8,
+      "stockQuantity": 25,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "8ac1ac77-7358-425e-be16-0bdde9f02e59",
+      "name": "Oakley Holbrook",
+      "price": 14999,
+      "rating": 4.7,
+      "stockQuantity": 30,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
+      "name": "Vincent Chase Blue Block",
+      "price": 1999,
+      "rating": 4.2,
+      "stockQuantity": 50,
+      "category": "frames"
+    },
+    {
+      "productId": "af84cc12-4fea-4f58-aece-f2ce92ca9580",
+      "name": "Tommy Hilfiger TH 1355",
+      "price": 8999,
+      "rating": 4.5,
+      "stockQuantity": 20,
+      "category": "frames"
+    },
+    {
+      "productId": "86e3bb1c-2f5d-4774-98f3-4df7cddd0a0f",
+      "name": "John Jacobs JJ E137",
+      "price": 7999,
+      "rating": 4.6,
+      "stockQuantity": 15,
+      "category": "frames"
+    },
+    {
+      "productId": "26b017c6-06d8-443f-9b4a-d6b1cee6f4c0",
+      "name": "Fastrack FS 1001",
+      "price": 2499,
+      "rating": 4.0,
+      "stockQuantity": 40,
+      "category": "frames"
+    },
+    {
+      "productId": "440c9e80-6bf8-4eb3-b2d2-f81936d67de3",
+      "name": "Gucci GG0397S",
+      "price": 24999,
+      "rating": 4.9,
+      "stockQuantity": 10,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "98255f4e-40a6-470f-89a5-0792729f8947",
+      "name": "Carrera 6006/S",
+      "price": 15999,
+      "rating": 4.7,
+      "stockQuantity": 12,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "2a339fb2-f9f3-43bc-a85a-b217a0a38f12",
+      "name": "Lenskart Air Classic",
+      "price": 3999,
+      "rating": 4.3,
+      "stockQuantity": 35,
+      "category": "frames"
+    },
+    {
+      "productId": "8a8391b2-b4ac-4847-b652-66ffd8d65875",
+      "name": "Specsmakers Unisex",
+      "price": 2999,
+      "rating": 4.1,
+      "stockQuantity": 45,
+      "category": "frames"
+    },
+    {
+      "productId": "be2157fb-7454-405e-9511-bf7ba81b7726",
+      "name": "Persol PO3015S",
+      "price": 18999,
+      "rating": 4.8,
+      "stockQuantity": 8,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "fdf1ba3d-fa06-4ce5-90ff-d081c5d37176",
+      "name": "Maui Jim MJ 429",
+      "price": 16999,
+      "rating": 4.7,
+      "stockQuantity": 15,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "afded6df-058f-477d-9878-e0e0b1d3dff3",
+      "name": "Warby Parker Percey",
+      "price": 9999,
+      "rating": 4.6,
+      "stockQuantity": 25,
+      "category": "frames"
+    },
+    {
+      "productId": "daa29167-82a7-474b-9687-b8b903e7ec69",
+      "name": "Oliver Peoples OV5398",
+      "price": 21999,
+      "rating": 4.9,
+      "stockQuantity": 5,
+      "category": "frames"
+    },
+    {
+      "productId": "ccb83982-71f3-4497-bad8-7e64c6920dc6",
+      "name": "Titan Eyeplus Classic",
+      "price": 3499,
+      "rating": 4.2,
+      "stockQuantity": 30,
+      "category": "frames"
+    },
+    {
+      "productId": "1936d406-e89e-40e4-bff7-1827532269d4",
+      "name": "Prada PR 16YS",
+      "price": 27999,
+      "rating": 4.9,
+      "stockQuantity": 7,
+      "category": "sunglasses"
+    },
+    {
+      "productId": "c849a535-5f8b-47e3-889c-015693a644ac",
+      "name": "Bottega Veneta BV 3016",
+      "price": 25999,
+      "rating": 4.8,
+      "stockQuantity": 6,
+      "category": "frames"
+    },
+    {
+      "productId": "0c3e80ee-59b3-4fc4-b760-8b07acc2d3ae",
+      "name": "GKB Optical Basic",
+      "price": 1499,
+      "rating": 3.9,
+      "stockQuantity": 60,
+      "category": "frames"
+    },
+    {
+      "productId": "d8f5bee3-f3eb-4071-a124-6b857e0fd798",
+      "name": "Burberry BE 3026",
+      "price": 22999,
+      "rating": 4.8,
+      "stockQuantity": 8,
+      "category": "frames"
+    },
+    {
+      "productId": "8d15de86-0e4a-4414-9166-7a33610202d3",
+      "name": "EyeMo Trendy",
+      "price": 1999,
+      "rating": 4.0,
+      "stockQuantity": 55,
+      "category": "frames"
+    },
+    {
+      "productId": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
+      "name": "Zeiss Single Vision Lens",
+      "price": 4999,
+      "rating": 4.7,
+      "stockQuantity": 100,
+      "category": "lenses"
+    },
+    {
+      "productId": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+      "name": "Essilor Progressive Lens",
+      "price": 8999,
+      "rating": 4.8,
+      "stockQuantity": 75,
+      "category": "lenses"
+    },
+    {
+      "productId": "d3e4f5g6-h7i8-j9k0-l1m2-n3o4p5q6r7s8",
+      "name": "Blue Light Blocking Lens",
+      "price": 2999,
+      "rating": 4.5,
+      "stockQuantity": 150,
+      "category": "lenses"
+    },
+    {
+      "productId": "e4f5g6h7-i8j9-k0l1-m2n3-o4p5q6r7s8t9",
+      "name": "Transitions Photochromic Lens",
+      "price": 6999,
+      "rating": 4.6,
+      "stockQuantity": 80,
+      "category": "lenses"
+    },
+    {
+      "productId": "f5g6h7i8-j9k0-l1m2-n3o4-p5q6r7s8t9u0",
+      "name": "Lens Cleaning Kit",
+      "price": 499,
+      "rating": 4.3,
+      "stockQuantity": 200,
+      "category": "accessories"
+    },
+    {
+      "productId": "g6h7i8j9-k0l1-m2n3-o4p5-q6r7s8t9u0v1",
+      "name": "Premium Microfiber Cloth",
+      "price": 299,
+      "rating": 4.4,
+      "stockQuantity": 300,
+      "category": "accessories"
+    },
+    {
+      "productId": "h7i8j9k0-l1m2-n3o4-p5q6-r7s8t9u0v1w2",
+      "name": "Designer Case - Leather",
+      "price": 1499,
+      "rating": 4.7,
+      "stockQuantity": 50,
+      "category": "accessories"
+    },
+    {
+      "productId": "i8j9k0l1-m2n3-o4p5-q6r7-s8t9u0v1w2x3",
+      "name": "Lens Cleaning Spray",
+      "price": 399,
+      "rating": 4.2,
+      "stockQuantity": 150,
+      "category": "accessories"
+    },
+    {
+      "productId": "j9k0l1m2-n3o4-p5q6-r7s8-t9u0v1w2x3y4",
+      "name": "Vogue VO 5120",
+      "price": 7999,
+      "rating": 4.6,
+      "stockQuantity": 25,
+      "category": "frames"
+    },
+    {
+      "productId": "k0l1m2n3-o4p5-q6r7-s8t9-u0v1w2x3y4z5",
+      "name": "IDEE IF 1001",
+      "price": 5999,
+      "rating": 4.4,
+      "stockQuantity": 35,
+      "category": "frames"
+    }
+]

@@ -1,0 +1,112 @@
+[
+  {
+    "saleId": "d35623ee-bef6-42b2-8776-2f99f8bb4782",
+    "productId": "d35623ee-bef6-42b2-8776-2f99f8bb4782",
+    "customerId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "quantity": 2,
+    "unitPrice": 12999.00,
+    "totalAmount": 25998.00,
+    "timestamp": "2024-03-15T10:30:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "8ac1ac77-7358-425e-be16-0bdde9f02e59",
+    "productId": "8ac1ac77-7358-425e-be16-0bdde9f02e59",
+    "customerId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "quantity": 1,
+    "unitPrice": 14999.00,
+    "totalAmount": 14999.00,
+    "timestamp": "2024-03-15T11:45:00Z",
+    "paymentMethod": "CASH",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
+    "productId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
+    "customerId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "quantity": 3,
+    "unitPrice": 1999.00,
+    "totalAmount": 5997.00,
+    "timestamp": "2024-03-15T14:20:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "af84cc12-4fea-4f58-aece-f2ce92ca9580",
+    "productId": "af84cc12-4fea-4f58-aece-f2ce92ca9580",
+    "customerId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "quantity": 1,
+    "unitPrice": 8999.00,
+    "totalAmount": 8999.00,
+    "timestamp": "2024-03-15T15:30:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "86e3bb1c-2f5d-4774-98f3-4df7cddd0a0f",
+    "productId": "86e3bb1c-2f5d-4774-98f3-4df7cddd0a0f",
+    "customerId": "22c29051-d301-4cc2-86dd-c19695408adb",
+    "quantity": 2,
+    "unitPrice": 7999.00,
+    "totalAmount": 15998.00,
+    "timestamp": "2024-03-15T16:45:00Z",
+    "paymentMethod": "CASH",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "26b017c6-06d8-443f-9b4a-d6b1cee6f4c0",
+    "productId": "26b017c6-06d8-443f-9b4a-d6b1cee6f4c0",
+    "customerId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "quantity": 4,
+    "unitPrice": 2499.00,
+    "totalAmount": 9996.00,
+    "timestamp": "2024-03-15T17:20:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "440c9e80-6bf8-4eb3-b2d2-f81936d67de3",
+    "productId": "440c9e80-6bf8-4eb3-b2d2-f81936d67de3",
+    "customerId": "552c1c73-e324-47ee-bf7f-b0dfbeb59788",
+    "quantity": 1,
+    "unitPrice": 24999.00,
+    "totalAmount": 24999.00,
+    "timestamp": "2024-03-15T18:10:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "98255f4e-40a6-470f-89a5-0792729f8947",
+    "productId": "98255f4e-40a6-470f-89a5-0792729f8947",
+    "customerId": "962c8a6b-c914-4aa4-93bc-2b91188a1a58",
+    "quantity": 2,
+    "unitPrice": 15999.00,
+    "totalAmount": 31998.00,
+    "timestamp": "2024-03-15T19:30:00Z",
+    "paymentMethod": "CASH",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "2a339fb2-f9f3-43bc-a85a-b217a0a38f12",
+    "productId": "2a339fb2-f9f3-43bc-a85a-b217a0a38f12",
+    "customerId": "35393a7a-f41b-4fe9-8901-fc39a8f803d6",
+    "quantity": 3,
+    "unitPrice": 3999.00,
+    "totalAmount": 11997.00,
+    "timestamp": "2024-03-15T20:15:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  },
+  {
+    "saleId": "8a8391b2-b4ac-4847-b652-66ffd8d65875",
+    "productId": "8a8391b2-b4ac-4847-b652-66ffd8d65875",
+    "customerId": "9cf146a9-3da9-47fe-bcc3-3abdeb3a375d",
+    "quantity": 5,
+    "unitPrice": 2999.00,
+    "totalAmount": 14995.00,
+    "timestamp": "2024-03-15T21:00:00Z",
+    "paymentMethod": "CARD",
+    "status": "COMPLETED"
+  }
+]

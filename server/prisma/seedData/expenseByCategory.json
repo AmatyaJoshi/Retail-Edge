@@ -1,0 +1,114 @@
+[
+    {
+      "expenseByCategoryId": "b1c2d3e4-f5g6-h7i8-j9k0-l1m2n3o4p5q6",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Staff Salaries",
+      "amount": 450000,
+      "percentage": 45
+    },
+    {
+      "expenseByCategoryId": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Rent & Utilities",
+      "amount": 85000,
+      "percentage": 8.5
+    },
+    {
+      "expenseByCategoryId": "d3e4f5g6-h7i8-j9k0-l1m2-n3o4p5q6r7s8",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Inventory",
+      "amount": 250000,
+      "percentage": 25
+    },
+    {
+      "expenseByCategoryId": "e4f5g6h7-i8j9-k0l1-m2n3-o4p5q6r7s8t9",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Equipment & Maintenance",
+      "amount": 35000,
+      "percentage": 3.5
+    },
+    {
+      "expenseByCategoryId": "f5g6h7i8-j9k0-l1m2-n3o4-p5q6r7s8t9u0",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Marketing & Advertising",
+      "amount": 40000,
+      "percentage": 4
+    },
+    {
+      "expenseByCategoryId": "g6h7i8j9-k0l1-m2n3-o4p5-q6r7s8t9u0v1",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Professional Services",
+      "amount": 25000,
+      "percentage": 2.5
+    },
+    {
+      "expenseByCategoryId": "h7i8j9k0-l1m2-n3o4-p5q6-r7s8t9u0v1w2",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Insurance & Security",
+      "amount": 15000,
+      "percentage": 1.5
+    },
+    {
+      "expenseByCategoryId": "i8j9k0l1-m2n3-o4p5-q6r7-s8t9u0v1w2x3",
+      "expenseSummaryId": "e1f2g3h4-i5j6-k7l8-m9n0-o1p2q3r4s5t6",
+      "category": "Store Maintenance",
+      "amount": 20000,
+      "percentage": 2
+    },
+    {
+      "expenseByCategoryId": "j9k0l1m2-n3o4-p5q6-r7s8-t9u0v1w2x3y4",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Staff Salaries",
+      "amount": 450000,
+      "percentage": 47.37
+    },
+    {
+      "expenseByCategoryId": "k0l1m2n3-o4p5-q6r7-s8t9-u0v1w2x3y4z5",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Rent & Utilities",
+      "amount": 85000,
+      "percentage": 8.95
+    },
+    {
+      "expenseByCategoryId": "l1m2n3o4-p5q6-r7s8-t9u0-v1w2x3y4z5a6",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Inventory",
+      "amount": 275000,
+      "percentage": 28.95
+    },
+    {
+      "expenseByCategoryId": "m2n3o4p5-q6r7-s8t9-u0v1-w2x3y4z5a6b7",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Equipment & Maintenance",
+      "amount": 30000,
+      "percentage": 3.16
+    },
+    {
+      "expenseByCategoryId": "n3o4p5q6-r7s8-t9u0-v1w2-x3y4z5a6b7c8",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Marketing & Advertising",
+      "amount": 45000,
+      "percentage": 4.74
+    },
+    {
+      "expenseByCategoryId": "o4p5q6r7-s8t9-u0v1-w2x3-y4z5a6b7c8d9",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Professional Services",
+      "amount": 25000,
+      "percentage": 2.63
+    },
+    {
+      "expenseByCategoryId": "p5q6r7s8-t9u0-v1w2-x3y4-z5a6b7c8d9e0",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Insurance & Security",
+      "amount": 15000,
+      "percentage": 1.58
+    },
+    {
+      "expenseByCategoryId": "q6r7s8t9-u0v1-w2x3-y4z5-a6b7c8d9e0f1",
+      "expenseSummaryId": "f2g3h4i5-j6k7-l8m9-n0o1-p2q3r4s5t6u7",
+      "category": "Store Maintenance",
+      "amount": 20000,
+      "percentage": 2.11
+    }
+  ]

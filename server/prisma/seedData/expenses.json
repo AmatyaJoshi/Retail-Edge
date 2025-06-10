@@ -1,0 +1,98 @@
+[
+    {
+      "expenseId": "5c1121d7-20c8-4890-81c0-949bd60523a3",
+      "category": "Staff Salaries",
+      "amount": 450000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "4529aaef-39d0-4188-9256-8c8fd5bad7ca",
+      "category": "Rent & Utilities",
+      "amount": 85000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "fca4f2d0-c3d7-4246-a04e-626ab4045c40",
+      "category": "Inventory",
+      "amount": 250000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "34de9517-153e-4505-9af8-dc8440e28dd9",
+      "category": "Equipment & Maintenance",
+      "amount": 35000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "c21c08e8-51b9-40f1-be37-b5116cd8d174",
+      "category": "Marketing & Advertising",
+      "amount": 40000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "fb2dba2d-c186-4165-ab7d-66ce276041a4",
+      "category": "Professional Services",
+      "amount": 25000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "ba5ded78-639c-46ce-80bf-7d50642a1438",
+      "category": "Insurance & Security",
+      "amount": 15000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "c2f642b5-399b-48d7-9deb-e6a4eed0b9fa",
+      "category": "Store Maintenance",
+      "amount": 20000,
+      "timestamp": "2024-03-01T00:00:00Z"
+    },
+    {
+      "expenseId": "fc8b38d8-388a-4898-9ca5-b942bbbec035",
+      "category": "Staff Salaries",
+      "amount": 450000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "36764f05-d204-4f71-bbd3-9d0263ea6863",
+      "category": "Rent & Utilities",
+      "amount": 85000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "39e86828-36f4-4282-9599-bc4c42bae3a1",
+      "category": "Inventory",
+      "amount": 275000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "66a3d687-05b0-4796-9b09-14941aa73031",
+      "category": "Equipment & Maintenance",
+      "amount": 30000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "cfbd98f2-c6ed-4bcc-b604-f3d330c5f31e",
+      "category": "Marketing & Advertising",
+      "amount": 45000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "c68ccd7e-601c-4b09-b76f-c5a19308e526",
+      "category": "Professional Services",
+      "amount": 25000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "3f19431c-3403-468b-9421-c9f54d466052",
+      "category": "Insurance & Security",
+      "amount": 15000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    },
+    {
+      "expenseId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+      "category": "Store Maintenance",
+      "amount": 20000,
+      "timestamp": "2024-02-01T00:00:00Z"
+    }
+]
