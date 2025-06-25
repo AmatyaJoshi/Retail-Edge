@@ -1,79 +1,62 @@
-import { JSX } from "@emotion/react/jsx-runtime";
-import { LucideIcon } from "lucide-react";
-import React from "react";
+import { TrendingUp, TrendingDown, AlertCircle, ShoppingCart, Users, Package, Repeat, Clock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { DateRange } from "react-day-picker";
 
-type StatDetail = {
-  title: string;
-  amount: string;
-  changePercentage: number;
-  IconComponent: LucideIcon;
+const formatIndianNumber = (num: number) => {
+  if (num >= 10000000) {
+    return `₹${(num / 10000000).toFixed(2)} Cr`;
+  } else if (num >= 100000) {
+    return `₹${(num / 100000).toFixed(2)} L`;
+  } else if (num >= 1000) {
+    return `₹${(num / 1000).toFixed(1)}k`;
+  }
+  return `₹${num}`;
 };
 
-type StatCardProps = {
+interface StatCardProps {
   title: string;
-  primaryIcon: JSX.Element;
-  details: StatDetail[];
-  dateRange: string;
+  value: string | number;
+  description: string;
+  icon: "trending-up" | "trending-down" | "alert-circle" | "shopping-cart" | "users" | "package" | "repeat" | "clock";
+  dateRange?: DateRange;
+}
+
+const iconMap = {
+  "trending-up": TrendingUp,
+  "trending-down": TrendingDown,
+  "alert-circle": AlertCircle,
+  "shopping-cart": ShoppingCart,
+  "users": Users,
+  "package": Package,
+  "repeat": Repeat,
+  "clock": Clock,
 };
 
-const StatCard = ({
-  title,
-  primaryIcon,
-  details,
-  dateRange,
-}: StatCardProps) => {
-  const formatPercentage = (value: number) => {
-    const signal = value >= 0 ? "+" : "";
-    return `${signal}${value.toFixed()}%`;
-  };
-
-  const getChangeColor = (value: number) =>
-    value >= 0 ? "text-green-500" : "text-red-500";
+const StatCard = ({ title, value, description, icon, dateRange }: StatCardProps) => {
+  const Icon = iconMap[icon];
+  const isPositive = description.includes("+");
+  const isNegative = description.includes("-");
 
   return (
-    <div className="md:row-span-1 xl:row-span-2 bg-white dark:bg-gray-800 col-span-1 shadow-md rounded-2xl flex flex-col justify-between">
-      {/* HEADER */}
-      <div>
-        <div className="flex justify-between items-center mb-2 px-5 pt-4">
-          <h2 className="font-semibold text-lg text-gray-700 dark:text-gray-200">{title}</h2>
-          <span className="text-xs text-gray-400 dark:text-gray-500">{dateRange}</span>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold mb-1">
+          {typeof value === "number" ? formatIndianNumber(value) : value}
         </div>
-        <hr className="border-gray-200 dark:border-gray-700" />
-      </div>
-
-      {/* BODY */}
-      <div className="flex mb-6 items-center justify-around gap-4 px-5">
-        <div className="rounded-full p-5 bg-blue-50 dark:bg-blue-900/20 border-sky-300 dark:border-sky-700 border-[1px]">
-          {primaryIcon}
-        </div>
-        <div className="flex-1">
-          {details.map((detail, index) => (
-            <React.Fragment key={index}>
-              <div className="flex items-center justify-between my-4">
-                <span className="text-gray-500 dark:text-gray-400">{detail.title}</span>
-                <span className="font-bold text-gray-800 dark:text-gray-200">{detail.amount}</span>
-                <div className="flex items-center">
-                  <detail.IconComponent
-                    className={`w-4 h-4 mr-1 ${getChangeColor(
-                      detail.changePercentage
-                    )}`}
-                  />
-
-                  <span
-                    className={`font-medium ${getChangeColor(
-                      detail.changePercentage
-                    )}`}
-                  >
-                    {formatPercentage(detail.changePercentage)}
-                  </span>
-                </div>
-              </div>
-              {index < details.length - 1 && <hr className="border-gray-200 dark:border-gray-700" />}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-    </div>
+        <p className={`text-xs ${isPositive ? "text-green-500" : isNegative ? "text-red-500" : "text-muted-foreground"}`}>
+          {description}
+        </p>
+        {dateRange?.from && dateRange?.to && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {dateRange.from.toLocaleDateString()} - {dateRange.to.toLocaleDateString()}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

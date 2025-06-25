@@ -30,31 +30,12 @@ export interface Product {
     email?: string;
     address?: string;
     notes?: string;
-    prescription?: Prescription;
+    prescription?: import('./prescriptions').Prescription;
     loyaltyPoints?: number;
     lastVisit?: string;
     joinedDate: string;
   }
-  
-  export interface Prescription {
-    id: string;
-    customerId: string;
-    date: string;
-    expiryDate: string;
-    rightEye: EyePrescription;
-    leftEye: EyePrescription;
-    doctor: string;
-    notes?: string;
-  }
-  
-  export interface EyePrescription {
-    sphere: number;
-    cylinder?: number;
-    axis?: number;
-    add?: number;
-    pd?: number;
-  }
-  
+    // Prescription types moved to types/prescriptions.ts
   export interface Sale {
     id: string;
     invoiceNumber: string;

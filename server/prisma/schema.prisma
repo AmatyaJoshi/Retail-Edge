@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,11 +8,11 @@ datasource db {
 }
 
 model Customers {
-  customerId String @id @map("userId")
-  name   String
-  email  String? @unique
-  phone  String
-  joinedDate DateTime
+  customerId    String          @id @map("userId")
+  name          String
+  email         String?         @unique
+  phone         String
+  joinedDate    DateTime
   prescriptions Prescriptions[]
   sales         Sales[]
 
@@ -26,47 +20,47 @@ model Customers {
 }
 
 model Prescriptions {
-  id          String   @id @default(uuid())
-  userId      String
-  date        DateTime
-  expiryDate  DateTime
-  rightEye    Json
-  leftEye     Json
-  doctor      String
-  notes       String?
-  customer    Customers    @relation(fields: [userId], references: [customerId])
+  id         String    @id @default(uuid())
+  userId     String
+  date       DateTime
+  expiryDate DateTime
+  rightEye   Json
+  leftEye    Json
+  doctor     String
+  notes      String?
+  customer   Customers @relation(fields: [userId], references: [customerId])
 
   @@map("Prescriptions")
 }
 
 model Products {
-  productId     String      @id
-  name          String @unique
-  price         Float
-  rating        Float?
-  stockQuantity Int
-  category      String
-  brand         String?
-  sku           String? @unique
-  description   String?
-  imageUrl      String?
-  Sales         Sales[]
-  Purchases     Purchases[]
+  productId      String          @id
+  name           String          @unique
+  price          Float
+  rating         Float?
+  stockQuantity  Int
+  category       String
+  brand          String?
+  sku            String?         @unique
+  description    String?
+  imageUrl       String?
   purchaseOrders PurchaseOrder[]
+  Purchases      Purchases[]
+  Sales          Sales[]
 }
 
 model Sales {
-  saleId      String   @id
-  productId   String
-  customerId  String?
-  timestamp   DateTime
-  quantity    Int
-  unitPrice   Float
-  totalAmount Float
-  paymentMethod String @default("CARD")
-  status      String   @default("COMPLETED")
-  product     Products @relation(fields: [productId], references: [productId])
-  customer    Customers?   @relation(fields: [customerId], references: [customerId])
+  saleId        String     @id
+  productId     String
+  customerId    String?
+  timestamp     DateTime
+  quantity      Int
+  unitPrice     Float
+  totalAmount   Float
+  paymentMethod String     @default("CARD")
+  status        String     @default("COMPLETED")
+  customer      Customers? @relation(fields: [customerId], references: [customerId])
+  product       Products   @relation(fields: [productId], references: [productId])
 }
 
 model Purchases {
@@ -80,11 +74,93 @@ model Purchases {
 }
 
 model Expenses {
-  expenseId   String   @id
-  category    String
-  amount      Float
-  timestamp   DateTime
-  description String?
+  expenseId        String               @id
+  categoryId       String               
+  amount           Float
+  timestamp        DateTime
+  description      String?
+  status           String               @default("approved")
+  vendor           String?              @default("Unknown Vendor")
+  dueDate          DateTime?
+  paymentStatus    String               @default("PENDING")  
+  paidAmount       Float                @default(0)
+  lastPaymentDate  DateTime?
+  transactionType  String               @default("ON_DEMAND") 
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  transactions     ExpenseTransactions[] @relation("ExpenseTransactions")
+  allocations      BudgetAllocations[]
+  category         ExpenseCategories    @relation(fields: [categoryId], references: [categoryId])
+}
+
+
+model ExpenseCategories {
+  categoryId       String              @id
+  name             String
+  description      String?
+  isActive         Boolean             @default(true)
+  displayOrder     Int                 @default(0) 
+  color            String?             
+  icon             String?             
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  expenses         Expenses[]
+  
+  @@map("ExpenseCategories")
+}
+
+model ExpenseTransactions {
+  expenseTransactionId String     @id @default(uuid())
+  expenseId     String
+  type          String     @default("EXPENSE")
+  amount        Float
+  paymentMethod String     
+  reference     String?    
+  status        String     @default("COMPLETED")
+  date          DateTime
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  transactionType String?
+  categoryId    String?
+  expense       Expenses   @relation("ExpenseTransactions", fields: [expenseId], references: [expenseId], onDelete: Cascade)
+}
+
+model Budgets {
+  budgetId          String              @id
+  categoryId        String
+  name              String
+  description       String?
+  amount            Float
+  period            String              
+  startDate         DateTime
+  endDate           DateTime
+  fiscalYear        Int
+  status            String              @default("ACTIVE")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  allocations       BudgetAllocations[]
+  
+  @@map("Budgets")
+}
+
+model BudgetAllocations {
+  allocationId      String              @id
+  budgetId          String
+  expenseId         String
+  amount            Float
+  status            String              @default("PENDING") 
+  allocatedAt       DateTime
+  directPayment     Boolean             @default(false)     
+  paymentMethod     String?                                 
+  paymentReference  String?                                 
+  notes             String?                                 
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  budget            Budgets             @relation(fields: [budgetId], references: [budgetId])
+  expense           Expenses            @relation(fields: [expenseId], references: [expenseId])
+  
+  @@map("BudgetAllocations")
 }
 
 model SalesSummary {
@@ -101,50 +177,155 @@ model PurchaseSummary {
   date              DateTime
 }
 
-model ExpenseSummary {
-  expenseSummaryId  String              @id
-  totalExpenses     Float
-  date              DateTime
-  ExpenseByCategory ExpenseByCategory[]
-}
-
-model ExpenseByCategory {
-  expenseByCategoryId String         @id
-  expenseSummaryId    String
-  category            String
-  amount              BigInt
-  date                DateTime
-  expenseSummary      ExpenseSummary @relation(fields: [expenseSummaryId], references: [expenseSummaryId])
-}
-
 model PurchaseOrder {
-  id                  String    @id @default(uuid())
-  productId          String
-  product            Products   @relation(fields: [productId], references: [productId])
-  quantity           Int
-  supplier           String
+  id                   String     @id @default(uuid())
+  productId            String
+  quantity             Int
   expectedDeliveryDate DateTime
-  status             String    @default("PENDING") // PENDING, ORDERED, RECEIVED, CANCELLED
-  notes              String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  status               String     @default("PENDING")
+  notes                String?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  associateId          String
+  associate            Associates @relation(fields: [associateId], references: [associateId])
+  product              Products   @relation(fields: [productId], references: [productId])
 }
 
 model Persona {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("USER")
-  firebaseUid String? @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        String   @default("USER")
+  firebaseUid String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
+
+model Associates {
+  associateId    String                   @id @default(cuid())
+  type           PartnerType
+  name           String
+  contactPerson  String?
+  email          String?
+  phone          String?
+  address        String?
+  gstNumber      String?
+  panNumber      String?
+  creditLimit    Float?
+  currentBalance Float                    @default(0)
+  status         AssociateStatus          @default(ACTIVE)
+  notes          String?
+  joinedDate     DateTime                 @default(now())
+  paymentTerms   String?
+  updatedAt      DateTime                 @updatedAt
+  communications AssociateCommunication[]
+  contacts       AssociateContact[]
+  transactions   AssociateTransactions[]  @relation("AssociateTransactions")
+  contracts      Contract[]
+  documents      Document[]               @relation("AssociateDocuments")
+  purchaseOrders PurchaseOrder[]
+
+  @@map("Associates")
+}
+
+model AssociateTransactions {
+  id          String            @id @default(uuid())
+  associateId String
+  type        TransactionType
+  amount      Float
+  status      TransactionStatus @default(PENDING)
+  date        DateTime
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  associate   Associates        @relation("AssociateTransactions", fields: [associateId], references: [associateId], onDelete: Cascade)
+
+  @@map("AssociateTransactions")
+}
+
+model AssociateContact {
+  id          String     @id @default(cuid())
+  associateId String
+  name        String
+  role        String
+  email       String?
+  phone       String?
+  isPrimary   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  associate   Associates @relation(fields: [associateId], references: [associateId], onDelete: Cascade)
+
+  @@map("AssociateContacts")
+}
+
+model Contract {
+  id               String     @id @default(uuid())
+  associateId      String
+  startDate        DateTime
+  endDate          DateTime?
+  contractDuration String?
+  status           String     @default("ACTIVE")
+  notes            String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  associate        Associates @relation(fields: [associateId], references: [associateId], onDelete: Cascade)
+  documents        Document[]
+
+  @@map("Contracts")
+}
+
+model Document {
+  id          String      @id @default(uuid())
+  contractId  String?
+  associateId String?
+  name        String
+  url         String
+  fileType    String
+  category    String?
+  uploadDate  DateTime    @default(now())
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime   @updatedAt
+  associate   Associates? @relation("AssociateDocuments", fields: [associateId], references: [associateId])
+  contract    Contract?   @relation(fields: [contractId], references: [id])
+
+  @@map("Documents")
+}
+
+model AssociateCommunication {
+  id          String            @id @default(cuid())
+  associateId String
+  type        CommunicationType
+  subject     String
+  content     String
+  date        DateTime
+  createdBy   String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  associate   Associates        @relation(fields: [associateId], references: [associateId], onDelete: Cascade)
+
+  @@map("AssociateCommunications")
+}
+
+
 
 enum PartnerType {
   SUPPLIER
   BUYER
   BOTH
+}
+
+enum AssociateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TransactionType {
+  PURCHASE
+  SALE
+  CREDIT_NOTE
+  DEBIT_NOTE
 }
 
 enum TransactionStatus {
@@ -154,77 +335,20 @@ enum TransactionStatus {
 }
 
 enum CommunicationType {
-  EMAIL
   MEETING
   CALL
+  EMAIL
   NOTE
 }
 
-model Associate {
-  id                String               @id @default(cuid())
-  type              PartnerType
-  name              String
-  email             String?
-  phone             String
-  address           String
-  taxId            String?
-  creditLimit      Float?               @default(0)
-  currentBalance   Float                @default(0)
-  joinedDate       DateTime             @default(now())
-  isActive         Boolean              @default(true)
-  notes            String?
-  transactions     AssociateTransaction[]
-  contacts        AssociateContact[]
-  communications  AssociateCommunication[]
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-
-  @@map("BusinessPartner") // Keep the old table name for data consistency
+enum Role {
+  USER
+  ADMIN
 }
 
-model AssociateTransaction {
-  id              String            @id @default(cuid())
-  partnerId       String
-  partner         Associate         @relation(fields: [partnerId], references: [id])
-  type            String            // "PURCHASE" or "SALE"
-  amount          Float
-  status          TransactionStatus @default(PENDING)
-  date            DateTime          @default(now())
-  dueDate         DateTime?
-  description     String?
-  reference       String?           // PO number, invoice number, etc.
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-
-  @@map("BusinessTransaction") // Keep the old table name for data consistency
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
 
-model AssociateContact {
-  id              String      @id @default(cuid())
-  associateId     String
-  associate       Associate   @relation(fields: [associateId], references: [id])
-  name            String
-  role            String
-  email           String?
-  phone           String?
-  isPrimary       Boolean     @default(false)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-
-  @@map("BusinessPartnerContact")
-}
-
-model AssociateCommunication {
-  id              String             @id @default(cuid())
-  associateId     String
-  associate       Associate          @relation(fields: [associateId], references: [id])
-  type            CommunicationType
-  subject         String
-  content         String
-  date            DateTime
-  createdBy       String            // Reference to the user who created this entry
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-
-  @@map("BusinessPartnerCommunication")
-}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Customer } from '../types';
+import { type Customer } from '../types';
 import { useGetCustomersQuery } from '@/state/api';
 import AddCustomerModal from './AddCustomerModal';
 import { Search, Plus, X } from 'lucide-react';

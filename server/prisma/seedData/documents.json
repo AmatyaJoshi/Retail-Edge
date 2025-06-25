@@ -1,0 +1,54 @@
+[
+  {
+    "id": "d1e2f3g4-h5i6-j7k8-l9m0-n1o2p3q4r5s6",
+    "contractId": "c1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+    "associateId": null,
+    "name": "Lenskart Wholesale Agreement 2023.pdf",
+    "url": "https://example.com/documents/lenskart_agreement_2023.pdf",
+    "fileType": "application/pdf",
+    "category": "Contract",
+    "uploadDate": "2023-01-05T10:00:00.000Z",
+    "notes": "Signed annual contract for Lenskart Wholesale.",
+    "createdAt": "2023-01-05T10:00:00.000Z",
+    "updatedAt": "2023-01-05T10:00:00.000Z"
+  },
+  {
+    "id": "d2f3g4h5-i6j7-k8l9-m0n1-o2p3q4r5s6t7",
+    "contractId": null,
+    "associateId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "name": "Titan Eye Plus KYC.jpg",
+    "url": "https://example.com/documents/titan_kyc.jpg",
+    "fileType": "image/jpeg",
+    "category": "KYC",
+    "uploadDate": "2023-03-10T11:30:00.000Z",
+    "notes": "KYC documents for Titan Eye Plus.",
+    "createdAt": "2023-03-10T11:30:00.000Z",
+    "updatedAt": "2023-03-10T11:30:00.000Z"
+  },
+  {
+    "id": "d3g4h5i6-j7k8-l9m0-n1o2-p3q4r5s6t7u8",
+    "contractId": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+    "associateId": null,
+    "name": "Titan Eye Plus Supply Agreement.pdf",
+    "url": "https://example.com/documents/titan_supply_agreement.pdf",
+    "fileType": "application/pdf",
+    "category": "Contract",
+    "uploadDate": "2023-03-05T14:00:00.000Z",
+    "notes": "Signed supply agreement.",
+    "createdAt": "2023-03-05T14:00:00.000Z",
+    "updatedAt": "2023-03-05T14:00:00.000Z"
+  },
+  {
+    "id": "d4h5i6j7-k8l9-m0n1-o2p3-q4r5s6t7u8v9",
+    "contractId": null,
+    "associateId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "name": "Lenskart Invoice #20230401.pdf",
+    "url": "https://example.com/documents/lenskart_invoice_20230401.pdf",
+    "fileType": "application/pdf",
+    "category": "Invoice",
+    "uploadDate": "2023-04-01T09:00:00.000Z",
+    "notes": "Invoice for April 2023 order.",
+    "createdAt": "2023-04-01T09:00:00.000Z",
+    "updatedAt": "2023-04-01T09:00:00.000Z"
+  }
+] 

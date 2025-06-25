@@ -7,8 +7,8 @@ const router = Router();
 const prisma = new PrismaClient();
 
 const transactionSchema = z.object({
-  partnerId: z.string().min(1),
-  type: z.enum(['PURCHASE', 'SALE']),
+  associateId: z.string().min(1),
+  type: z.enum(['PURCHASE', 'SALE', 'CREDIT_NOTE', 'DEBIT_NOTE']),
   amount: z.number().positive(),
   status: z.enum(['PENDING', 'COMPLETED', 'CANCELLED']).optional(),
   dueDate: z.string().datetime().optional(),
@@ -19,25 +19,20 @@ const transactionSchema = z.object({
 // Get all transactions
 router.get('/', async (req, res) => {
   try {
-    const partnerId = req.query.partnerId as string;
+    const associateId = req.query.associateId as string;
     const type = req.query.type as string;
     const status = req.query.status as string;
 
     const where: any = {
-      ...(partnerId ? { partnerId } : {}),
+      ...(associateId ? { associateId } : {}),
       ...(type ? { type } : {}),
       ...(status ? { status } : {}),
     };
 
-    const transactions = await prisma.associateTransaction.findMany({
+    const transactions = await prisma.associateTransactions.findMany({
       where,
       include: {
-        partner: {
-          select: {
-            name: true,
-            type: true,
-          },
-        },
+        associate: true
       },
       orderBy: { date: 'desc' },
     });
@@ -51,10 +46,10 @@ router.get('/', async (req, res) => {
 // Get single transaction
 router.get('/:id', async (req, res) => {
   try {
-    const transaction = await prisma.associateTransaction.findUnique({
+    const transaction = await prisma.associateTransactions.findUnique({
       where: { id: req.params.id },
       include: {
-        partner: true,
+        associate: true
       },
     });
 
@@ -70,13 +65,13 @@ router.get('/:id', async (req, res) => {
 
 // Create transaction
 router.post('/', validateRequest(transactionSchema), async (req, res) => {
-  const { partnerId, amount, type, ...rest } = req.body;
+  const { associateId, amount, type, ...rest } = req.body;
 
   try {
     // Start a transaction to update both the transaction and partner balance
     const result = await prisma.$transaction(async (tx) => {
-      const partner = await tx.associate.findUnique({
-        where: { id: partnerId },
+      const partner = await tx.associates.findUnique({
+        where: { associateId },
       });
 
       if (!partner) {
@@ -85,8 +80,8 @@ router.post('/', validateRequest(transactionSchema), async (req, res) => {
 
       // Update partner's balance
       const balanceChange = type === 'SALE' ? amount : -amount;
-      await tx.associate.update({
-        where: { id: partnerId },
+      await tx.associates.update({
+        where: { associateId },
         data: {
           currentBalance: {
             increment: balanceChange,
@@ -95,9 +90,9 @@ router.post('/', validateRequest(transactionSchema), async (req, res) => {
       });
 
       // Create the transaction
-      const transaction = await tx.associateTransaction.create({
+      const transaction = await tx.associateTransactions.create({
         data: {
-          partnerId,
+          associateId,
           amount,
           type,
           ...rest,
@@ -122,7 +117,7 @@ router.patch('/:id/status', async (req, res) => {
   }
 
   try {
-    const transaction = await prisma.associateTransaction.update({
+    const transaction = await prisma.associateTransactions.update({
       where: { id: req.params.id },
       data: { status },
     });

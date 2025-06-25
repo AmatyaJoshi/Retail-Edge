@@ -1,0 +1,68 @@
+[
+  {
+    "id": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "associateId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "type": "MEETING",
+    "subject": "New Collection Review",
+    "content": "Discussed upcoming summer collection and pricing strategy",
+    "date": "2023-01-15T10:00:00.000Z",
+    "createdBy": "admin",
+    "createdAt": "2023-01-15T10:00:00.000Z",
+    "updatedAt": "2023-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "associateId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "type": "EMAIL",
+    "subject": "Order Confirmation",
+    "content": "Confirmed order for 500 units of premium frames",
+    "date": "2023-02-10T11:30:00.000Z",
+    "createdBy": "admin",
+    "createdAt": "2023-02-10T11:30:00.000Z",
+    "updatedAt": "2023-02-10T11:30:00.000Z"
+  },
+  {
+    "id": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "associateId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "type": "CALL",
+    "subject": "Payment Follow-up",
+    "content": "Discussed pending payment for last month's order",
+    "date": "2023-03-05T09:45:00.000Z",
+    "createdBy": "admin",
+    "createdAt": "2023-03-05T09:45:00.000Z",
+    "updatedAt": "2023-03-05T09:45:00.000Z"
+  },
+  {
+    "id": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "associateId": "22c29051-d301-4cc2-86dd-c19695408adb",
+    "type": "NOTE",
+    "subject": "Quality Issue",
+    "content": "Reported quality issues with recent shipment",
+    "date": "2023-04-12T14:20:00.000Z",
+    "createdBy": "admin",
+    "createdAt": "2023-04-12T14:20:00.000Z",
+    "updatedAt": "2023-04-12T14:20:00.000Z"
+  },
+  {
+    "id": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "associateId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "type": "MEETING",
+    "subject": "Contract Renewal",
+    "content": "Discussed terms for contract renewal",
+    "date": "2023-06-22T13:05:00.000Z",
+    "createdBy": "admin",
+    "createdAt": "2023-06-22T13:05:00.000Z",
+    "updatedAt": "2023-06-22T13:05:00.000Z"
+  },
+  {
+    "id": "552c1c73-e324-47ee-bf7f-b0dfbeb59788",
+    "associateId": "552c1c73-e324-47ee-bf7f-b0dfbeb59788",
+    "type": "EMAIL",
+    "subject": "Contract Renewal",
+    "content": "Sent contract renewal proposal",
+    "date": "2023-07-30T08:55:00.000Z",
+    "createdBy": "admin",
+    "createdAt": "2023-07-30T08:55:00.000Z",
+    "updatedAt": "2023-07-30T08:55:00.000Z"
+  }
+] 

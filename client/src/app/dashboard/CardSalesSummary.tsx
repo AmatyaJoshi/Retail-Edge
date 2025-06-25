@@ -1,155 +1,126 @@
 import { useGetDashboardMetricsQuery } from "@/state/api";
-import { TrendingUp } from "lucide-react";
-import React, { useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+
+const formatIndianNumber = (num: number) => {
+  if (num >= 10000000) {
+    return `₹${(num / 10000000).toFixed(2)} Cr`;
+  } else if (num >= 100000) {
+    return `₹${(num / 100000).toFixed(2)} L`;
+  } else if (num >= 1000) {
+    return `₹${(num / 1000).toFixed(1)}k`;
+  }
+  return `₹${num}`;
+};
 
 const CardSalesSummary = () => {
-  const { data, isLoading, isError } = useGetDashboardMetricsQuery();
-  const salesData = data?.salesSummary || [];
+  const { data, isLoading, error } = useGetDashboardMetricsQuery();
+  const [showPrediction, setShowPrediction] = useState(false);
 
-  const [timeframe, setTimeframe] = useState("weekly");
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px]">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  const totalValueSum =
-    salesData.reduce((acc, curr) => acc + curr.totalValue, 0) || 0;
+  if (error) {
+    return (
+      <Card>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px] text-red-500">Error loading data</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  const averageChangePercentage =
-    salesData.reduce((acc, curr, _, array) => {
-      return acc + curr.changePercentage! / array.length;
-    }, 0) || 0;
+  const salesSummary = data?.salesSummary || [];
+  const totalSales = salesSummary.reduce((sum, item) => sum + item.totalValue, 0);
+  const averageChange = salesSummary.reduce((sum, item) => sum + item.changePercentage, 0) / salesSummary.length;
+  const highestSales = salesSummary.reduce((max, item) => (item.totalValue > max.totalValue ? item : max), salesSummary[0] || { totalValue: 0, orderCount: 0, customerCount: 0 });
 
-  const highestValueData = salesData.reduce((acc, curr) => {
-    return acc.totalValue > curr.totalValue ? acc : curr;
-  }, salesData[0] || {});
+  const chartData = salesSummary.map((item) => ({
+    date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    value: item.totalValue,
+    orderCount: item.orderCount,
+    customerCount: item.customerCount,
+    changePercentage: item.changePercentage,
+  }));
 
-  const highestValueDate = highestValueData.date
-    ? new Date(highestValueData.date).toLocaleDateString("en-US", {
-      month: "numeric",
-      day: "numeric",
-      year: "2-digit",
-    })
-    : "N/A";
-
-  if (isError) {
-    return <div className="m-5">Failed to fetch data</div>;
+  if (showPrediction && highestSales) {
+    chartData.push({
+      date: "Tomorrow",
+      value: highestSales.totalValue * 1.1,
+      orderCount: highestSales.orderCount,
+      customerCount: highestSales.customerCount,
+      changePercentage: 10,
+    });
   }
 
   return (
-    <div className="row-span-3 xl:row-span-6 bg-white dark:bg-gray-800 shadow-md rounded-2xl flex flex-col justify-between">
-      {isLoading ? (
-        <div className="m-5 text-gray-700 dark:text-gray-300">Loading...</div>
-      ) : (
-        <>
-          {/* HEADER */}
-          <div>
-            <h2 className="text-lg font-semibold mb-2 px-7 pt-5 text-gray-900 dark:text-gray-100">
-              Sales Summary
-            </h2>
-            <hr className="border-gray-200 dark:border-gray-700" />
+    <Card>
+      <CardContent className="flex flex-col h-full">
+        <div className="flex items-center justify-between mb-4">
+          <CardTitle>Sales Overview</CardTitle>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="prediction"
+              checked={showPrediction}
+              onCheckedChange={setShowPrediction}
+            />
+            <Label htmlFor="prediction">Show Prediction</Label>
           </div>
-
-          {/* BODY */}
-          <div>
-            {/* BODY HEADER */}
-            <div className="flex justify-between items-center mb-6 px-7 mt-5">
-              <div className="text-lg font-medium">
-                <p className="text-xs text-gray-400 dark:text-gray-500">Value</p>
-                <span className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
-                  ₹
-                  {(totalValueSum).toLocaleString("en", {
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-                <span className="text-green-500 text-sm ml-2">
-                  <TrendingUp className="inline w-4 h-4 mr-1" />
-                  {averageChangePercentage.toFixed(2)}%
-                </span>
-              </div>
-              <select
-                className="shadow-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-2 rounded text-gray-900 dark:text-gray-100"
-                value={timeframe}
-                onChange={(e) => {
-                  setTimeframe(e.target.value);
-                }}
-              >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
+        </div>
+        <div className="grid gap-4 flex-grow">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Total Sales</p>
+              <p className="text-2xl font-bold">{formatIndianNumber(totalSales)}</p>
             </div>
-            {/* CHART */}
-            <ResponsiveContainer width="100%" height={350} className="px-7">
-              <BarChart
-                data={salesData}
-                margin={{ top: 0, right: 0, left: -25, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="" vertical={false} stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    return `${date.getMonth() + 1}/${date.getDate()}`;
-                  }}
-                  stroke="#6b7280"
-                />
+          <div>
+              <p className="text-sm font-medium text-muted-foreground">Average Change</p>
+              <p className="text-2xl font-bold">{averageChange.toFixed(1)}%</p>
+              </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Highest Sales</p>
+              <p className="text-2xl font-bold">{formatIndianNumber(highestSales.totalValue)}</p>
+            </div>
+          </div>
+          <div>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" interval="preserveStartEnd" angle={-45} textAnchor="end" height={60} />
                 <YAxis
-                  tickFormatter={(value) => {
-                    return `₹${(value / 1000)}k`;
-                  }}
-                  tick={{ fontSize: 12, dx: -1 }}
-                  tickLine={false}
+                  tickFormatter={(value) => formatIndianNumber(value)}
                   axisLine={false}
-                  stroke="#6b7280"
+                  tickLine={false}
+                  width={80}
                 />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--bg-color)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '0.5rem',
-                  }}
-                  formatter={(value: number) => [
-                    `$${value.toLocaleString("en")}`,
-                  ]}
-                  labelFormatter={(label) => {
-                    const date = new Date(label);
-                    return date.toLocaleDateString("en-IN", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    });
-                  }}
+                  formatter={(value: number) => [formatIndianNumber(value), "Sales"]}
                 />
-                <Bar
-                  dataKey="totalValue"
-                  fill="#3182ce"
-                  barSize={10}
-                  radius={[10, 10, 0, 0]}
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#8884d8"
+                  strokeWidth={3}
+                  dot={false}
+                  name="Sales"
                 />
-              </BarChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
-
-          {/* FOOTER */}
-          <div>
-            <hr className="border-gray-200 dark:border-gray-700" />
-            <div className="flex justify-between items-center mt-6 text-sm px-7 mb-4 text-gray-600 dark:text-gray-400">
-              <p>{salesData.length || 0} days</p>
-              <p className="text-sm">
-                Highest Sales Date:{" "}
-                <span className="font-bold text-gray-900 dark:text-gray-100">{highestValueDate}</span>
-              </p>
             </div>
-          </div>
-        </>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,14 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import { EyePrescription, Prescription } from '../types';
+import type { EyePrescription, Prescription } from '../types/prescriptions';
 
 interface PrescriptionFormProps {
-  existingPrescription?: Prescription;
+  existingPrescription?: Prescription | undefined;
   customerId: string;
   onSave: (prescription: Prescription) => void;
   onCancel: () => void;
 }
+
+const formatDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getExpiryDate = (): string => {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() + 1); // Add 1 year
+  return formatDate(date);
+};
+
+const createEmptyEyePrescription = (): EyePrescription => ({
+  sphere: 0,
+  cylinder: undefined,
+  axis: undefined,
+  add: undefined,
+  pd: undefined
+});
 
 export default function PrescriptionForm({
   existingPrescription,
@@ -16,18 +37,22 @@ export default function PrescriptionForm({
   onSave,
   onCancel
 }: PrescriptionFormProps) {
-  const [prescription, setPrescription] = useState<Prescription>(
-    existingPrescription || {
+  const [prescription, setPrescription] = useState<Prescription>(() => {
+    if (existingPrescription) {
+      return existingPrescription;
+    }
+    
+    return {
       id: `rx-${Date.now()}`,
       customerId,
-      date: new Date().toISOString().split('T')[0],
-      expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      rightEye: { sphere: 0 },
-      leftEye: { sphere: 0 },
+      date: formatDate(new Date()),
+      expiryDate: getExpiryDate(),
+      rightEye: createEmptyEyePrescription(),
+      leftEye: createEmptyEyePrescription(),
       doctor: '',
       notes: ''
-    }
-  );
+    };
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -49,6 +74,19 @@ export default function PrescriptionForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!prescription.date || !prescription.expiryDate || !prescription.doctor) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Validate sphere values
+    if (typeof prescription.rightEye.sphere !== 'number' || typeof prescription.leftEye.sphere !== 'number') {
+      alert('Please enter sphere values for both eyes');
+      return;
+    }
+
     onSave(prescription);
   };
 
@@ -56,8 +94,8 @@ export default function PrescriptionForm({
     <div className="bg-white p-6 rounded shadow-lg max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Eye Prescription</h2>
       
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Date
@@ -86,7 +124,7 @@ export default function PrescriptionForm({
           </div>
         </div>
         
-        <div className="mb-4">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Doctor's Name
           </label>
@@ -101,9 +139,9 @@ export default function PrescriptionForm({
         </div>
         
         {/* Right Eye */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-2">Right Eye (OD)</h3>
-          <div className="grid grid-cols-5 gap-2">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="font-bold mb-4">Right Eye (OD)</h3>
+          <div className="grid grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Sphere
@@ -170,9 +208,9 @@ export default function PrescriptionForm({
         </div>
         
         {/* Left Eye */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-2">Left Eye (OS)</h3>
-          <div className="grid grid-cols-5 gap-2">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="font-bold mb-4">Left Eye (OS)</h3>
+          <div className="grid grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Sphere
@@ -238,13 +276,13 @@ export default function PrescriptionForm({
           </div>
         </div>
         
-        <div className="mb-6">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Notes
           </label>
           <textarea
             name="notes"
-            value={prescription.notes || ''}
+            value={prescription.notes}
             onChange={handleChange}
             className="w-full p-2 border rounded"
             rows={3}
@@ -255,13 +293,13 @@ export default function PrescriptionForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border rounded bg-white text-gray-700"
+            className="px-4 py-2 border rounded bg-white text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 rounded bg-blue-500 text-white"
+            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
           >
             Save Prescription
           </button>

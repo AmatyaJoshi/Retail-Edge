@@ -156,3 +156,55 @@ export const deleteCustomer = async (req: Request, res: Response): Promise<void>
     res.status(500).json({ message: "Error deleting customer" });
   }
 };
+
+export const getBuyerRanking = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const buyerRanking = await prisma.customers.findMany({
+      select: {
+        customerId: true,
+        name: true,
+        _count: {
+          select: { sales: true },
+        },
+        sales: {
+          select: {
+            totalAmount: true,
+          },
+        },
+      },
+    });
+
+    // Define a type for the structure returned by the Prisma query
+    type CustomerWithSalesAndCount = Prisma.CustomersGetPayload<{
+      select: {
+        customerId: true;
+        name: true;
+        _count: { select: { sales: true } };
+        sales: { select: { totalAmount: true } };
+      };
+    }>;
+
+    const rankedBuyers = (buyerRanking as CustomerWithSalesAndCount[])
+      .map((customer) => {
+        const totalSpent = customer.sales.reduce((sum: number, sale: { totalAmount: number | null }) => sum + (sale.totalAmount ? Number(sale.totalAmount) : 0), 0);
+        return {
+          customerId: customer.customerId,
+          name: customer.name,
+          purchases: customer._count.sales,
+          totalSpent: totalSpent,
+        };
+      })
+      .sort((a, b) => b.totalSpent - a.totalSpent) // Sort by total spent descending
+      .map((buyer, index) => ({
+        rank: index + 1,
+        buyer: buyer.name,
+        purchases: buyer.purchases,
+        totalSpent: buyer.totalSpent,
+      }));
+
+    res.json(rankedBuyers);
+  } catch (error) {
+    console.error('Error fetching buyer ranking:', error);
+    res.status(500).json({ message: "Error retrieving buyer ranking" });
+  }
+};

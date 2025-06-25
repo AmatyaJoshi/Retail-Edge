@@ -1,0 +1,62 @@
+[
+  {
+    "id": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "associateId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "type": "PURCHASE",
+    "amount": 150000,
+    "status": "COMPLETED",
+    "date": "2023-01-15T10:00:00.000Z",
+    "createdAt": "2023-01-15T10:00:00.000Z",
+    "updatedAt": "2023-01-15T10:00:00.000Z"
+  },
+  {
+    "id": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "associateId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "type": "SALE",
+    "amount": 250000,
+    "status": "PENDING",
+    "date": "2023-02-10T11:30:00.000Z",
+    "createdAt": "2023-02-10T11:30:00.000Z",
+    "updatedAt": "2023-02-10T11:30:00.000Z"
+  },
+  {
+    "id": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "associateId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "type": "PURCHASE",
+    "amount": 75000,
+    "status": "COMPLETED",
+    "date": "2023-03-05T09:45:00.000Z",
+    "createdAt": "2023-03-05T09:45:00.000Z",
+    "updatedAt": "2023-03-05T09:45:00.000Z"
+  },
+  {
+    "id": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "associateId": "22c29051-d301-4cc2-86dd-c19695408adb",
+    "type": "SALE",
+    "amount": 180000,
+    "status": "COMPLETED",
+    "date": "2023-04-12T14:20:00.000Z",
+    "createdAt": "2023-04-12T14:20:00.000Z",
+    "updatedAt": "2023-04-12T14:20:00.000Z"
+  },
+  {
+    "id": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "associateId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "type": "PURCHASE",
+    "amount": 200000,
+    "status": "COMPLETED",
+    "date": "2023-06-22T13:05:00.000Z",
+    "createdAt": "2023-06-22T13:05:00.000Z",
+    "updatedAt": "2023-06-22T13:05:00.000Z"
+  },
+  {
+    "id": "552c1c73-e324-47ee-bf7f-b0dfbeb59788",
+    "associateId": "552c1c73-e324-47ee-bf7f-b0dfbeb59788",
+    "type": "SALE",
+    "amount": 120000,
+    "status": "COMPLETED",
+    "date": "2023-07-30T15:40:00.000Z",
+    "createdAt": "2023-07-30T15:40:00.000Z",
+    "updatedAt": "2023-07-30T15:40:00.000Z"
+  }
+] 

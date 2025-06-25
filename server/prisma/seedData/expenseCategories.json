@@ -1,0 +1,92 @@
+[
+  {
+    "categoryId": "5d2e8c1b-3a7f-4d82-9c56-83a5b6e74f12",
+    "name": "Staff Salaries",
+    "description": "Expenses related to employee compensation",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "5d2e8c1b-4b8g-5e93-ad67-94b6c5e85d23",
+    "name": "Regular Salaries",
+    "description": "Monthly base salary expenses",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "5d2e8c1b-5c9h-6f04-be78-a5c7d6f97e34",
+    "name": "Bonuses",
+    "description": "Performance and seasonal bonus expenses",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "68f31e4a-7c92-48b6-aa7e-9d43b5c79e1d",
+    "name": "Rent & Utilities",
+    "description": "Expenses for rent, electricity, water, and other facility costs",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "68f31e4a-8d03-59c7-bb8f-0e54c6d80f2e",
+    "name": "Rent",
+    "description": "Rent for retail and office spaces",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "68f31e4a-9e14-60d8-cc9g-1f65d7e91f3f",
+    "name": "Utilities",
+    "description": "Electricity, water, and other utility expenses",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "9b4f7c3e-5a2d-48b1-9e68-2d1f8b36a0c7",
+    "name": "Inventory",
+    "description": "Expenses related to product inventory and stock",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "c3e8d5a1-4b7f-42e9-9d56-8a3f2c1b70e9",
+    "name": "Maintenance",
+    "description": "Expenses for repairs, cleaning, and general upkeep",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "7a1d9e2b-3c4f-4e8a-b9d7-5f6c2e1a0b9d",
+    "name": "Marketing",
+    "description": "Expenses for advertising, promotions, and marketing campaigns",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "e2d8c7b6-a5f4-4d3e-9b2a-1c0f8e7d6b5a",
+    "name": "Professional Services",
+    "description": "Expenses for legal, accounting, consulting and other professional services",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "f8e7d6c5-b4a3-42f1-9e8d-7c6b5a4f3e2d",
+    "name": "Insurance",
+    "description": "Expenses for business insurance and coverage",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "categoryId": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "name": "Equipment",
+    "description": "Expenses for business and office equipment",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2024-01-01T00:00:00Z"
+  }
+]

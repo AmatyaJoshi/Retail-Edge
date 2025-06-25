@@ -2,56 +2,18 @@
 
 import { useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
-import POSSystem from './POSSytem';
+import POSSystem from './POSSystem';
 import CustomerSelection from './CustomerSelection';
 import PrescriptionForm from './PrescriptionForm';
-import { Customer, Sale, Prescription } from '../types';
-// import { products as productData } from '../data/products';
+import type { Customer } from '../types';
+import type { Prescription } from '../types/prescriptions';
+import { useUpdatePrescriptionMutation } from '@/state/api';
 
 export default function Home() {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [sales, setSales] = useState<Sale[]>([]);
-//   const [products, setProducts] = useState<Product[]>(productData);
-  const [isLoggedIn] = useState(true); // Set to false for real authentication
-  
-  // Function to handle barcode detection from the global barcode reader
-//   const handleBarcodeDetected = (barcode: string) => {
-//     // const product = products.find(p => p.barcode === barcode);
-    
-//     if (product) {
-//       // Pass the detected product to your POS system
-//       // In a real implementation, you would use a context or ref to access the POS component
-//       toast.success(`Detected: ${product.name}`);
-      
-//       // This is just a placeholder - in real implementation, you'll need to 
-//       // pass this to your POSSystem component
-//     } else {
-//       toast.error(`Product not found for barcode: ${barcode}`);
-//     }
-//   };
-  
-  // Handle adding a new sale
-//   const handleAddSale = (sale: Sale) => {
-//     setSales(prev => [...prev, sale]);
-    
-//     // In a real app, update product inventory
-//     setProducts(prev => 
-//       prev.map(product => {
-//         const soldItem = sale.items.find(item => item.id === product.id);
-//         if (soldItem) {
-//           return {
-//             ...product,
-//             stock: product.stock - soldItem.quantity
-//           };
-//         }
-//         return product;
-//       })
-//     );
-    
-//     toast.success(`Sale #${sale.invoiceNumber} completed!`);
-//   };
+  const [updatePrescription] = useUpdatePrescriptionMutation();
   
   // Handle selecting a customer
   const handleSelectCustomer = (customer: Customer) => {
@@ -60,38 +22,47 @@ export default function Home() {
     toast.success(`Customer ${customer.name} selected`);
   };
   
-  // Handle adding a new customer
-  const handleAddNewCustomer = () => {
-    // In a real app, you would show a form to add a new customer
-    setShowCustomerModal(false);
-    toast.success('Customer created!');
-    
-    // For demo purposes, just create a mock customer
-    const newCustomer: Customer = {
-      customerId: `cust-${Date.now()}`,
-      name: 'New Customer',
-      phone: '(555) 987-6543',
-      email: 'new@example.com',
-      joinedDate: new Date().toISOString(),
-    };
-    
-    setSelectedCustomer(newCustomer);
-  };
-  
   // Handle saving a prescription
-  const handleSavePrescription = (prescription: Prescription) => {
-    if (selectedCustomer) {
-      setSelectedCustomer({
-        ...selectedCustomer,
+  const handleSavePrescription = async (prescription: Prescription) => {
+    if (!selectedCustomer) return;
+
+    try {
+      // Update the prescription in the backend
+      await updatePrescription({
+        customerId: selectedCustomer.customerId,
+        prescription: {
+          ...prescription,
+          rightEye: {
+            ...prescription.rightEye,
+            cylinder: prescription.rightEye.cylinder ?? 0,
+            axis: prescription.rightEye.axis ?? 0,
+            add: prescription.rightEye.add ?? 0,
+            pd: prescription.rightEye.pd ?? 0
+          },
+          leftEye: {
+            ...prescription.leftEye,
+            cylinder: prescription.leftEye.cylinder ?? 0,
+            axis: prescription.leftEye.axis ?? 0,
+            add: prescription.leftEye.add ?? 0,
+            pd: prescription.leftEye.pd ?? 0
+          }
+        }
+      }).unwrap();
+
+      // Update the local state
+      setSelectedCustomer(prev => prev ? {
+        ...prev,
         prescription
-      });
+      } : null);
       
       // Show success message with expiry date
       const expiryDate = new Date(prescription.expiryDate).toLocaleDateString();
       toast.success(`Prescription saved! Valid until ${expiryDate}`);
+      setShowPrescriptionModal(false);
+    } catch (error) {
+      console.error('Failed to save prescription:', error);
+      toast.error('Failed to save prescription. Please try again.');
     }
-    
-    setShowPrescriptionModal(false);
   };
 
   // Handle opening prescription form
@@ -106,9 +77,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-100">
       <Toaster position="top-right" />
-      
-      {/* Global barcode reader that works anywhere in the application */}
-      {/* <BarcodeReader onBarcodeDetected={handleBarcodeDetected} isActive={isLoggedIn} /> */}
       
       {/* POS System */}
       <POSSystem 

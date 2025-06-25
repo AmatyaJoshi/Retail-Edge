@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useGetProductsQuery, useGetPurchaseOrdersQuery, useCreatePurchaseOrderMutation, useUpdatePurchaseOrderStatusMutation, useUpdateProductStockMutation } from "@/state/api";
-import Header from "@/app/(components)/Header";
-import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar, GridColumnVisibilityModel, GridColumnMenu } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import type { GridColDef, GridRenderCellParams, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import { useAppSelector } from "@/app/redux";
-import { Plus, AlertTriangle, CheckCircle2, Clock, XCircle, Search, ShoppingCart, ArrowDownToLine, Eye, Columns, PenBox } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { ArrowDownToLine, CheckCircle2, Clock, PenBox, ShoppingCart, XCircle, Search, Columns } from "lucide-react";
 
 // Eyewear SVG icon from svgrepo.com
 const EyewearIcon = () => (
@@ -54,12 +54,6 @@ interface UpdateProductDetails {
   name?: string;
   price?: number;
   category?: string;
-}
-
-interface UpdateOrderStatusParams {
-  orderId: string;
-  status: 'PENDING' | 'ORDERED' | 'RECEIVED' | 'CANCELLED';
-  processingStage?: PurchaseOrder['processingStage'];
 }
 
 const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProps) => {
@@ -390,7 +384,6 @@ const Inventory = () => {
     expectedDeliveryDate: true,
     processingStage: true,
   });
-  const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now());
   
   // Fetch products with proper error handling
   const { 
@@ -416,7 +409,6 @@ const Inventory = () => {
   useEffect(() => {
     const pollInterval = setInterval(() => {
       refetchOrders();
-      setLastUpdateTime(Date.now());
     }, 5000);
 
     return () => clearInterval(pollInterval);
@@ -472,75 +464,6 @@ const Inventory = () => {
     }
   };
 
-  const handleUpdateProcessingStage = async (orderId: string, stage: PurchaseOrder['processingStage']) => {
-    try {
-      // Get the current order to maintain its status
-      const currentOrder = purchaseOrders?.find(order => order.id === orderId);
-      if (!currentOrder) {
-        toast.error("Order not found");
-        return;
-      }
-
-      const updateParams = {
-        orderId,
-        status: currentOrder.status,
-        processingStage: stage
-      };
-
-      await updatePurchaseOrderStatus(updateParams);
-      
-      // Immediately refetch orders to update the UI
-      await refetchOrders();
-      setLastUpdateTime(Date.now());
-      
-      // Show a more detailed notification with the order details
-      toast.success(
-        <div className="flex flex-col">
-          <span className="font-medium">Order Status Updated</span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            Order #{orderId.slice(0, 8)}... - {currentOrder.product.name}
-          </span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            New Stage: {stage.replace(/_/g, ' ')}
-          </span>
-        </div>,
-        {
-          duration: 4000,
-          position: 'top-right',
-          style: {
-            background: isDarkMode ? '#1f2937' : '#ffffff',
-            color: isDarkMode ? '#e5e7eb' : '#374151',
-            border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-            padding: '12px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          },
-        }
-      );
-    } catch (error) {
-      toast.error(
-        <div className="flex flex-col">
-          <span className="font-medium">Update Failed</span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            Failed to update processing stage
-          </span>
-        </div>,
-        {
-          duration: 4000,
-          position: 'top-right',
-          style: {
-            background: isDarkMode ? '#1f2937' : '#ffffff',
-            color: isDarkMode ? '#e5e7eb' : '#374151',
-            border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-            padding: '12px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          },
-        }
-      );
-    }
-  };
-
   const handleUpdateStatus = async (orderId: string, status: 'ORDERED' | 'RECEIVED' | 'CANCELLED') => {
     try {
       let processingStage: PurchaseOrder['processingStage'];
@@ -569,7 +492,6 @@ const Inventory = () => {
       
       // Immediately refetch orders to update the UI
       await refetchOrders();
-      setLastUpdateTime(Date.now());
       
       // Get the order details for the notification
       const order = purchaseOrders?.find(order => order.id === orderId);
@@ -724,7 +646,7 @@ const columns: GridColDef[] = [
       return (
         <div className={`flex items-center justify-center gap-2 text-base font-semibold ${stock < 5 ? 'text-red-500 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
           <span>{stock.toLocaleString()}</span>
-          {stock < 5 && <AlertTriangle className="w-4 h-4" />}
+          {stock < 5 && <EyewearIcon />}
         </div>
       );
     },

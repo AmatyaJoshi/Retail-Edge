@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { AssociateCommunication } from '../types/business';
+import type { AssociateCommunication } from '../types/business';
 
 export const communicationsApi = createApi({
   reducerPath: 'communicationsApi',

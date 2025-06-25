@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DataGrid, GridColDef, GridToolbar, GridColumnVisibilityModel } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import type { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import Header from "@/app/(components)/Header";
 import { useAppSelector } from "@/app/redux";
 import { Search, Download, Eye, Columns, XCircle } from "lucide-react";
@@ -54,7 +55,7 @@ const Transactions = () => {
   const fetchSales = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(API_ENDPOINTS.sales, {
+      const response = await axios.get(`${API_ENDPOINTS.base}/sales`, {
         params: {
           startDate,
           endDate

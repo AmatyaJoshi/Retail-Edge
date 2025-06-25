@@ -1,8 +1,18 @@
 import { Request, Response } from 'express';
-import { auth } from '../config/firebase';
+// Temporarily commented out Firebase auth while working on expenses feature
+// import { auth } from '../config/firebase';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+// Temporary mock auth object while working on expenses feature
+const mockAuth = {
+  createCustomToken: async (uid: string) => {
+    return `mock_token_${uid}`;
+  }
+};
+
+const auth = mockAuth; // Use mock auth instead of Firebase auth
 
 // Store OTPs temporarily (in production, use Redis or a database)
 const otpStore = new Map<string, { otp: string; timestamp: number }>();
@@ -179,4 +189,4 @@ export const getCustomToken = async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-}; 
+};

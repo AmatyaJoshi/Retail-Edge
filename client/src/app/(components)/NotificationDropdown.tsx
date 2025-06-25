@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNotifications, Notification } from '../context/NotificationContext';
+import { useNotifications, type Notification } from '../context/NotificationContext';
 import { Bell, Check, Trash2 } from 'lucide-react';
 
 const NotificationDropdown = () => {

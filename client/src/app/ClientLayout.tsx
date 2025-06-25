@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
 import { usePathname } from 'next/navigation';
 import DashboardWrapper from './dashboardWrapper';
+import ReduxProvider from '@/providers/ReduxProvider';
 
 export default function ClientLayout({
   children,
@@ -12,8 +14,12 @@ export default function ClientLayout({
   const isAuthPage = pathname?.startsWith('/auth');
 
   if (isAuthPage) {
-    return <>{children}</>;
+    return <ReduxProvider>{children}</ReduxProvider>;
   }
 
-  return <DashboardWrapper>{children}</DashboardWrapper>;
+  return (
+    <ReduxProvider>
+      <DashboardWrapper>{children}</DashboardWrapper>
+    </ReduxProvider>
+  );
 } 

@@ -176,14 +176,14 @@ export const createPurchaseOrder = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { productId, quantity, supplier, expectedDeliveryDate, notes } = req.body;
+    const { productId, quantity, associateId, expectedDeliveryDate, notes } = req.body;
 
     // Create purchase order
     const purchaseOrder = await prisma.purchaseOrder.create({
       data: {
         productId,
         quantity,
-        supplier,
+        associateId,
         expectedDeliveryDate: new Date(expectedDeliveryDate),
         notes,
         status: 'PENDING'
@@ -267,26 +267,26 @@ export const updatePurchaseOrder = async (
 ): Promise<void> => {
   try {
     const { orderId } = req.params;
-    const { productId, quantity, supplier, expectedDeliveryDate, notes, status } = req.body;
+    const { productId, quantity, associateId, expectedDeliveryDate, status, notes } = req.body;
 
-    const updatedOrder = await prisma.purchaseOrder.update({
+    const updatedPurchaseOrder = await prisma.purchaseOrder.update({
       where: { id: orderId },
       data: {
         productId,
         quantity,
-        supplier,
+        associateId,
         expectedDeliveryDate: new Date(expectedDeliveryDate),
-        notes,
-        status
+        status,
+        notes
       },
     });
 
-    res.status(200).json(updatedOrder);
+    res.status(200).json(updatedPurchaseOrder);
   } catch (error) {
     console.error('Error updating purchase order:', error);
-    res.status(500).json({
-      message: "Error updating purchase order",
-      error: error instanceof Error ? error.message : 'Unknown error'
+    res.status(500).json({ 
+      message: "Error updating purchase order", 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     });
   }
 };

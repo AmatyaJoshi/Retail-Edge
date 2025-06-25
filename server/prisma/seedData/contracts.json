@@ -1,0 +1,46 @@
+[
+  {
+    "id": "c1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+    "associateId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "startDate": "2023-01-01T00:00:00.000Z",
+    "endDate": "2023-12-31T23:59:59.999Z",
+    "contractDuration": "1 year",
+    "status": "ACTIVE",
+    "notes": "Annual supply contract for eyewear products with Lenskart Wholesale.",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "updatedAt": "2023-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "c2d3e4f5-g6h7-i8j9-k0l1-m2n3o4p5q6r7",
+    "associateId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "startDate": "2023-03-01T00:00:00.000Z",
+    "endDate": "2024-02-28T23:59:59.999Z",
+    "contractDuration": "1 year",
+    "status": "ACTIVE",
+    "notes": "Supply agreement for luxury eyewear frames with Titan Eye Plus.",
+    "createdAt": "2023-03-01T00:00:00.000Z",
+    "updatedAt": "2023-03-01T00:00:00.000Z"
+  },
+  {
+    "id": "c3e4f5g6-h7i8-j9k0-l1m2-n3o4p5q6r7s8",
+    "associateId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "startDate": "2023-04-15T00:00:00.000Z",
+    "endDate": "2023-10-15T23:59:59.999Z",
+    "contractDuration": "6 months",
+    "status": "ACTIVE",
+    "notes": "Short-term contract for designer optical frames from Vincent Opticals.",
+    "createdAt": "2023-04-15T00:00:00.000Z",
+    "updatedAt": "2023-04-15T00:00:00.000Z"
+  },
+  {
+    "id": "c4f5g6h7-i8j9-k0l1-m2n3-o4p5q6r7s8t9",
+    "associateId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "startDate": "2023-05-01T00:00:00.000Z",
+    "endDate": null,
+    "contractDuration": "ongoing",
+    "status": "ACTIVE",
+    "notes": "Ongoing purchase agreement for contact lenses with Vision Care India.",
+    "createdAt": "2023-05-01T00:00:00.000Z",
+    "updatedAt": "2023-05-01T00:00:00.000Z"
+  }
+] 

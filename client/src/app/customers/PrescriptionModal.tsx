@@ -2,23 +2,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { X } from 'lucide-react';
 
-interface EyeData {
-  sphere: number;
-  cylinder: number;
-  axis: number;
-  add: number;
-  pd: number;
-}
-
-interface Prescription {
-  id: string;
-  date: string;
-  expiryDate: string;
-  rightEye: EyeData;
-  leftEye: EyeData;
-  doctor: string;
-  notes?: string;
-}
+import type { Prescription } from '../types/prescriptions';
 
 interface PrescriptionModalProps {
   isOpen: boolean;

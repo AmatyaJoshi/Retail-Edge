@@ -1,4 +1,4 @@
-import { Prescription } from '../types';
+import type { Prescription } from '../types/prescriptions';
 
 interface RxDataModalProps {
   prescription: Prescription;

@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
-    const transactions = await prisma.associateTransaction.findMany({
+    const transactions = await prisma.associateTransactions.findMany({
       include: {
-        partner: true
+        associate: true
       },
       orderBy: {
         date: 'desc'
@@ -23,10 +23,10 @@ export const getTransactions = async (req: Request, res: Response) => {
 export const getTransactionById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const transaction = await prisma.associateTransaction.findUnique({
+    const transaction = await prisma.associateTransactions.findUnique({
       where: { id },
       include: {
-        partner: true
+        associate: true
       }
     });
 
@@ -43,41 +43,39 @@ export const getTransactionById = async (req: Request, res: Response) => {
 
 export const createTransaction = async (req: Request, res: Response) => {
   try {
-    const { partnerId, type, amount, status, date, dueDate, description, reference } = req.body;
+    const { associateId, type, amount, status, date, notes } = req.body;
 
     // Validate required fields
-    if (!partnerId || !type || !amount) {
+    if (!associateId || !type || !amount) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Validate the associate exists
-    const partner = await prisma.associate.findUnique({
-      where: { id: partnerId }
+    const associate = await prisma.associates.findUnique({
+      where: { associateId }
     });
 
-    if (!partner) {
+    if (!associate) {
       return res.status(404).json({ error: 'Associate not found' });
     }
 
-    const transaction = await prisma.associateTransaction.create({
+    const transaction = await prisma.associateTransactions.create({
       data: {
-        partnerId,
+        associateId,
         type,
         amount: parseFloat(amount),
         status: status || 'PENDING',
         date: date ? new Date(date) : new Date(),
-        dueDate: dueDate ? new Date(dueDate) : null,
-        description,
-        reference
+        notes: notes || undefined
       },
       include: {
-        partner: true
+        associate: true
       }
     });
 
     // Update associate's current balance
-    await prisma.associate.update({
-      where: { id: partnerId },
+    await prisma.associates.update({
+      where: { associateId },
       data: {
         currentBalance: {
           increment: type === 'PURCHASE' ? parseFloat(amount) : -parseFloat(amount)
@@ -95,10 +93,10 @@ export const createTransaction = async (req: Request, res: Response) => {
 export const updateTransaction = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { type, amount, status, date, dueDate, description, reference } = req.body;
+    const { type, amount, status, date, notes } = req.body;
 
     // Get the old transaction to calculate balance adjustment
-    const oldTransaction = await prisma.associateTransaction.findUnique({
+    const oldTransaction = await prisma.associateTransactions.findUnique({
       where: { id }
     });
 
@@ -116,26 +114,24 @@ export const updateTransaction = async (req: Request, res: Response) => {
       balanceAdjustment = oldTransaction.amount * 2 * (type === 'PURCHASE' ? 1 : -1);
     }
 
-    const transaction = await prisma.associateTransaction.update({
+    const transaction = await prisma.associateTransactions.update({
       where: { id },
       data: {
         type: type || undefined,
         amount: amount ? parseFloat(amount) : undefined,
         status: status || undefined,
         date: date ? new Date(date) : undefined,
-        dueDate: dueDate ? new Date(dueDate) : undefined,
-        description: description || undefined,
-        reference: reference || undefined
+        notes: notes || undefined
       },
       include: {
-        partner: true
+        associate: true
       }
     });
 
     // Update associate's balance if there was a change in amount or type
     if (balanceAdjustment !== 0) {
-      await prisma.associate.update({
-        where: { id: transaction.partnerId },
+      await prisma.associates.update({
+        where: { associateId: transaction.associateId },
         data: {
           currentBalance: {
             increment: balanceAdjustment

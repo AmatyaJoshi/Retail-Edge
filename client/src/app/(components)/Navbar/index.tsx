@@ -1,15 +1,16 @@
 "use client";
 
-import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
 import { Menu, Moon, Settings, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import type React from "react";
 import NotificationDropdown from "../NotificationDropdown";
+import type { RootState } from "@/state/store";
 
 // Eyewear SVG icon from svgrepo.com
-const EyewearIcon = () => (
+const EyewearIcon: React.FC = () => (
   <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
     <circle cx="16" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
     <circle cx="48" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -18,12 +19,12 @@ const EyewearIcon = () => (
   </svg>
 );
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state: RootState) => state.global.isSidebarCollapsed
   );
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state: RootState) => state.global.isDarkMode);
 
   const toggleSidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));

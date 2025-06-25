@@ -1,0 +1,46 @@
+[
+  {
+    "id": "po1a2b3c-d4e5-f6g7-h8i9-j0k1l2m3n4o5",
+    "productId": "d35623ee-bef6-42b2-8776-2f99f8bb4782",
+    "quantity": 100,
+    "associateId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "expectedDeliveryDate": "2023-08-15T00:00:00.000Z",
+    "status": "PENDING",
+    "notes": "Initial order for new line of prescription glasses.",
+    "createdAt": "2023-08-01T09:00:00.000Z",
+    "updatedAt": "2023-08-01T09:00:00.000Z"
+  },
+  {
+    "id": "po2b3c4d-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+    "productId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
+    "quantity": 50,
+    "associateId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "expectedDeliveryDate": "2023-09-01T00:00:00.000Z",
+    "status": "ORDERED",
+    "notes": "Reorder of popular contact lenses.",
+    "createdAt": "2023-08-10T11:00:00.000Z",
+    "updatedAt": "2023-08-10T11:00:00.000Z"
+  },
+  {
+    "id": "po3c4d5e-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
+    "productId": "86e3bb1c-2f5d-4774-98f3-4df7cddd0a0f",
+    "quantity": 20,
+    "associateId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "expectedDeliveryDate": "2023-09-20T00:00:00.000Z",
+    "status": "RECEIVED",
+    "notes": "New designer frames received and stocked.",
+    "createdAt": "2023-09-05T14:00:00.000Z",
+    "updatedAt": "2023-09-20T10:00:00.000Z"
+  },
+  {
+    "id": "po4d5e6f-g7h8-i9j0-k1l2-m3n4o5p6q7r8",
+    "productId": "8ac1ac77-7358-425e-be16-0bdde9f02e59",
+    "quantity": 75,
+    "associateId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "expectedDeliveryDate": "2023-10-01T00:00:00.000Z",
+    "status": "PENDING",
+    "notes": "Bulk order for corrective lenses.",
+    "createdAt": "2023-09-15T16:00:00.000Z",
+    "updatedAt": "2023-09-15T16:00:00.000Z"
+  }
+] 

@@ -1,4 +1,3 @@
-import { sendEmail } from './config/email';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -25,11 +24,11 @@ const testEmail = async () => {
       </div>
     `;
 
-    await sendEmail(
-      'retailedgeoperations@gmail.com',
-      'Test Email from RetailEdge',
-      testHtml
-    );
+    // await sendEmail(
+    //   'retailedgeoperations@gmail.com',
+    //   'Test Email from RetailEdge',
+    //   testHtml
+    // );
 
     console.log('Test email sent successfully!');
   } catch (error) {
@@ -38,4 +37,4 @@ const testEmail = async () => {
 };
 
 // Run the test
-testEmail(); 
+testEmail();

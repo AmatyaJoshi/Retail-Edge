@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import fileUpload from 'express-fileupload';
+import path from 'path';
 /* ROUTE IMPORTS */
 import dashboardRoutes from "./routes/dashboardRoutes";
 import productRoutes from "./routes/productRoutes";
@@ -17,6 +19,7 @@ import communicationsRoutes from './routes/communications';
 import contactsRoutes from './routes/contacts';
 import transactionsRoutes from './routes/transactions';
 import analyticsRoutes from './routes/analytics';
+import expenseTransactionsRoutes from './routes/expenseTransactionsRoutes';
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -28,18 +31,29 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
+// Configure file upload middleware
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max file size
+  useTempFiles: true,
+  tempFileDir: path.join(__dirname, '../tmp'),
+  createParentPath: true,
+  abortOnLimit: true,
+  responseOnLimit: 'File size limit has been reached',
+  debug: process.env.NODE_ENV === 'development'
+}));
+
 /* ROUTES */
-app.use("/dashboard", dashboardRoutes); // http://localhost:8000/dashboard
-app.use("/products", productRoutes); // http://localhost:8000/products
-app.use("/customers", customerRoutes); // http://localhost:8000/customers
-app.use("/expenses", expenseRoutes); // http://localhost:8000/expenses
-app.use("/prescriptions", prescriptionRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/prescriptions", prescriptionRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/associates', associatesRoutes);
@@ -47,6 +61,8 @@ app.use('/api/communications', communicationsRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/analytics', analyticsRoutes);
+// Register expense transactions routes as part of expenses
+app.use("/api/expenses/transactions", expenseTransactionsRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -82,5 +98,5 @@ const startServer = async (port: number): Promise<void> => {
   }
 };
 
-const PORT = Number(process.env.PORT) || 8000;
+const PORT = Number(process.env.PORT) || 3001;
 startServer(PORT);

@@ -1,7 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
+
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl }),
   reducerPath: "api",
   tagTypes: ["DashboardMetrics", "Products", "Customers", "Expenses", "Sales", "Prescription", "Customer", "PurchaseOrders"],
   endpoints: (build) => ({
@@ -12,7 +14,7 @@ export const api = createApi({
     getProducts: build.query<Product[], { searchTerm?: string; sortField?: string; sortOrder?: "asc" | "desc"; } | void>({
       query: (params) => ({
         url: "/products",
-        params: params || undefined,
+        params: params || {},
       }),
       providesTags: ["Products"],
     }),
@@ -36,13 +38,50 @@ export const api = createApi({
       }),
       invalidatesTags: ["Customers"],
     }),
-    getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({
-      query: () => "/expenses",
-      providesTags: ["Expenses"],
+    getExpensesByCategory: build.query<ExpenseByCategorySummary[], {
+      startDate?: string;
+      endDate?: string;
+      category?: string;
+    }>({
+      query: (params) => ({
+        url: "/expenses/by-category",
+        params
+      }),
+      providesTags: ["Expenses"]
+    }),
+    getExpenses: build.query<Expense[], { categoryId?: string }>({
+      query: (params) => ({
+        url: "/expenses",
+        params
+      }),
+      providesTags: ["Expenses"]
+    }),
+    addExpense: build.mutation<Expense, Partial<Expense>>({
+      query: (expense) => ({
+        url: "/expenses",
+        method: "POST",
+        body: expense
+      }),
+      invalidatesTags: ["Expenses"]
+    }),
+    updateExpense: build.mutation<Expense, { expenseId: string; expense: Partial<Expense> }>({
+      query: ({ expenseId, expense }) => ({
+        url: `/expenses/${expenseId}`,
+        method: "PATCH",
+        body: expense
+      }),
+      invalidatesTags: ["Expenses"]
+    }),
+    deleteExpense: build.mutation<void, string>({
+      query: (expenseId) => ({
+        url: `/expenses/${expenseId}`,
+        method: "DELETE"
+      }),
+      invalidatesTags: ["Expenses"]
     }),
     getCustomerSales: build.query<Sale[], string>({
       query: (customerId) => `/customers/${customerId}/sales`,
-      providesTags: (result, error, customerId) => [{ type: 'Sales', id: customerId }],
+      providesTags: (_result, _error, customerId) => [{ type: 'Sales', id: customerId }],
     }),
     deleteCustomer: build.mutation<void, string>({
       query: (customerId) => ({
@@ -76,7 +115,7 @@ export const api = createApi({
     }),
     getPrescription: build.query<Prescription, string>({
       query: (customerId) => `api/prescriptions/${customerId}`,
-      providesTags: (result, error, customerId) => [{ type: 'Prescription', id: customerId }],
+      providesTags: (_result, _error, customerId) => [{ type: 'Prescription', id: customerId }],
     }),
     createPrescription: build.mutation<Prescription, NewPrescription>({
       query: (prescription) => ({
@@ -84,7 +123,7 @@ export const api = createApi({
         method: 'POST',
         body: prescription,
       }),
-      invalidatesTags: (result, error, { customerId }) => [
+      invalidatesTags: (_result, _error, { customerId }) => [
         { type: 'Prescription', id: customerId },
         { type: 'Customer', id: customerId },
       ],
@@ -95,20 +134,14 @@ export const api = createApi({
         method: 'PATCH',
         body: prescription,
       }),
-      invalidatesTags: (result, error, { customerId }) => [
+      invalidatesTags: (_result, _error, { customerId }) => [
         { type: 'Prescription', id: customerId },
         { type: 'Customer', id: customerId },
       ],
     }),
     getPrescriptionsByCustomer: build.query<Prescription[], string>({
       query: (customerId) => `api/prescriptions/customer/${customerId}`,
-      providesTags: (result, error, customerId) =>
-        result 
-          ? [
-              ...result.map(({ id }) => ({ type: 'Prescription' as const, id })),
-              { type: 'Prescription', id: 'LIST' },
-            ]
-          : [{ type: 'Prescription', id: 'LIST' }],
+      providesTags: (_result, _error, _customerId) => [/* ... */],
     }),
     getPurchaseOrders: build.query<PurchaseOrder[], void>({
       query: () => "/products/purchase-orders",
@@ -138,6 +171,46 @@ export const api = createApi({
       }),
       invalidatesTags: ["Products", "DashboardMetrics"],
     }),
+    getPendingExpenses: build.query<Expense[], void>({
+      query: () => ({
+        url: "/expenses/pending"
+      }),
+      providesTags: ["Expenses"]
+    }),
+    payExpense: build.mutation<Expense, string>({
+      query: (expenseId) => ({
+        url: `/expenses/${expenseId}/pay`,
+        method: "POST"
+      }),
+      invalidatesTags: ["Expenses"]
+    }),
+    getExpenseTransactions: build.query<ExpenseTransaction[], string>({
+      query: (expenseId) => `/expenses/transactions/${expenseId}`,
+      providesTags: (result, error, expenseId) => [
+        { type: "Expenses", id: expenseId }
+      ]
+    }),
+    addExpenseTransaction: build.mutation<ExpenseTransaction, Omit<ExpenseTransaction, 'id' | 'createdAt' | 'updatedAt'>>({
+      query: ({ expenseId, ...transaction }) => ({
+        url: `/expenses/${expenseId}/transactions`,
+        method: "POST",
+        body: transaction
+      }),
+      invalidatesTags: (result, error, { expenseId }) => [
+        { type: "Expenses", id: expenseId },
+        "Expenses"
+      ]
+    }),
+    getAllExpenseTransactions: build.query<ExpenseTransaction[], void>({
+      query: () => "/expenses/transactions/all",
+      providesTags: ["Expenses"]
+    }),
+    getAllExpenseCategories: build.query<any[], void>({
+      query: () => ({
+        url: "/expenses/categories"
+      }),
+      providesTags: ["Expenses"]
+    }),
   }),
 });
 
@@ -156,6 +229,10 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   imageUrl?: string;
+  revenue?: number;
+  revenueChange?: number;
+  quantity?: number;
+  quantityChange?: number;
 }
 
 export interface NewProduct {
@@ -186,18 +263,53 @@ export interface ExpenseSummary {
 }
 
 export interface ExpenseByCategorySummary {
-  expenseByCategorySummaryId: string;
+  expenseByCategoryId: string;
   category: string;
   amount: string;
+  count: number;
+  pendingAmount?: number;
+  pendingCount?: number;
   date: string;
+  allocated: number;
+  remaining: number;
+  status: 'approved' | 'pending' | 'rejected';
+  totalExpenses: number;
+  changePercentage: number;
+  vendor?: string;
+  dueDate?: string;
 }
 
 export interface DashboardMetrics {
-  popularProducts: Product[];
-  salesSummary: SalesSummary[];
-  purchaseSummary: PurchaseSummary[];
-  expenseSummary: ExpenseSummary[];
-  expenseByCategorySummary: ExpenseByCategorySummary[];
+  totalCustomers: number;
+  totalProducts: number;
+  inventoryValue: number;
+  totalSales: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  popularProducts: {
+    productId: string;
+    name: string;
+    revenue: number;
+    quantity: number;
+    revenueChange: number;
+    quantityChange: number;
+  }[];
+  salesSummary: {
+    date: string;
+    totalValue: number;
+    orderCount: number;
+    customerCount: number;
+    changePercentage: number;
+  }[];
+  categoryAnalysis: {
+    category: string;
+    revenue: number;
+    quantity: number;
+    productCount: number;
+  }[];
+  totalDues: number;
+  repeatCustomerPercentage: number;
+  pendingOrders: number;
 }
 
 export interface Customer {
@@ -297,6 +409,43 @@ export interface NewPurchaseOrder {
   notes?: string;
 }
 
+export interface Expense {
+  expenseId: string;
+  category: string;
+  amount: number;
+  budget: number;
+  timestamp: string;
+  description?: string;
+  vendor?: string;
+  status: 'approved' | 'pending' | 'rejected';
+  dueDate?: string;
+  paymentStatus: 'PENDING' | 'PARTIAL' | 'PAID' | 'OVERDUE';
+  paidAmount: number;
+  lastPaymentDate?: string;
+  paymentType: 'Subscription' | 'Prepaid' | 'Postpaid';
+}
+
+export interface ExpenseTransaction {
+  id: string;
+  expenseId: string;
+  type: string;
+  amount: number;
+  paymentMethod: 'Bank Transfer' | 'Cheque' | 'UPI' | 'Cash';
+  reference?: string;
+  status: string;
+  date: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExpenseSummaryResponse {
+  byCategory: { [key: string]: number };
+  byMonth: { [key: string]: number };
+  totalExpenses: number;
+  averageExpense: number;
+}
+
 export const {
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
@@ -304,6 +453,10 @@ export const {
   useGetCustomersQuery,
   useCreateCustomerMutation,
   useGetExpensesByCategoryQuery,
+  useGetExpensesQuery,
+  useAddExpenseMutation,
+  useUpdateExpenseMutation,
+  useDeleteExpenseMutation,
   useGetCustomerSalesQuery,
   useDeleteCustomerMutation,
   useUpdateProductStockMutation,
@@ -317,4 +470,10 @@ export const {
   useCreatePurchaseOrderMutation,
   useUpdatePurchaseOrderStatusMutation,
   useUpdateProductMutation,
+  useGetPendingExpensesQuery,
+  usePayExpenseMutation,
+  useGetExpenseTransactionsQuery,
+  useAddExpenseTransactionMutation,
+  useGetAllExpenseTransactionsQuery,
+  useGetAllExpenseCategoriesQuery,
 } = api;

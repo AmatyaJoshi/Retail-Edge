@@ -3,19 +3,20 @@
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsSidebarCollapsed } from "@/state";
 import {
+  type LucideIcon,
+  Home,
+  Users,
+  ShoppingCart,
+  Package,
+  Settings,
+  LogOut,
+  Menu,
   Archive,
   CircleDollarSign,
   Clipboard,
   Layout,
-  LucideIcon,
-  Menu,
-  Monitor,
-  SlidersHorizontal,
-  User,
-  Users,
   Receipt,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -125,7 +126,7 @@ const Sidebar = () => {
       <div className="flex flex-col mt-6 flex-1 overflow-y-auto">
         <SidebarLink
           href="/pos"
-          icon={Monitor}
+          icon={Home}
           label="POS"
           isCollapsed={isSidebarCollapsed}
         />
@@ -155,13 +156,13 @@ const Sidebar = () => {
         />
         <SidebarLink
           href="/products"
-          icon={Clipboard}
+          icon={ShoppingCart}
           label="Products"
           isCollapsed={isSidebarCollapsed}
         />
         <SidebarLink
           href="/customers"
-          icon={User}
+          icon={Home}
           label="Customers"
           isCollapsed={isSidebarCollapsed}
         />
@@ -173,7 +174,7 @@ const Sidebar = () => {
         />
         <SidebarLink
           href="/settings"
-          icon={SlidersHorizontal}
+          icon={Settings}
           label="Settings"
           isCollapsed={isSidebarCollapsed}
         />

@@ -1,80 +1,135 @@
 import { useGetDashboardMetricsQuery } from "@/state/api";
-import { ShoppingBag } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import React from "react";
-import Rating from "../(components)/Rating";
-import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardTitle
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Eyewear SVG icon from svgrepo.com
-const EyewearIcon = () => (
-  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="16" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
-    <circle cx="48" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
-    <path d="M4 40c0-6 4-12 12-12m32 0c8 0 12 6 12 12" stroke="currentColor" strokeWidth="2" fill="none" />
-    <path d="M28 40h8" stroke="currentColor" strokeWidth="2" fill="none" />
-  </svg>
-);
+const formatIndianNumber = (num: number) => {
+  if (num >= 10000000) {
+    return `₹${(num / 10000000).toFixed(2)} Cr`;
+  } else if (num >= 100000) {
+    return `₹${(num / 100000).toFixed(2)} L`;
+  } else if (num >= 1000) {
+    return `₹${(num / 1000).toFixed(1)}k`;
+  }
+  return `₹${num}`;
+};
 
 const CardPopularProducts = () => {
-  const { data: dashboardMetrics, isLoading } = useGetDashboardMetricsQuery();
+  const { data, isLoading, error } = useGetDashboardMetricsQuery();
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px]">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent>
+          <div className="flex items-center justify-center h-[300px] text-red-500">Error loading data</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const popularProducts = data?.popularProducts || [];
+
+  // Sort products by revenue and quantity to ensure correct ranking
+  const popularProductsByRevenue = [...popularProducts].sort((a, b) => (b.revenue || 0) - (a.revenue || 0));
+  const popularProductsByQuantity = [...popularProducts].sort((a, b) => (b.quantity || 0) - (a.quantity || 0));
 
   return (
-    <div className="row-span-3 xl:row-span-6 bg-white dark:bg-gray-800 shadow-md rounded-2xl pb-16">
-      {isLoading ? (
-        <div className="m-5 text-gray-700 dark:text-gray-300">Loading...</div>
-      ) : (
-        <>
-          <h3 className="text-lg font-semibold px-7 pt-5 pb-2 text-gray-900 dark:text-gray-100">
-            Popular Products
-          </h3>
-          <hr className="border-gray-200 dark:border-gray-700" />
-          <div className="overflow-auto h-[calc(100%-4rem)] custom-scrollbar">
-            {dashboardMetrics?.popularProducts.map((product) => (
+    <Card>
+      <CardContent className="flex flex-col h-full">
+        <CardTitle className="mb-4 text-xl font-semibold">Popular Products</CardTitle>
+        <Tabs defaultValue="revenue" className="w-full flex-grow flex flex-col">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="revenue">By Revenue</TabsTrigger>
+            <TabsTrigger value="quantity">By Quantity</TabsTrigger>
+          </TabsList>
+          <TabsContent value="revenue" className="space-y-4 max-h-[300px] overflow-y-auto flex-grow">
+            <div className="space-y-4 max-h-[300px] overflow-y-auto">
+              {popularProductsByRevenue.map((product, index) => (
               <div
-                key={product.productId}
-                className="flex items-center justify-between gap-3 px-5 py-7 border-b border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex justify-center mb-2">
-                    {product.imageUrl ? (
-                      <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        width={100}
-                        height={100}
-                        className="rounded-lg object-contain"
-                      />
+                  key={index}
+                  className="flex items-center justify-between py-2 border-b last:border-b-0"
+                >
+                  <span className="text-base font-bold text-gray-800 dark:text-gray-200 w-1/2 truncate pr-2">
+                    {index + 1}. {product.name}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {formatIndianNumber(product.revenue || 0)}
+                    </span>
+                    {product.revenueChange !== undefined && (
+                      <span
+                        className={`flex items-center text-sm font-medium ${
+                          product.revenueChange >= 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {product.revenueChange >= 0 ? (
+                          <TrendingUp className="w-4 h-4 mr-1" />
                     ) : (
-                      <div className="w-[100px] h-[100px] bg-gray-100 rounded-lg flex items-center justify-center">
-                        <EyewearIcon />
-                      </div>
+                          <TrendingDown className="w-4 h-4 mr-1" />
+                        )}
+                        {Math.abs(product.revenueChange)}%
+                      </span>
                     )}
                   </div>
-                  <div className="flex flex-col justify-between gap-1">
-                    <div className="font-bold text-gray-700 dark:text-gray-300">
-                      {product.name}
-                    </div>
-                    <div className="flex text-sm items-center">
-                      <span className="font-bold text-blue-500 dark:text-blue-400 text-xs">
-                        ₹{product.price}
-                      </span>
-                      <span className="mx-2 text-gray-400 dark:text-gray-600">|</span>
-                      <Rating rating={product.rating || 0} />
-                    </div>
-                  </div>
                 </div>
-
-                <div className="text-xs flex items-center text-gray-600 dark:text-gray-400">
-                  <button className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 mr-2">
-                    <ShoppingBag className="w-4 h-4" />
-                  </button>
-                  {product.stockQuantity} Sold
+              ))}
+                    </div>
+          </TabsContent>
+          <TabsContent value="quantity" className="space-y-4 max-h-[300px] overflow-y-auto flex-grow">
+            <div className="space-y-4 max-h-[300px] overflow-y-auto">
+              {popularProductsByQuantity.map((product, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between py-2 border-b last:border-b-0"
+                >
+                  <span className="text-base font-bold text-gray-800 dark:text-gray-200 w-1/2 truncate pr-2">
+                    {index + 1}. {product.name}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {product.quantity || 0}
+                    </span>
+                    {product.quantityChange !== undefined && (
+                      <span
+                        className={`flex items-center text-sm font-medium ${
+                          product.quantityChange >= 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {product.quantityChange >= 0 ? (
+                          <TrendingUp className="w-4 h-4 mr-1" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 mr-1" />
+                        )}
+                        {Math.abs(product.quantityChange)}%
+                      </span>
+                    )}
                 </div>
               </div>
             ))}
           </div>
-        </>
-      )}
-    </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
