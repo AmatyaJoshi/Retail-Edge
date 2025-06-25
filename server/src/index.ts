@@ -20,6 +20,7 @@ import contactsRoutes from './routes/contacts';
 import transactionsRoutes from './routes/transactions';
 import analyticsRoutes from './routes/analytics';
 import expenseTransactionsRoutes from './routes/expenseTransactionsRoutes';
+import barcodeRoutes from './routes/barcode';
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -63,6 +64,7 @@ app.use('/api/transactions', transactionsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 // Register expense transactions routes as part of expenses
 app.use("/api/expenses/transactions", expenseTransactionsRoutes);
+app.use('/api/barcode', barcodeRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

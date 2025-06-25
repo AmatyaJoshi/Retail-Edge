@@ -44,9 +44,12 @@ model Products {
   sku            String?         @unique
   description    String?
   imageUrl       String?
+  barcode        String?         @unique
   purchaseOrders PurchaseOrder[]
   Purchases      Purchases[]
   Sales          Sales[]
+
+  @@map("Products")
 }
 
 model Sales {
@@ -121,7 +124,7 @@ model ExpenseTransactions {
   notes         String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-  transactionType String?
+  transactionType String     @default("ON_DEMAND")
   categoryId    String?
   expense       Expenses   @relation("ExpenseTransactions", fields: [expenseId], references: [expenseId], onDelete: Cascade)
 }

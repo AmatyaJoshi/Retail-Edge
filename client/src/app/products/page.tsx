@@ -1,6 +1,7 @@
 "use client";
 
-import { useCreateProductMutation, useGetProductsQuery, useUpdateProductMutation, Product, useDeleteProductMutation } from "@/state/api";
+import { useCreateProductMutation, useGetProductsQuery, useUpdateProductMutation, useDeleteProductMutation } from "@/state/api";
+import type { Product } from "@/state/api";
 import { PlusCircleIcon, SearchIcon, ChevronLeft, ChevronRight, ArrowDownWideNarrow, ArrowUpWideNarrow } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";

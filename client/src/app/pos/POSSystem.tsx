@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useGetProductsQuery, useUpdateProductStockMutation, useCreateSaleMutation } from '@/state/api';
 import type { Customer } from '../types';
 import ConfirmationModal from './ConfirmationModal';
+import BarcodeScanner from '@/components/BarcodeScanner';
 
 // Constants
 const TAX_RATE = 0.08; // 8% tax rate
@@ -100,6 +101,7 @@ export default function POSSystem({
   });
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [sortOption, setSortOption] = useState<POSSystemState['sortOption']>('name-asc');
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const barcodeInputRef = useRef<HTMLInputElement>(null);
 
@@ -203,6 +205,20 @@ export default function POSSystem({
     // Refocus on input for next scan
     if (barcodeInputRef.current) {
       barcodeInputRef.current.focus();
+    }
+  };
+
+  // Handle barcode detected from camera
+  const handleBarcodeDetected = (barcode: string) => {
+    setBarcodeInput(barcode);
+    setScannerOpen(false);
+    // Optionally, auto-add to cart:
+    const product = products.find(p => p.barcode === barcode);
+    if (product) {
+      addToCart(product);
+      toast.success(`Added ${product.name} to cart`);
+    } else {
+      toast.error(`Product not found for barcode: ${barcode}`);
     }
   };
 
@@ -498,7 +514,7 @@ export default function POSSystem({
         {/* Left side - Products */}
         <div className="w-2/3 p-4 flex flex-col">
           {/* Search and Barcode */}
-          <div className="mb-4 flex items-center space-x-2">
+          <div className="mb-4 flex flex-col gap-2">
             <div className="flex-1">
               <input
                 type="text"
@@ -509,22 +525,30 @@ export default function POSSystem({
               />
             </div>
 
-            <form onSubmit={handleBarcodeSubmit} className="flex-1 flex">
+            <form onSubmit={handleBarcodeSubmit} className="flex items-center gap-2 bg-white rounded-lg shadow-sm px-3 py-2 border border-gray-200">
               <input
                 ref={barcodeInputRef}
                 type="text"
-                placeholder="Scan barcode..."
                 value={barcodeInput}
-                onChange={(e) => setBarcodeInput(e.target.value)}
-                className="w-full p-2 border rounded-l"
+                onChange={e => setBarcodeInput(e.target.value)}
+                placeholder="Scan or enter barcode"
+                className="flex-1 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-gray-50"
               />
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-r"
-              >
-                Add
+              <button type="submit" className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Add by Barcode
+              </button>
+              <button type="button" className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-gray-100 text-blue-700 font-semibold border border-blue-200 shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" onClick={() => setScannerOpen(true)}>
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#1976d2" strokeWidth="2"/><path d="M8 12h8M12 8v8" stroke="#1976d2" strokeWidth="2" strokeLinecap="round"/></svg>
+                Scan
               </button>
             </form>
+            {scannerOpen && (
+              <BarcodeScanner
+                onDetected={handleBarcodeDetected}
+                onClose={() => setScannerOpen(false)}
+              />
+            )}
           </div>
 
           {/* Categories and Sort Filter Row */}

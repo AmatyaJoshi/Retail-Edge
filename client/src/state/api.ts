@@ -233,6 +233,7 @@ export interface Product {
   revenueChange?: number;
   quantity?: number;
   quantityChange?: number;
+  barcode?: string; // <-- Added barcode field
 }
 
 export interface NewProduct {
