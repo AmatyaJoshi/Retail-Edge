@@ -54,7 +54,7 @@ export default function Dashboard() {
 
   const formatDateRange = (range: DateRange) => {
     if (!range.from || !range.to) return "";
-    return `${range.from.toLocaleDateString()} - ${range.to.toLocaleDateString()}`;
+    return `${range.from.toLocaleDateString('en-GB')} - ${range.to.toLocaleDateString('en-GB')}`;
   };
 
   const handleRefresh = async () => {

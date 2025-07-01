@@ -752,7 +752,7 @@ const columns: GridColDef[] = [
         const date = new Date(params.row.createdAt);
         return (
           <div className="flex flex-col items-center justify-center h-full">
-            <span className="font-medium">{date.toLocaleDateString()}</span>
+            <span className="font-medium">{date.toLocaleDateString('en-GB')}</span>
             <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
@@ -821,7 +821,7 @@ const columns: GridColDef[] = [
         const isOverdue = date < new Date() && params.row.status !== 'RECEIVED' && params.row.status !== 'CANCELLED';
         return (
           <div className={`flex flex-col items-center justify-center h-full ${isOverdue ? 'text-red-500 dark:text-red-400' : ''}`}>
-            <span className="font-medium">{date.toLocaleDateString()}</span>
+            <span className="font-medium">{date.toLocaleDateString('en-GB')}</span>
             <span className="text-xs mt-1">{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             {isOverdue && <span className="text-xs mt-1">Overdue</span>}
           </div>

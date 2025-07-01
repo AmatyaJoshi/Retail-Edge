@@ -18,6 +18,21 @@ body,
   @apply text-sm;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
 /* Light mode (default) */
 :root {
   @apply bg-gray-50 text-gray-900;

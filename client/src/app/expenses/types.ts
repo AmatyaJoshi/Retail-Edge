@@ -7,7 +7,7 @@ export interface Expense {
   dueDate?: string;
   budget: number;
   status: "pending" | "approved" | "rejected";
-  paymentStatus: "PENDING" | "PARTIAL" | "PAID";
+  paymentStatus: "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
   paidAmount: number;
   lastPaymentDate?: string;
   timestamp: string;
@@ -32,7 +32,7 @@ export interface ExpenseByCategorySummary {
   description?: string;
   vendor?: string;
   budget?: number;
-  paymentStatus?: "PENDING" | "PARTIAL" | "PAID";
+  paymentStatus?: "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
   paidAmount?: number;
   lastPaymentDate?: string;
   timestamp?: string;

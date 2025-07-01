@@ -7,11 +7,6 @@ interface VerificationCodeInputProps {
   onBack: () => void;
 }
 
-interface VerificationResult {
-  isExistingUser: boolean;
-  customToken?: string;
-}
-
 export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
   email,
   onVerificationSuccess,
@@ -19,8 +14,9 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
 }) => {
   const [code, setCode] = useState<string[]>(Array(6).fill(''));
   const [error, setError] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const { verifyEmailOTP, loading, cooldown, sendEmailOTP } = useAuth();
+  const { verifyEmailOTP, loading, sendEmailOTP } = useAuth();
 
   useEffect(() => {
     // Focus the first input on mount
@@ -56,12 +52,15 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
     const pastedData = e.clipboardData.getData('text').slice(0, 6);
     const newCode = [...code];
     
-    for (let i = 0; i < pastedData.length; i++) {
-      newCode[i] = pastedData[i];
+    for (let i = 0; i < pastedData.length && i < newCode.length; i++) {
+      const char = pastedData[i];
+      if (char && char.match(/[0-9]/)) {
+        newCode[i] = char;
+      }
     }
     
     setCode(newCode);
-    inputRefs.current[pastedData.length - 1]?.focus();
+    inputRefs.current[Math.min(pastedData.length - 1, 5)]?.focus();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +74,7 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
     }
 
     try {
-      const result = await verifyEmailOTP(verificationCode);
+      const result = await verifyEmailOTP(verificationCode, email);
       if (result) {
         onVerificationSuccess(result.isExistingUser);
       }
@@ -86,6 +85,18 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
 
   const handleResendCode = async () => {
     if (cooldown > 0) return;
+    
+    // Start cooldown
+    setCooldown(60);
+    const timer = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
     
     try {
       const result = await sendEmailOTP(email);
@@ -164,4 +175,4 @@ export const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
       </form>
     </div>
   );
-}; 
+};

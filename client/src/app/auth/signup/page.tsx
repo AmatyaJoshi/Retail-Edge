@@ -2,8 +2,23 @@
 
 import SignupSteps from '@/components/SignupSteps';
 import styles from './auth.module.css';
+import { useSignUp, useUser } from '@clerk/nextjs';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
+  const { signUp, isLoaded } = useSignUp();
+  const { isSignedIn } = useUser();
+  const router = useRouter();
+
+  // Redirect authenticated users away from signup page
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      console.log('User is already signed in, redirecting to POS');
+      router.push('/pos');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
       <div className="flex-1 flex items-center justify-center p-12">
@@ -49,4 +64,4 @@ export default function SignupPage() {
       </footer>
     </div>
   );
-} 
+}

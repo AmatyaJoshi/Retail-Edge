@@ -57,7 +57,7 @@ const PrescriptionModal = ({ isOpen, onClose, prescription }: PrescriptionModalP
                       <div>
                         <p className="text-xl font-medium text-gray-900">Dr. {prescription.doctor}</p>
                         <p className="text-base text-gray-500 mt-1">
-                          Date: {new Date(prescription.date).toLocaleDateString()}
+                          Date: {new Date(prescription.date).toLocaleDateString('en-GB')}
                         </p>
                       </div>
                       <div className="text-right">
@@ -69,7 +69,7 @@ const PrescriptionModal = ({ isOpen, onClose, prescription }: PrescriptionModalP
                           {new Date(prescription.expiryDate) < new Date() ? 'Expired' : 'Valid'}
                         </p>
                         <p className="text-base text-gray-500 mt-1">
-                          Expires: {new Date(prescription.expiryDate).toLocaleDateString()}
+                          Expires: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}
                         </p>
                       </div>
                     </div>

@@ -2,18 +2,16 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getCustomerPurchaseHistory = async (associateId: string) => {
+export const getCustomerPurchaseHistory = async (customerId: string) => {
   try {
-    // Assuming a direct link or a way to identify the customer from the associateId
-    // For now, let's assume associateId is equivalent to customerId for customer associates
     const sales = await prisma.sales.findMany({
-      where: { customerId: associateId },
+      where: { customerId },
       include: { product: true },
       orderBy: { timestamp: 'desc' },
     });
 
     const prescriptions = await prisma.prescriptions.findMany({
-      where: { userId: associateId },
+      where: { customerId },
       orderBy: { date: 'desc' },
     });
 

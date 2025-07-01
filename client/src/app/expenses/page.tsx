@@ -1,23 +1,10 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
-import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
-import { useGetExpensesByCategoryQuery, api, useGetAllExpenseTransactionsQuery, useGetExpensesQuery } from "@/state/api";
+import { useMemo, useState } from "react";
+import { useGetExpensesByCategoryQuery, useGetAllExpenseTransactionsQuery, useGetExpensesQuery } from "@/state/api";
 import type { Expense, ExpenseByCategorySummary, ExpenseTransaction } from '@/state/api';
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,34 +20,22 @@ import {
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { DataTable } from '@/components/ui/data-table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { ColumnDef } from '@tanstack/react-table';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useRouter } from 'next/navigation';
 
 // Icons
 import { 
   PlusCircleIcon,
-  SearchIcon,
-  FolderOpen,
-  AlertTriangle,
-  MoreVertical,
-  CalendarIcon,
-  DollarSign,
-  AlertTriangleIcon,
-  Info,
   CreditCard,
   Calendar,
   Tag,
-  User,
   FileText,
   Hash
 } from "lucide-react";
 
 import { AddExpenseModal, type ExpenseFormBase } from "./components/AddExpenseModal";
-import { ExpenseDetailModal } from "./components/ExpenseDetailModal";
 import { ExpenseAnalytics } from "./components/ExpenseAnalytics";
-import PaymentTracking from "./components/PaymentTracking";
 import { useExpenseCategories } from "@/hooks/use-expense-categories";
 import { ExpenseList } from "./components/ExpenseList";
 import { ExpenseAnalyticsSidebar } from "./components/ExpenseAnalyticsSidebar";
@@ -102,11 +77,11 @@ export function ExpenseModalWrapper({
     amount: parseFloat(selectedExpense.amount),
     description: selectedExpense.description ?? "",
     vendor: selectedExpense.vendor ?? "",
-    dueDate: new Date(selectedExpense.dueDate || Date.now()),
+    dueDate: (selectedExpense.dueDate || new Date().toISOString().split('T')[0]) as string,
     budget: selectedExpense.allocated || undefined,
     status: selectedExpense.status,
-    paymentStatus: selectedExpense.paymentStatus,
-    paidAmount: selectedExpense.paidAmount
+    paymentStatus: selectedExpense.paymentStatus || "PENDING",
+    paidAmount: selectedExpense.paidAmount || 0
   } : undefined;
   
   // Get expense ID, checking if it's a ExpenseByCategory ID (starts with exp_cat_)
@@ -281,7 +256,6 @@ export default function ExpensesPage() {
           open={isPayModalOpen}
           onOpenChange={setIsPayModalOpen}
           expense={selectedExpense}
-          categoryName={categoryIdToName[selectedExpense.category] || selectedExpense.category}
         />
       )}
     </div>
@@ -317,7 +291,7 @@ function ExpenseTransactionHistory() {
       const categoryName = categoryIdToName[expense.category] || expense.category || '-';
       return {
         id: (txn as any).expenseTransactionId || txn.id || idx,
-        date: new Date(txn.date).toLocaleDateString(),
+        date: new Date(txn.date).toLocaleDateString('en-GB'),
         amount: txn.amount,
         paymentMethod: txn.paymentMethod,
         notes: txn.notes || '-',
@@ -415,7 +389,7 @@ function TransactionDetailModal({ open, onOpenChange, txn }: { open: boolean, on
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl w-full p-0 bg-gray-50 rounded-2xl overflow-hidden shadow-2xl font-sans border-0">
-        <DialogTitle><VisuallyHidden>Expense Transaction Details</VisuallyHidden></DialogTitle>
+        <DialogTitle className="sr-only">Expense Transaction Details</DialogTitle>
         <div className="flex flex-col md:flex-row">
           {/* Left: Summary Card */}
           <div className="md:w-1/3 bg-gradient-to-br from-blue-700 to-blue-400 flex flex-col items-center justify-center p-16 gap-10 min-h-[520px]">
@@ -425,7 +399,7 @@ function TransactionDetailModal({ open, onOpenChange, txn }: { open: boolean, on
               {raw && (
                 <span className="text-blue-100 text-lg flex items-center gap-2">
                   <Calendar className="h-5 w-5 inline-block" />
-                  {new Date(raw.date).toLocaleDateString()}
+                  {new Date(raw.date).toLocaleDateString('en-GB')}
                 </span>
               )}
             </div>

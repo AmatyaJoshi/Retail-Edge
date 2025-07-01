@@ -21,14 +21,14 @@ model Customers {
 
 model Prescriptions {
   id         String    @id @default(uuid())
-  userId     String
+  customerId     String
   date       DateTime
   expiryDate DateTime
   rightEye   Json
   leftEye    Json
   doctor     String
   notes      String?
-  customer   Customers @relation(fields: [userId], references: [customerId])
+  customer   Customers @relation(fields: [customerId], references: [customerId])
 
   @@map("Prescriptions")
 }
@@ -194,15 +194,22 @@ model PurchaseOrder {
   product              Products   @relation(fields: [productId], references: [productId])
 }
 
-model Persona {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        String   @default("USER")
-  firebaseUid String?  @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Users {
+  id            String   @id @default(uuid())
+  clerkId       String   @unique
+  appwriteId    String   @unique
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  firstName     String
+  lastName      String?
+  role          String
+  pan           String?
+  aadhaar       String?
+  phone         String
+  address       String?
+  photoUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Associates {

@@ -1,9 +1,0 @@
-[
-  {
-    "id": "1",
-    "name": "Admin User",
-    "email": "admin@retailedge.com",
-    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBAQNQxJxJ5K8y",
-    "role": "ADMIN"
-  }
-] 

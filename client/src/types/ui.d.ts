@@ -1,5 +1,6 @@
 import { ReactNode } from "react"
 
+/*
 declare module "@/components/ui/button" {
   export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
@@ -8,6 +9,7 @@ declare module "@/components/ui/button" {
   }
   export const Button: React.FC<ButtonProps>
 }
+*/
 
 declare module "@/components/ui/dialog" {
   export interface DialogProps {

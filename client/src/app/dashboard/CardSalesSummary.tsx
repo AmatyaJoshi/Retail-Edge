@@ -46,7 +46,7 @@ const CardSalesSummary = () => {
   const highestSales = salesSummary.reduce((max, item) => (item.totalValue > max.totalValue ? item : max), salesSummary[0] || { totalValue: 0, orderCount: 0, customerCount: 0 });
 
   const chartData = salesSummary.map((item) => ({
-    date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    date: new Date(item.date).toLocaleDateString('en-GB'),
     value: item.totalValue,
     orderCount: item.orderCount,
     customerCount: item.customerCount,

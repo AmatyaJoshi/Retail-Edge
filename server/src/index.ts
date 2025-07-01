@@ -6,6 +6,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import fileUpload from 'express-fileupload';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 /* ROUTE IMPORTS */
 import dashboardRoutes from "./routes/dashboardRoutes";
 import productRoutes from "./routes/productRoutes";
@@ -31,11 +32,13 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser()); // Add cookie parser middleware
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
+  credentials: true,
+  exposedHeaders: ['Set-Cookie']
 }));
 
 // Configure file upload middleware
@@ -48,6 +51,36 @@ app.use(fileUpload({
   responseOnLimit: 'File size limit has been reached',
   debug: process.env.NODE_ENV === 'development'
 }));
+
+/* MIDDLEWARES */
+// Middleware to check for initial session and set cookie
+app.use((req, res, next) => {
+  // Skip for API and static routes
+  if (req.path.startsWith('/api') || 
+      req.path.startsWith('/_next') || 
+      req.path.includes('.')) {
+    return next();
+  }
+  
+  // Check if this is an initial session
+  if (!req.cookies['initial_session']) {
+    // Set initial_session cookie
+    res.cookie('initial_session', 'true', {
+      httpOnly: false, // Allow client middleware to access
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/'
+    });
+    
+    // Only redirect if not already going to login
+    if (!req.path.includes('/auth/login') && !req.path.startsWith('/api')) {
+      console.log('First-time visitor, redirecting to login');
+      return res.redirect('/auth/login');
+    }
+  }
+  next();
+});
 
 /* ROUTES */
 app.use("/api/dashboard", dashboardRoutes);

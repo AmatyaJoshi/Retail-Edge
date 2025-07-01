@@ -1,4 +1,3 @@
-console.log('ExpenseTransactionsRoutes loaded');
 import { Router } from "express";
 import { getExpenseTransactions, addExpenseTransaction, getAllExpenseTransactions } from "../controllers/expenseTransactionsController";
 

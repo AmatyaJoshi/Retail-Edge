@@ -807,7 +807,7 @@ export default function POSSystem({
                         <div className="flex justify-between items-center mb-2">
                           <h4 className="font-semibold text-blue-600">Prescription Details</h4>
                           <span className="text-sm text-gray-500">
-                            Expires: {new Date(selectedCustomer.prescription.expiryDate).toLocaleDateString()}
+                            Expires: {new Date(selectedCustomer.prescription.expiryDate).toLocaleDateString('en-GB')}
                           </span>
                         </div>
                         

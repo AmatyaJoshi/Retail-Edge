@@ -365,7 +365,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                             </div>
                             <div className="flex items-center text-gray-600 p-3 bg-white/50 rounded-xl">
                               <Calendar className="w-5 h-5 mr-3 text-blue-500" />
-                              <span className="text-lg">Joined {new Date(user.joinedDate).toLocaleDateString()}</span>
+                              <span className="text-lg">Joined {new Date(user.joinedDate).toLocaleDateString('en-GB')}</span>
                             </div>
                           </div>
                         </div>
@@ -481,7 +481,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                                 {filteredSales.map((sale) => (
                                   <tr key={sale.saleId} className="hover:bg-white/80 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                      {new Date(sale.timestamp).toLocaleDateString()}
+                                      {new Date(sale.timestamp).toLocaleDateString('en-GB')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sale.productId}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sale.quantity}</td>
@@ -552,8 +552,8 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                                     <EyewearIcon />
                                   </div>
                                   <div>
-                                    <p className="font-semibold text-gray-900">Prescription from {new Date(prescription.date).toLocaleDateString()}</p>
-                                    <p className="text-sm text-gray-600">Expires: {new Date(prescription.expiryDate).toLocaleDateString()}</p>
+                                    <p className="font-semibold text-gray-900">Prescription from {new Date(prescription.date).toLocaleDateString('en-GB')}</p>
+                                    <p className="text-sm text-gray-600">Expires: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}</p>
                                   </div>
                                 </div>
                                 <div className="space-y-3">

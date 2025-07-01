@@ -79,10 +79,10 @@ const CardPurchaseSummary = () => {
                   ]}
                   labelFormatter={(label) => {
                     const date = new Date(label);
-                    return date.toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
+                    return date.toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
                     });
                   }}
                 />

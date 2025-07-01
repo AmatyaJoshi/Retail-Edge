@@ -38,14 +38,14 @@ export default function RxDataModal({ prescription, onClose, onUpdate }: RxDataM
              '✓ Valid Prescription'}
           </p>
           <p className="text-sm mt-1">
-            Expiry Date: {new Date(prescription.expiryDate).toLocaleDateString()}
+            Expiry Date: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}
           </p>
         </div>
 
         {/* Prescription Date */}
         <div className="mb-4">
           <p className="text-sm text-gray-600">
-            Prescribed on: {new Date(prescription.date).toLocaleDateString()}
+            Prescribed on: {new Date(prescription.date).toLocaleDateString('en-GB')}
           </p>
         </div>
 

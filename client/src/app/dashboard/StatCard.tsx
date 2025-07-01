@@ -52,7 +52,7 @@ const StatCard = ({ title, value, description, icon, dateRange }: StatCardProps)
         </p>
         {dateRange?.from && dateRange?.to && (
           <p className="text-xs text-muted-foreground mt-1">
-            {dateRange.from.toLocaleDateString()} - {dateRange.to.toLocaleDateString()}
+            {dateRange.from.toLocaleDateString('en-GB')} - {dateRange.to.toLocaleDateString('en-GB')}
           </p>
         )}
       </CardContent>

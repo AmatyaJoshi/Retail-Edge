@@ -5,6 +5,7 @@ import { usePrefetch } from "@/hooks/use-prefetch";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLoading } from "@/contexts/loading-context";
+import { useAuth } from '@/hooks/useAuth';
 
 interface NavItem {
   title: string;
@@ -22,6 +23,7 @@ export function Nav({ items, className }: NavProps) {
   const pathname = usePathname();
   const { prefetchPath } = usePrefetch();
   const { startLoading, stopLoading } = useLoading();
+  const { user } = useAuth();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [prefetchedPaths, setPrefetchedPaths] = useState<Set<string>>(new Set());
 
@@ -50,6 +52,22 @@ export function Nav({ items, className }: NavProps) {
 
   return (
     <nav className={cn("flex items-center space-x-4 lg:space-x-6", className)}>
+      {/* User identity section */}
+      {user && (
+        <div className="flex items-center space-x-2">
+          <img
+            src="/path/to/avatar.png" // Replace with dynamic avatar URL if available
+            alt="User Avatar"
+            className="w-8 h-8 rounded-full"
+          />
+          <div>
+            <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
+            <p className="text-xs text-muted-foreground">{user.role}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation items */}
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;
@@ -111,4 +129,4 @@ export function Nav({ items, className }: NavProps) {
       })}
     </nav>
   );
-} 
+}

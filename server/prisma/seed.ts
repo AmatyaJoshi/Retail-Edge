@@ -63,7 +63,15 @@ async function main() {
     await safeDeleteMany('Products', prisma.products);
     await safeDeleteMany('Customers', prisma.customers);
     await safeDeleteMany('Associates', prisma.associates);
-    await safeDeleteMany('Persona', prisma.persona);
+    await safeDeleteMany('Users', prisma.users); // Clear Users table
+
+    // Remove Persona table if it exists
+    try {
+      await prisma.$executeRawUnsafe('DROP TABLE IF EXISTS "Persona" CASCADE;');
+      console.log('Dropped Persona table if it existed.');
+    } catch (error) {
+      console.warn('Could not drop Persona table:', error instanceof Error ? error.message : error);
+    }
 
     console.log('All tables cleared successfully');
 
@@ -85,7 +93,7 @@ async function main() {
     const expenseTransactions = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'expenseTransactions.json'), 'utf-8'));
     const products = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'products.json'), 'utf-8'));
     const customers = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'customers.json'), 'utf-8'));
-    const personas = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'personas.json'), 'utf-8'));
+    // const users = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'users.json'), 'utf-8'));
     
     // Load new budget-related JSON files
     let expenseCategories = [];
@@ -110,9 +118,6 @@ async function main() {
 
     try {
       // Seed tables in the correct order (parent tables first)
-      console.log('Seeding Persona...');
-      await prisma.persona.createMany({ data: personas });
-
       console.log('Seeding Associates...');
       await prisma.associates.createMany({ data: associates });
 
@@ -199,6 +204,47 @@ async function main() {
           );
         }
       }
+
+      // Seed User table with sample users
+      console.log('Seeding User...');
+      await prisma.$executeRawUnsafe(`DELETE FROM "Users"`);
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO "Users" ("id", "clerkId", "appwriteId", "email", "emailVerified", "firstName", "lastName", "role", "pan", "aadhaar", "phone", "address", "createdAt", "updatedAt") 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+        'admin001',
+        'clerk_001',
+        'appwrite_001',
+        'admin@example.com',
+        true,
+        'Admin',
+        'User',
+        'ADMIN',
+        'ABCDE1234F',
+        '123412341234',
+        '9999999999', // Removed "+" prefix for database storage
+        '123 Admin Street',
+        new Date(),
+        new Date()
+      );
+      
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO "Users" ("id", "clerkId", "appwriteId", "email", "emailVerified", "firstName", "lastName", "role", "pan", "aadhaar", "phone", "address", "createdAt", "updatedAt") 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+        'user001',
+        'clerk_002',
+        'appwrite_002',
+        'user@example.com',
+        true,
+        'Regular',
+        'User',
+        'USER',
+        'FGHIJ5678K',
+        '567856785678',
+        '8888888888', // Removed "+" prefix for database storage
+        '456 User Avenue',
+        new Date(),
+        new Date()
+      );
 
       // Continue with other seeding
       console.log('Seeding ExpenseTransactions...');

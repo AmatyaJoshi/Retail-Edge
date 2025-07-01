@@ -8,7 +8,7 @@ export const getPrescription = async (req: Request, res: Response) => {
     const { customerId } = req.params;
 
     const prescription = await prisma.prescriptions.findFirst({
-      where: { userId: customerId },
+      where: { customerId: customerId },
       orderBy: { date: 'desc' },
     });
 
@@ -38,7 +38,7 @@ export const createPrescription = async (req: Request, res: Response) => {
 
     const prescription = await prisma.prescriptions.create({
       data: {
-        userId: customerId,
+        customerId: customerId,
         date: new Date(date),
         expiryDate: new Date(expiryDate),
         rightEye,
@@ -61,7 +61,7 @@ export const updatePrescription = async (req: Request, res: Response) => {
     const { date, expiryDate, rightEye, leftEye, doctor, notes } = req.body;
 
     const prescription = await prisma.prescriptions.findFirst({
-      where: { userId: customerId },
+      where: { customerId: customerId },
       orderBy: { date: 'desc' },
     });
 
@@ -103,7 +103,7 @@ export const getPrescriptionsByCustomer = async (req: Request, res: Response) =>
     }
 
     const prescriptions = await prisma.prescriptions.findMany({
-      where: { userId: customerId },
+      where: { customerId: customerId },
       orderBy: { date: 'desc' },
     });
 

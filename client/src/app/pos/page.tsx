@@ -56,7 +56,7 @@ export default function Home() {
       } : null);
       
       // Show success message with expiry date
-      const expiryDate = new Date(prescription.expiryDate).toLocaleDateString();
+      const expiryDate = new Date(prescription.expiryDate).toLocaleDateString('en-GB');
       toast.success(`Prescription saved! Valid until ${expiryDate}`);
       setShowPrescriptionModal(false);
     } catch (error) {

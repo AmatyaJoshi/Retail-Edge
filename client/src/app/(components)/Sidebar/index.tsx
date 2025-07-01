@@ -36,7 +36,7 @@ const SidebarLink = ({
 }: SidebarLinkProps) => {
   const pathname = usePathname();
   const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
+    pathname === href || (pathname === "/" && href === "/pos");
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   return (

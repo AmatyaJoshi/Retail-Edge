@@ -4,6 +4,8 @@ import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import { Toaster } from "@/components/ui/toaster";
+import AIAssistantWidget from "@/components/AIAssistantWidget";
+import { ClerkProvider } from '@clerk/nextjs';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,17 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ReactQueryProvider>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
-          <Toaster />
-        </ReactQueryProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <ReactQueryProvider>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+            <AIAssistantWidget />
+            <Toaster />
+          </ReactQueryProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

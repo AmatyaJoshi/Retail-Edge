@@ -57,7 +57,7 @@ const CardTrendAnalysis = () => {
   const salesSummary = data?.salesSummary || [];
 
   const chartData = salesSummary.map((item) => ({
-    date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    date: new Date(item.date).toLocaleDateString('en-GB'),
     revenue: item.totalValue,
     orders: item.orderCount,
     customers: item.customerCount,
