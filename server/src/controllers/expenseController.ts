@@ -52,14 +52,16 @@ export const getExpensesByCategory = async (
     const expenseByCategorySummary = Object.entries(byCategory).map(([cat, data]) => ({
       expenseByCategoryId: `exp_cat_${cat}`,
       category: typeof cat === 'string' ? cat : '',
-      amount: data.amount,
+      amount: data.amount.toString(),
       count: data.count,
       pendingAmount: data.pendingAmount,
       pendingCount: data.pendingCount,
-      lastDate: data.lastDate,
+      date: data.lastDate.toISOString(),
       allocated: Math.round(data.amount * 1.2),
       remaining: Math.round(data.amount * 1.2) - data.amount,
-      status: data.amount / Math.round(data.amount * 1.2) > 0.9 ? 'over' : data.amount / Math.round(data.amount * 1.2) > 0.7 ? 'warning' : 'under',
+      status: 'approved', // Default to approved since we don't have approval logic yet
+      totalExpenses: data.count,
+      changePercentage: 0, // Placeholder for now
       vendor: 'Default Vendor',
       dueDate: data.lastDate ? data.lastDate.toISOString() : '',
     }));

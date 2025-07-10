@@ -7,6 +7,8 @@ import type { GridColDef, GridRenderCellParams, GridColumnVisibilityModel } from
 import { useAppSelector } from "@/app/redux";
 import { toast } from "react-hot-toast";
 import { ArrowDownToLine, CheckCircle2, Clock, PenBox, ShoppingCart, XCircle, Search, Columns } from "lucide-react";
+import { useTheme } from 'next-themes';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Eyewear SVG icon from svgrepo.com
 const EyewearIcon = () => (
@@ -343,10 +345,10 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
             onClick={handleSubmit}
             className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors flex items-center gap-2 ${
               type === 'order'
-                ? 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-blue-600 hover:bg-blue-700'
                 : type === 'sell'
-                ? 'bg-green-500 hover:bg-green-600'
-                : 'bg-purple-500 hover:bg-purple-600'
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-gray-700 hover:bg-gray-800'
             }`}
           >
             {type === 'order' && <ArrowDownToLine className="w-4 h-4" />}
@@ -384,6 +386,8 @@ const Inventory = () => {
     expectedDeliveryDate: true,
     processingStage: true,
   });
+  // Pagination state
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
   
   // Fetch products with proper error handling
   const { 
@@ -431,6 +435,28 @@ const Inventory = () => {
       product.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [products, searchQuery]);
+
+  // Filter purchase orders based on search query (like products)
+  const filteredPurchaseOrders = useMemo(() => {
+    if (!purchaseOrders) return [];
+    if (!searchQuery) return purchaseOrders;
+    return purchaseOrders.filter(order =>
+      order.product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.supplier && order.supplier.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [purchaseOrders, searchQuery]);
+
+  // Ensure all purchase orders have processingStage for DataGrid compatibility
+  const normalizedPurchaseOrders = useMemo(() =>
+    filteredPurchaseOrders.map(order => {
+      const { processingStage, ...rest } = order as any;
+      return {
+        ...rest,
+        processingStage: processingStage || 'ORDER_PLACED',
+      };
+    }),
+    [filteredPurchaseOrders]
+  );
 
   const handleCreateOrder = async (quantity: number, supplier?: string) => {
     if (!selectedProduct || !supplier) return;
@@ -563,17 +589,18 @@ const Inventory = () => {
 const columns: GridColDef[] = [
   { 
     field: "productId", 
-    headerName: "ID", 
+    headerName: "Product ID", 
     flex: 0.8,
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
-    cellClassName: "font-medium text-gray-600 dark:text-gray-400",
+    minWidth: 120,
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
+    cellClassName: "font-medium text-gray-800 dark:text-gray-200",
     align: "center",
     headerAlign: "center",
     renderCell: (params: GridRenderCellParams<Product>) => {
       return (
         <div className="flex items-center justify-center w-full">
           <span 
-            className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded text-base font-mono text-gray-700 dark:text-gray-300 cursor-help whitespace-normal text-center leading-snug"
+            className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-base font-mono text-gray-700 dark:text-gray-300 cursor-help whitespace-normal text-center leading-snug"
             title={params.row.productId}
           >
             {params.row.productId.slice(0, 8)}...
@@ -585,8 +612,9 @@ const columns: GridColDef[] = [
   { 
     field: "name", 
     headerName: "Product Name", 
-    flex: 1.5,
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
+    flex: 1.7, // slightly increased flex
+    minWidth: 180, // slightly increased minWidth
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
     cellClassName: "font-medium text-gray-800 dark:text-gray-200",
     align: "center",
     headerAlign: "center",
@@ -600,8 +628,9 @@ const columns: GridColDef[] = [
     field: "price",
     headerName: "Unit Price",
     flex: 0.8,
+    minWidth: 120,
     type: "number",
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
     cellClassName: "font-medium text-blue-600 dark:text-blue-400",
     align: "center",
     headerAlign: "center",
@@ -617,8 +646,9 @@ const columns: GridColDef[] = [
     field: "totalValue",
     headerName: "Total Value",
     flex: 0.8,
+    minWidth: 120,
     type: "number",
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
     cellClassName: "font-medium text-green-600 dark:text-green-400",
     align: "center",
     headerAlign: "center",
@@ -633,10 +663,11 @@ const columns: GridColDef[] = [
   },
   {
     field: "stockQuantity",
-    headerName: "Stock",
-    flex: 0.7,
+    headerName: "Stock Quantity",
+    flex: 0.9,
+    minWidth: 140,
     type: "number",
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
     cellClassName: "font-medium",
     align: "center",
     headerAlign: "center",
@@ -655,14 +686,15 @@ const columns: GridColDef[] = [
     field: "category",
     headerName: "Category",
     flex: 0.8,
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
+    minWidth: 120,
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
     cellClassName: "text-gray-600 dark:text-gray-400",
     align: "center",
     headerAlign: "center",
     renderCell: (params: GridRenderCellParams<Product>) => {
       return (
         <div className="flex items-center justify-center w-full">
-          <span className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full text-base font-medium">
+          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-base font-medium">
             {params.row.category}
           </span>
         </div>
@@ -672,21 +704,22 @@ const columns: GridColDef[] = [
   {
     field: "actions",
     headerName: "Actions",
-    flex: 1.8,
+    flex: 2, // much wider
+    minWidth: 220, // much wider
     disableColumnMenu: true,
     sortable: false,
-    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg",
+    headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
     cellClassName: "text-gray-600 dark:text-gray-400",
     align: "center",
     headerAlign: "center",
     renderCell: (params: GridRenderCellParams<Product>) => (
-      <div className="flex items-center justify-center gap-4 w-full py-2">
+      <div className="flex items-center justify-center gap-1 w-full py-2"> {/* reduced gap */}
         <button
           onClick={() => {
             setSelectedProduct(params.row);
             setModalType('sell');
           }}
-          className="px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors flex items-center gap-1 shadow-sm"
+          className="px-2 py-0.5 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors flex items-center gap-1 shadow-sm"
           title="Sell product"
         >
           <ShoppingCart className="w-3.5 h-3.5" />
@@ -697,7 +730,7 @@ const columns: GridColDef[] = [
             setSelectedProduct(params.row);
             setModalType('order');
           }}
-          className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1 shadow-sm"
+          className="px-2 py-0.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1 shadow-sm"
           title="Create new order"
         >
           <ArrowDownToLine className="w-3.5 h-3.5" />
@@ -708,7 +741,7 @@ const columns: GridColDef[] = [
             setSelectedProduct(params.row);
             setModalType('update');
           }}
-          className="px-3 py-1 text-sm bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors flex items-center gap-1 shadow-sm"
+          className="px-2 py-0.5 text-sm bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1 shadow-sm"
           title="Update product details"
         >
           <PenBox className="w-3.5 h-3.5 shrink-0" />
@@ -723,16 +756,18 @@ const columns: GridColDef[] = [
     {
       field: "id",
       headerName: "Order ID",
-      flex: 0.8,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-600 dark:text-gray-400",
+      flex: 0.9,
+      minWidth: 120,
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
+      cellClassName: "font-medium text-gray-800 dark:text-gray-200 text-base",
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
+        if (!params.row.id || params.row.id.startsWith('empty-')) return <span className="text-gray-300">&nbsp;</span>;
         return (
           <div className="flex items-center justify-center w-full">
             <span 
-              className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm font-mono cursor-help"
+              className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-base font-mono cursor-help"
               title={params.row.id}
             >
               {params.row.id.slice(0, 8)}...
@@ -743,17 +778,19 @@ const columns: GridColDef[] = [
     },
     {
       field: "createdAt",
-      headerName: "Order Date",      flex: 1.2,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
+      headerName: "Order Date",      flex: 1.1,
+      minWidth: 130,
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
+      cellClassName: "font-medium text-gray-800 dark:text-gray-200 text-base",
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
+        if (!params.row.createdAt) return <span className="text-gray-300">&nbsp;</span>;
         const date = new Date(params.row.createdAt);
         return (
-          <div className="flex flex-col items-center justify-center h-full">
-            <span className="font-medium">{date.toLocaleDateString('en-GB')}</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="flex flex-col items-center justify-center h-full leading-tight">
+            <span className="font-medium text-base">{date.toLocaleDateString('en-GB')}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block" style={{ marginTop: '4px', fontSize: '0.85em' }}>
               {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -764,65 +801,57 @@ const columns: GridColDef[] = [
       field: "product",
       headerName: "Product",
       flex: 1.5,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: GridRenderCellParams<PurchaseOrder>) => (
-        <div className="flex flex-col items-center gap-1">
-          <span className="font-medium">{params.row.product.name}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {params.row.product.category}
-          </span>
-        </div>
-      ),
-    },
-    {
-      field: "quantity",
-      headerName: "Quantity",      flex: 0.7,
-      type: "number",
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: GridRenderCellParams<PurchaseOrder>) => (
-        <div className="flex items-center justify-center gap-2">
-          <span className="font-medium">{params.row.quantity}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">units</span>
-        </div>
-      ),
-    },
-    {
-      field: "supplier",
-      headerName: "Supplier",
-      flex: 1,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: GridRenderCellParams<PurchaseOrder>) => (
-        <div className="flex items-center justify-center">
-          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">
-            {params.row.supplier}
-          </span>
-        </div>
-      ),
-    },
-    {
-      field: "expectedDeliveryDate",
-      headerName: "Expected Delivery",
-      flex: 1.2,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
+      minWidth: 160,
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
+      cellClassName: "font-medium text-gray-800 dark:text-gray-200 text-base",
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
+        if (!params.row.product || !params.row.product.name) return <span className="text-gray-300">&nbsp;</span>;
+        return (
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="font-medium text-base text-gray-800 dark:text-gray-200">{params.row.product.name}</span>
+            <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full text-base font-medium text-gray-600 dark:text-gray-400">
+              {params.row.product.category}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",      flex: 0.8,
+      minWidth: 110,
+      type: "number",
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
+      cellClassName: "font-medium text-gray-800 dark:text-gray-200 text-base",
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
+        if (!params.row.quantity) return <span className="text-gray-300">&nbsp;</span>;
+        return (
+          <div className="flex items-center justify-center gap-2">
+            <span className="font-medium">{params.row.quantity}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">units</span>
+          </div>
+        );
+      },
+    },
+    {
+      field: "expectedDeliveryDate",
+      headerName: "Expected\nDelivery",
+      flex: 1.3,
+      minWidth: 140,
+      headerAlign: 'center',
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-xs whitespace-pre-line",
+      renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
+        if (!params.row.expectedDeliveryDate) return <span className="text-gray-300">&nbsp;</span>;
         const date = new Date(params.row.expectedDeliveryDate);
         const isOverdue = date < new Date() && params.row.status !== 'RECEIVED' && params.row.status !== 'CANCELLED';
         return (
-          <div className={`flex flex-col items-center justify-center h-full ${isOverdue ? 'text-red-500 dark:text-red-400' : ''}`}>
-            <span className="font-medium">{date.toLocaleDateString('en-GB')}</span>
-            <span className="text-xs mt-1">{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <div className={`flex flex-col items-center justify-center h-full leading-tight ${isOverdue ? 'text-red-500 dark:text-red-400' : ''}`}>
+            <span className="font-medium text-base">{date.toLocaleDateString('en-GB')}</span>
+            <span className="text-xs mt-1 block" style={{ marginTop: '4px', fontSize: '0.85em' }}>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             {isOverdue && <span className="text-xs mt-1">Overdue</span>}
           </div>
         );
@@ -830,13 +859,13 @@ const columns: GridColDef[] = [
     },
     {
       field: "processingStage",
-      headerName: "Processing Stage",
-      flex: 1.2,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      align: "center",
-      headerAlign: "center",
+      headerName: "Processing\nStage",
+      flex: 1.3,
+      minWidth: 140,
+      headerAlign: 'center',
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-xs whitespace-pre-line",
       renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
+        if (!params.row.processingStage || params.row.id.startsWith('empty-')) return <span className="text-gray-300">&nbsp;</span>;
         const stageConfig = {
           ORDER_CONFIRMED: {
             color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
@@ -885,27 +914,28 @@ const columns: GridColDef[] = [
       field: "actions",
       headerName: "Actions",
       flex: 1.3,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
+      minWidth: 140,
+      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center text-lg whitespace-pre-line",
+      cellClassName: "font-medium text-gray-800 dark:text-gray-200 text-base",
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams<PurchaseOrder>) => {
         const status = params.row.status;
-        
+        if (!params.row.id || params.row.id.startsWith('empty-')) return <div className="flex items-center justify-center w-full">&nbsp;</div>;
         return (
           <div className="flex items-center justify-center gap-2 w-full">
             {status === 'PENDING' && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleUpdateStatus(params.row.id, 'RECEIVED')}
-                  className="px-2.5 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors flex items-center gap-1 shadow-sm"
+                  className="px-2.5 py-1.5 text-xs font-medium text-white rounded-md transition-colors flex items-center gap-1 bg-green-600 hover:bg-green-700 shadow"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Receive
                 </button>
                 <button
                   onClick={() => handleUpdateStatus(params.row.id, 'CANCELLED')}
-                  className="px-2.5 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-1 shadow-sm"
+                  className="px-2.5 py-1.5 text-xs font-medium text-white rounded-md transition-colors flex items-center gap-1 bg-red-600 hover:bg-red-700 shadow"
                 >
                   <XCircle className="w-3.5 h-3.5" />
                   Cancel
@@ -916,14 +946,14 @@ const columns: GridColDef[] = [
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleUpdateStatus(params.row.id, 'RECEIVED')}
-                  className="px-2.5 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors flex items-center gap-1 shadow-sm"
+                  className="px-2.5 py-1.5 text-xs font-medium text-white rounded-md transition-colors flex items-center gap-1 bg-green-600 hover:bg-green-700 shadow"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Receive
                 </button>
                 <button
                   onClick={() => handleUpdateStatus(params.row.id, 'CANCELLED')}
-                  className="px-2.5 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center gap-1 shadow-sm"
+                  className="px-2.5 py-1.5 text-xs font-medium text-white rounded-md transition-colors flex items-center gap-1 bg-red-600 hover:bg-red-700 shadow"
                 >
                   <XCircle className="w-3.5 h-3.5" />
                   Cancel
@@ -933,7 +963,7 @@ const columns: GridColDef[] = [
             {status === 'RECEIVED' && (
               <div className="flex items-center">
                 <button
-                  className="px-2.5 py-1 text-sm bg-gray-500 text-white rounded-md cursor-not-allowed flex items-center gap-1 shadow-sm"
+                  className="px-2.5 py-1.5 text-xs font-medium text-white rounded-md flex items-center gap-1 bg-gray-400 cursor-not-allowed shadow"
                   disabled
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -944,7 +974,7 @@ const columns: GridColDef[] = [
             {status === 'CANCELLED' && (
               <div className="flex items-center">
                 <button
-                  className="px-2.5 py-1 text-sm bg-gray-500 text-white rounded-md cursor-not-allowed flex items-center gap-1 shadow-sm"
+                  className="px-2.5 py-1.5 text-xs font-medium text-white rounded-md flex items-center gap-1 bg-gray-400 cursor-not-allowed shadow"
                   disabled
                 >
                   <XCircle className="w-3.5 h-3.5" />
@@ -958,6 +988,75 @@ const columns: GridColDef[] = [
     },
   ];
 
+  // Helper to pad rows to always show 5 rows
+  function padRows(rows: PurchaseOrder[], count = 5): PurchaseOrder[] {
+    const emptyRow: PurchaseOrder = {
+      id: '',
+      productId: '',
+      product: { productId: '', name: '', price: 0, stockQuantity: 0, category: '' },
+      quantity: 0,
+      supplier: '',
+      expectedDeliveryDate: '',
+      status: 'PENDING',
+      processingStage: 'ORDER_PLACED',
+      createdAt: '',
+      updatedAt: '',
+    };
+    const padded = [...rows];
+    while (padded.length < count) {
+      padded.push({ ...emptyRow, id: `empty-${padded.length}` });
+    }
+    return padded;
+  }
+
+  // Modern custom pagination component for DataGrid
+  interface ModernPaginationProps {
+    page: number;
+    pageCount: number;
+    onPageChange: (page: number) => void;
+    pageSize: number;
+    onPageSizeChange: (pageSize: number) => void;
+  }
+  function ModernPagination({ page, pageCount, onPageChange, pageSize, onPageSizeChange }: ModernPaginationProps) {
+    return (
+      <div className="flex items-center justify-between w-full px-4 py-2 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-700 rounded-b-xl">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600 dark:text-gray-300">Rows per page:</span>
+          <select
+            className="rounded-full border border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            value={pageSize}
+            onChange={e => onPageSizeChange(Number(e.target.value))}
+          >
+            {[5, 10, 25, 50].map(size => (
+              <option key={size} value={size}>{size}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            className="rounded-full px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+            onClick={() => onPageChange(page - 1)}
+            disabled={page === 0}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-sm text-gray-700 dark:text-gray-200">
+            <span className="font-semibold">{page + 1}</span> / {pageCount}
+          </span>
+          <button
+            className="rounded-full px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+            onClick={() => onPageChange(page + 1)}
+            disabled={page + 1 >= pageCount}
+            aria-label="Next page"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Column management modal component
   const ColumnManagementModal = () => {
     if (!showColumnModal) return null;
@@ -967,7 +1066,7 @@ const columns: GridColDef[] = [
       { field: 'name', label: 'Product Name' },
       { field: 'price', label: 'Unit Price' },
       { field: 'totalValue', label: 'Total Value' },
-      { field: 'stockQuantity', label: 'Stock' },
+      { field: 'stockQuantity', label: 'Stock Quantity' },
       { field: 'category', label: 'Category' },
       { field: 'actions', label: 'Actions' },
     ];
@@ -977,8 +1076,7 @@ const columns: GridColDef[] = [
       { field: 'createdAt', label: 'Order Date' },
       { field: 'product', label: 'Product' },
       { field: 'quantity', label: 'Quantity' },
-      { field: 'supplier', label: 'Supplier' },
-      { field: 'expectedDeliveryDate', label: 'Expected Delivery' },
+      { field: 'expectedDeliveryDate', label: 'Expected Delivery Date' },
       { field: 'processingStage', label: 'Processing Stage' },
     ];
 
@@ -1045,80 +1143,70 @@ const columns: GridColDef[] = [
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
       {/* Professional Header Section */}
-      <div className="flex items-center gap-4 px-2 pt-8 pb-2">
-        <div className="bg-blue-100 text-blue-600 rounded-full p-3 shadow-sm">
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="16" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
-            <circle cx="48" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
-            <path d="M4 40c0-6 4-12 12-12m32 0c8 0 12 6 12 12" stroke="currentColor" strokeWidth="2" fill="none" />
-            <path d="M28 40h8" stroke="currentColor" strokeWidth="2" fill="none" />
-          </svg>
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Inventory Management</h1>
-          <p className="text-gray-500 text-base mt-1">Monitor, order, and manage your product inventory efficiently</p>
-        </div>
+      <div className="px-2 py-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Inventory</h1>
+        <p className="text-gray-500 text-base">Manage your inventory, track stock levels, and handle purchase orders efficiently. Keep your products up to date for smooth operations.</p>
       </div>
 
       {/* Summary Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-2 pb-2">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-          <span className="text-sm text-gray-500 mb-1">Total Products</span>
-          <span className="text-2xl font-bold text-blue-600">{products?.length ?? 0}</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-2 pb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+          <span className="text-sm text-gray-500 mb-2">Total Products</span>
+          <span className="text-xl font-semibold text-gray-800 dark:text-gray-200">{products?.length ?? 0}</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-          <span className="text-sm text-gray-500 mb-1">Total Stock</span>
-          <span className="text-2xl font-bold text-green-600">{products ? products.reduce((sum, p) => sum + (p.stockQuantity || 0), 0).toLocaleString() : 0}</span>
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+          <span className="text-sm text-gray-500 mb-2">Total Stock</span>
+          <span className="text-xl font-semibold text-gray-800 dark:text-gray-200">{products ? products.reduce((sum, p) => sum + (p.stockQuantity || 0), 0).toLocaleString() : 0}</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-          <span className="text-sm text-gray-500 mb-1">Inventory Value</span>
-          <span className="text-2xl font-bold text-purple-600">₹{products ? products.reduce((sum, p) => sum + (p.price * (p.stockQuantity || 0)), 0).toLocaleString() : 0}</span>
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+          <span className="text-sm text-gray-500 mb-2">Inventory Value</span>
+          <span className="text-xl font-semibold text-gray-800 dark:text-gray-200">₹{products ? products.reduce((sum, p) => sum + (p.price * (p.stockQuantity || 0)), 0).toLocaleString() : 0}</span>
         </div>
       </div>
 
       <div className="border-b border-gray-200 dark:border-gray-700 my-4 mx-2" />
 
-      <div className="px-2 py-6 flex-1">
+      <div className="px-2 py-8 flex-1">
         {/* Search Bar, Column Management, and Tabs */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex gap-3">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('inventory')}
-              className={`px-3 py-2 rounded-lg font-medium transition-colors font-sans ${
+              className={`px-4 py-2 rounded-xl font-medium transition-colors font-sans text-base cursor-pointer ${
                 activeTab === 'inventory'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               Inventory
             </button>
             <button
               onClick={() => setActiveTab('orders')}
-              className={`px-3 py-2 rounded-lg font-medium transition-colors font-sans ${
+              className={`px-4 py-2 rounded-xl font-medium transition-colors font-sans text-base cursor-pointer ${
                 activeTab === 'orders'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               Purchase Orders
             </button>
           </div>
-          <div className="flex items-center gap-3 flex-1 ml-6">
-            <div className="relative flex-1 min-w-[600px]">
+          <div className="flex items-center gap-4 flex-1 ml-8">
+            <div className="relative flex-1 min-w-[400px]">
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow font-sans text-lg"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow font-sans text-base"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>
             <button
               onClick={() => setShowColumnModal(true)}
-              className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap shadow"
+              className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap shadow cursor-pointer"
             >
               <Columns className="w-5 h-5" />
               Manage Columns
@@ -1127,170 +1215,202 @@ const columns: GridColDef[] = [
         </div>
 
         {/* Content */}
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden h-[calc(100vh-340px)]">
+        <div className="w-full max-w-[1100px] mx-auto px-2">
           {activeTab === 'inventory' ? (
             <DataGrid
               rows={filteredProducts}
               columns={columns}
               getRowId={(row) => row.productId}
-              className="!text-gray-700 dark:!text-gray-300 font-sans text-base"
+              className="font-sans text-base !text-gray-800 dark:!text-gray-200"
               slots={{
                 toolbar: () => (
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between items-center">
-                      <div className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                      <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                         Products
                       </div>
                     </div>
                   </div>
                 ),
-              }}
-              columnVisibilityModel={columnVisibilityModel}
-              onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-              sx={{
-                '& .MuiDataGrid-main': {
-                  blockSize: '100%',
-                },
-                '& .MuiDataGrid-virtualScroller': {
-                  overflow: 'auto',
-                },
-                '& .MuiDataGrid-row': {
-                  blockSize: '80px !important',
-                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                  borderBlockEnd: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                  '&:hover': {
-                    backgroundColor: isDarkMode ? '#2d3340' : '#f8fafc',
-                  },
-                },
-                '& .MuiDataGrid-cell': {
-                  padding: '16px 12px',
-                  whiteSpace: 'normal',
-                  overflow: 'visible',
-                  textOverflow: 'ellipsis',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1rem',
-                },
-                '& .MuiDataGrid-columnHeaders': {
-                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                  borderBlockEnd: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                  blockSize: '56px !important',
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                },
-                '& .MuiDataGrid-footerContainer': {
-                  borderBlockStart: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                  padding: '8px 16px',
-                  '& .MuiTablePagination-root': {
-                    fontSize: '1rem',
-                  },
-                },
-                '& .MuiDataGrid-columnSeparator': {
-                  display: 'none',
-                },
-              }}
-              rowHeight={80}
-              pageSizeOptions={[10, 25, 50]}
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10 },
-                },
-              }}
-              disableRowSelectionOnClick
-            />
-          ) : (
-            <DataGrid
-              rows={purchaseOrders || []}
-              columns={purchaseOrderColumns}
-              getRowId={(row) => row.id}
-              className="!text-gray-700 dark:!text-gray-300 font-sans"
-              slots={{
-                toolbar: () => (
-                  <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        Purchase Orders
-                      </div>
-                    </div>
-                  </div>
+                pagination: (props) => (
+                  <ModernPagination
+                    page={paginationModel.page}
+                    pageCount={Math.ceil(filteredProducts.length / paginationModel.pageSize)}
+                    onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
+                    pageSize={paginationModel.pageSize}
+                    onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
+                  />
                 ),
               }}
               columnVisibilityModel={columnVisibilityModel}
               onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
               sx={{
-                '& .MuiDataGrid-cell': {
-              borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-              color: isDarkMode ? '#e5e7eb' : '#374151',
-                  padding: '24px 12px',
-                  fontSize: '0.95rem',
-                  fontFamily: 'var(--font-geist-sans)',
-            },
-                '& .MuiDataGrid-columnHeaders': {
-                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                  borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-              color: isDarkMode ? '#e5e7eb' : '#374151',
-                  padding: '24px 12px',
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
-                  fontFamily: 'var(--font-geist-sans)',
-            },
-                '& .MuiDataGrid-footerContainer': {
-                  borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-              color: isDarkMode ? '#e5e7eb' : '#374151',
-                  padding: '12px 16px',
-                  fontFamily: 'var(--font-geist-sans)',
-                  fontSize: '0.875rem',
-            },
+                fontFamily: 'inherit',
+                fontSize: '1rem',
+                color: isDarkMode ? '#e0e1dd' : '#22223b',
                 '& .MuiDataGrid-row': {
-                  borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-              backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                  minHeight: '48px !important',
+                  maxHeight: '48px !important',
+                  backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                  borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
                   '&:hover': {
-                    backgroundColor: isDarkMode ? '#374151' : '#f3f4f6',
-                    transition: 'background-color 0.2s ease',
+                    backgroundColor: isDarkMode ? '#2d3340' : '#f8fafc',
                   },
-            },
+                },
+                '& .MuiDataGrid-cell': {
+                  padding: '8px 8px',
+                  fontSize: '1rem',
+                  color: isDarkMode ? '#e0e1dd' : '#22223b',
+                  fontWeight: 500,
+                },
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                  borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                  minHeight: '48px !important',
+                  maxHeight: '72px !important',
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  color: isDarkMode ? '#e0e1dd' : '#22223b',
+                  whiteSpace: 'pre-line',
+                  textAlign: 'center',
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  minHeight: '40px',
+                  height: '40px',
+                  overflow: 'hidden',
+                  borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                  padding: '8px 12px',
+                  '& .MuiTablePagination-root': {
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: '40px',
+                    height: '40px',
+                  },
+                  '& .MuiTablePagination-toolbar': {
+                    minHeight: '40px',
+                    height: '40px',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
+                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                    fontSize: '0.95rem',
+                    lineHeight: 1.2,
+                    margin: 0,
+                    padding: 0,
+                  },
+                  '& .MuiInputBase-root, & .MuiTablePagination-select': {
+                    minHeight: '32px',
+                    height: '32px',
+                    fontSize: '0.95rem',
+                    margin: 0,
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
+                },
                 '& .MuiDataGrid-columnSeparator': {
                   display: 'none',
-            },
-            '& .MuiDataGrid-virtualScroller': {
                 },
-                '& .MuiDataGrid-virtualScrollerContent': {
+                '& .MuiDataGrid-virtualScroller': {
+                  overflowY: 'hidden !important',
                 },
-                '& .MuiDataGrid-virtualScrollerRenderZone': {
+              }}
+              rowHeight={48}
+              pageSizeOptions={[5, 10, 25, 50]}
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              autoHeight
+              disableRowSelectionOnClick
+            />
+          ) : (
+            <DataGrid
+              rows={padRows(normalizedPurchaseOrders, 5)}
+              columns={purchaseOrderColumns}
+              getRowId={(row) => row.id}
+              className="font-sans text-base !text-gray-800 dark:!text-gray-200"
+              rowHeight={56}
+              slots={{
+                toolbar: () => (
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between items-center">
+                      <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                        Purchase Orders
+                      </div>
+                    </div>
+                  </div>
+                ),
+                pagination: (props) => (
+                  <ModernPagination
+                    page={paginationModel.page}
+                    pageCount={Math.ceil(normalizedPurchaseOrders.length / paginationModel.pageSize)}
+                    onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
+                    pageSize={paginationModel.pageSize}
+                    onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
+                  />
+                ),
+              }}
+              columnVisibilityModel={columnVisibilityModel}
+              onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+              sx={{
+                fontFamily: 'inherit',
+                fontSize: '1rem',
+                color: isDarkMode ? '#e0e1dd' : '#22223b',
+                '& .MuiDataGrid-row': {
+                  minHeight: '56px !important',
+                  maxHeight: '56px !important',
+                  backgroundColor: isDarkMode
+                    ? '#1f2937'
+                    : 'inherit',
+                  borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                  '&:nth-of-type(even)': {
+                    backgroundColor: isDarkMode ? '#23293a' : '#f9fafb',
+                  },
+                  '&:nth-of-type(odd)': {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                  },
+                  '&:hover': {
+                    backgroundColor: isDarkMode ? '#2d3340' : '#f3f4f6',
+                    boxShadow: isDarkMode
+                      ? '0 2px 8px 0 rgba(31,41,55,0.15)'
+                      : '0 2px 8px 0 rgba(0,0,0,0.06)',
+                  },
                 },
-          }}
-          pageSizeOptions={[5, 10, 25]}
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10 },
-            },
-          }}
-          disableRowSelectionOnClick
-        />
+                '& .MuiDataGrid-cell': {
+                  padding: '8px 8px',
+                  fontSize: '1rem',
+                  color: isDarkMode ? '#e0e1dd' : '#22223b',
+                  fontWeight: 500,
+                },
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                  borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                  minHeight: '48px !important',
+                  maxHeight: '72px !important',
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  color: isDarkMode ? '#e0e1dd' : '#22223b',
+                  whiteSpace: 'pre-line',
+                  textAlign: 'center',
+                },
+              }}
+              pageSizeOptions={[5, 10, 25, 50]}
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              autoHeight
+              disableRowSelectionOnClick
+            />
           )}
         </div>
+        {/* Column Management Modal */}
+        <ColumnManagementModal />
       </div>
-
-      {/* Column Management Modal */}
-      <ColumnManagementModal />
-
-      {/* Stock Modal */}
-      {selectedProduct && modalType && (
-        <StockModal
-          isOpen={true}
-          onClose={() => {
-            setSelectedProduct(null);
-            setModalType(null);
-          }}
-          product={selectedProduct}
-          type={modalType}
-          onSubmit={modalType === 'order' ? handleCreateOrder : modalType === 'sell' ? handleSellStock : handleUpdateProduct}
-        />
-      )}
     </div>
   );
-};
+}
 
 export default Inventory;

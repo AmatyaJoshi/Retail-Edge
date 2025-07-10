@@ -85,14 +85,14 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-4">
+    <div className="flex-1 space-y-6 p-6 pt-6 bg-white">
       {/* Header Section */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-2xl shadow-xl p-8 mb-8 bg-white/80 backdrop-blur border border-gray-200">
+        {/* Futuristic top accent line */}
+        <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 opacity-80 shadow-lg" />
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground">
-            Monitor your business performance and analytics
-          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Dashboard</h2>
+          <p className="text-gray-500 text-base">Monitor your business performance and analytics.</p>
         </div>
         <div className="flex items-center gap-2">
           <DateRangePicker value={dateRange} onChange={setDateRange} />
@@ -217,8 +217,8 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="w-full justify-start p-1 bg-muted/50 rounded-lg">
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="w-full justify-start p-1 bg-gray-50 rounded-xl mb-4">
           <TabsTrigger 
             value="overview" 
             className="flex-1 max-w-[200px] data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium"
@@ -238,9 +238,9 @@ export default function Dashboard() {
             Reports
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-6">
           {/* Top Row - KPIs */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total Sales"
               value="₹45.2L"
@@ -272,7 +272,7 @@ export default function Dashboard() {
           </div>
 
           {/* Second Row - Main Charts */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
             <CardContent className="col-span-1 flex flex-col overflow-hidden min-h-[350px] flex-grow min-h-0 h-full p-6 bg-background border rounded-xl shadow-md">
               <CardSalesSummary />
             </CardContent>
@@ -282,7 +282,7 @@ export default function Dashboard() {
           </div>
 
           {/* Third Row - Trend Analysis */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
             <CardContent className="col-span-1 flex flex-col overflow-hidden min-h-[350px] flex-grow min-h-0 h-full p-6 bg-background border rounded-xl shadow-md">
               <CardTrendAnalysis />
             </CardContent>
@@ -292,7 +292,7 @@ export default function Dashboard() {
           </div>
 
           {/* Fourth Row - Additional Metrics */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Inventory Value"
               value="₹12.5L"

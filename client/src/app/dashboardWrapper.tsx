@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Navbar from "@/app/(components)/Navbar";
-import Sidebar from "@/app/(components)/Sidebar";
+import Navbar from "@/app/components/Navbar";
+import Sidebar from "@/app/components/Sidebar";
 import StoreProvider, { useAppSelector } from "./redux";
-import { NotificationProvider, useNotifications } from "./context/NotificationContext";
+import { NotificationProvider, useNotifications } from "./contexts/NotificationContext";
+import { usePathname } from "next/navigation";
 
 // Example notifications component
 const NotificationInitializer = () => {
@@ -39,6 +40,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -57,18 +59,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         className={`flex w-full min-h-screen ${
           isDarkMode 
             ? 'bg-gray-900 text-gray-50' 
-            : 'bg-gray-50 text-gray-900'
+            : 'bg-white text-gray-900'
         }`}
       >
-        <Sidebar />
+        {pathname !== "/settings" && <Sidebar />}
         <main
-          className={`flex flex-col w-full h-full py-7 px-9 ${
-            isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+          className={`flex flex-col w-full h-full ${
+            pathname !== "/settings" ? "py-7 px-9 pt-20" : "pt-6"
           } ${
-            isSidebarCollapsed ? "md:pl-24" : "md:pl-72"
+            isDarkMode ? 'bg-gray-900' : 'bg-white'
+          } ${
+            pathname !== "/settings" ? (isSidebarCollapsed ? "md:pl-24" : "md:pl-72") : ""
           }`}
         >
-          <Navbar />
+          <Navbar showBackButton={pathname === "/settings"} />
           {children}
         </main>
       </div>

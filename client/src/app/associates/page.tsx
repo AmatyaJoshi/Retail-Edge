@@ -191,7 +191,7 @@ export default function AssociatesPage() {
   };
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
+    <div className="min-h-screen bg-white w-full p-6">
       <PageHeader
         onAddClick={() => {
           setSelectedAssociate(null);

@@ -1,0 +1,19 @@
+{
+  "welcome": "স্বাগতম",
+  "settings": "সেটিংস",
+  "logout": "লগআউট",
+  "profile": "প্রোফাইল",
+  "language": "ভাষা",
+  "save": "সংরক্ষণ করুন",
+  "cancel": "বাতিল করুন",
+  "general": "সাধারণ",
+  "appearance": "রূপ",
+  "notifications": "বিজ্ঞপ্তি",
+  "security": "নিরাপত্তা",
+  "billing": "বিলিং",
+  "store": "স্টোর",
+  "localization": "স্থানীয়করণ",
+  "pos": "পিওএস",
+  "inventory": "ইনভেন্টরি",
+  "back": "ফিরে যান"
+} 

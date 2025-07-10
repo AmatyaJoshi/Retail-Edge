@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
-  TypedUseSelectorHook,
   useDispatch,
   useSelector,
   Provider,
 } from "react-redux";
+import type { TypedUseSelectorHook } from "react-redux";
 import globalReducer from "@/state";
 import { api } from "@/state/api";
 import { associatesApi } from "@/state/associates";

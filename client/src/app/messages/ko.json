@@ -1,0 +1,19 @@
+{
+  "welcome": "환영합니다",
+  "settings": "설정",
+  "logout": "로그아웃",
+  "profile": "프로필",
+  "language": "언어",
+  "save": "저장",
+  "cancel": "취소",
+  "general": "일반",
+  "appearance": "모양",
+  "notifications": "알림",
+  "security": "보안",
+  "billing": "청구",
+  "store": "상점",
+  "localization": "현지화",
+  "pos": "POS",
+  "inventory": "재고",
+  "back": "뒤로"
+} 

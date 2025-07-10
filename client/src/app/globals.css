@@ -33,6 +33,14 @@ body,
   animation: fadeIn 0.2s ease-out forwards;
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 8px rgba(110, 56, 255, 0.3));
+}
+
 /* Light mode (default) */
 :root {
   @apply bg-gray-50 text-gray-900;

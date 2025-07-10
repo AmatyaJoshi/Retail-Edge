@@ -4,8 +4,8 @@ import { useCreateProductMutation, useGetProductsQuery, useUpdateProductMutation
 import type { Product } from "@/state/api";
 import { PlusCircleIcon, SearchIcon, ChevronLeft, ChevronRight, ArrowDownWideNarrow, ArrowUpWideNarrow } from "lucide-react";
 import { useState } from "react";
-import Header from "@/app/(components)/Header";
-import Rating from "@/app/(components)/Rating";
+import Header from "@/app/components/Header";
+import Rating from "@/app/components/Rating";
 import CreateProductModal from "./CreateProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
 import Image from "next/image";
@@ -136,147 +136,150 @@ const Products = () => {
   }
 
   return (
-    <div className="mx-auto pb-5 w-full">
-      {/* SEARCH BAR AND FILTER DROPDOWN */}
-      <div className="mb-6 flex space-x-4">
-        <div className="flex items-center border-2 border-gray-200 rounded flex-grow">
-          <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
-          <input
-            className="w-full py-2 px-4 rounded bg-white"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
+      {/* Professional Header Section */}
+      <div className="px-2 py-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Products</h1>
+        <p className="text-gray-500 text-base">Browse, search, and manage your store's product catalog. Add new products, update stock, and keep your inventory up to date for seamless sales and operations.</p>
+      </div>
+
+      {/* Controls Card */}
+      <div className="mb-4 mx-2 md:mx-0 bg-white shadow border border-gray-200 rounded-xl px-6 py-6 flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="relative flex-grow max-w-xl">
+            <input
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white shadow font-sans text-base transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          </div>
+          <div className="hidden md:block w-px h-10 bg-gray-100 mx-4" />
+          <div className="flex gap-2 items-center">
+            <select
+              className="py-2 px-4 border border-gray-200 rounded-xl bg-white text-gray-700 font-medium shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
+              value={sortField}
+              onChange={(e) => setSortField(e.target.value)}
+            >
+              <option value="name">Sort by Name</option>
+              <option value="rating">Sort by Rating</option>
+              <option value="stockQuantity">Sort by Stock</option>
+            </select>
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="p-2 border border-gray-200 rounded-xl bg-white text-gray-700 hover:bg-gray-100 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
+            >
+              {sortOrder === "asc" ? <ArrowUpWideNarrow className="w-5 h-5" /> : <ArrowDownWideNarrow className="w-5 h-5" />}
+            </button>
+            <button
+              className="flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg ml-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <PlusCircleIcon className="w-5 h-5 mr-2 !text-white" /> Create Product
+            </button>
+          </div>
         </div>
-        <select
-          className="py-2 px-4 border rounded-md bg-white text-gray-700"
-          value={sortField}
-          onChange={(e) => setSortField(e.target.value)}
-        >
-          <option value="name">Sort by Name</option>
-          <option value="rating">Sort by Rating</option>
-          <option value="stockQuantity">Sort by Stock</option>
-          <option value="createdAt">Sort by Date Created</option>
-        </select>
-        <button
-          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-          className="p-2 border rounded-md bg-white text-gray-700 hover:bg-gray-100"
-        >
-          {sortOrder === "asc" ? <ArrowUpWideNarrow className="w-5 h-5" /> : <ArrowDownWideNarrow className="w-5 h-5" />}
-        </button>
       </div>
+      <div className="border-b border-gray-100 mb-8" />
 
-      {/* HEADER BAR */}
-      <div className="flex justify-between items-center mb-6">
-        <Header name="Products" />
-        <button
-          className="flex items-center bg-blue-500 hover:bg-blue-700 text-gray-200 font-bold py-2 px-4 rounded"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <PlusCircleIcon className="w-5 h-5 mr-2 !text-gray-200" /> Create
-          Product
-        </button>
-      </div>
-
-      {/* Products Container with Background */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        {/* Scrollable Products Grid */}
-        <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              currentProducts?.map((product) => (
-                <div
-                  key={product.productId}
-                  className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                  onClick={() => setSelectedProduct(product)}
-                >
-                  <div className="p-4">
-                    <div className="flex flex-col items-center">
-                      <div className="flex justify-center mb-2">
-                        <div className="w-[100px] h-[100px] bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                          {product.imageUrl ? (
-                            <Image
-                              src={product.imageUrl}
-                              alt={product.name}
-                              width={100}
-                              height={100}
-                              className="object-contain"
-                            />
-                          ) : (
-                            <EyewearIcon />
-                          )}
-                        </div>
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900 text-center">
-                        {product.name}
-                      </h3>
-                      <p className="text-lg font-medium text-blue-600 mt-1">
-                        ₹{product.price}
-                      </p>
-                      <div className="flex items-center justify-between w-full mt-2">
-                        <span className="text-sm text-gray-600">
-                          Stock: {product.stockQuantity}
-                        </span>
-                        {product.rating && (
-                          <div className="flex items-center">
-                            <Rating rating={product.rating} />
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleReduceStock(product);
-                        }}
-                        className="mt-3 w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md"
-                      >
-                        Manage Stock
-                      </button>
+      {/* Main Content: Products Grid */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-0 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-10 gap-x-6 w-full">
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            currentProducts?.map((product) => (
+              <div
+                key={product.productId}
+                className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-transform duration-200 cursor-pointer flex flex-col h-full group"
+                onClick={() => setSelectedProduct(product)}
+              >
+                <div className="p-4 flex flex-col items-center flex-1">
+                  <div className="flex justify-center mb-2">
+                    <div className="w-[100px] h-[100px] bg-white rounded-lg flex items-center justify-center overflow-hidden border border-gray-200">
+                      {product.imageUrl ? (
+                        <Image
+                          src={product.imageUrl}
+                          alt={product.name}
+                          width={100}
+                          height={100}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <EyewearIcon />
+                      )}
                     </div>
                   </div>
+                  <h3 className="text-lg font-semibold text-gray-900 text-center truncate w-full">
+                    {product.name}
+                  </h3>
+                  <p className="text-lg font-medium text-blue-600 mt-1">
+                    ₹{product.price}
+                  </p>
+                  <div className="flex items-center justify-between w-full mt-2">
+                    <span className="text-sm text-gray-600 flex items-center">
+                      Stock: {product.stockQuantity}
+                      {product.stockQuantity <= 10 && (
+                        <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Low</span>
+                      )}
+                    </span>
+                    {product.rating && (
+                      <div className="flex items-center">
+                        <Rating rating={product.rating} />
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReduceStock(product);
+                    }}
+                    className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  >
+                    Manage Stock
+                  </button>
                 </div>
-              ))
-            )}
-          </div>
+              </div>
+            ))
+          )}
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-6 gap-2">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="p-2 rounded-lg border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-3 py-1 rounded-lg ${
-                    currentPage === page
-                      ? "bg-blue-500 text-white"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
       </div>
+
+      {/* Pagination Bar */}
+      {totalPages > 1 && (
+        <div className="py-3 flex justify-center items-center gap-2 border-t border-gray-200 bg-white">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 rounded-lg border border-gray-200 bg-white transition ${
+                  currentPage === page
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
       {/* Create Product Modal */}
       <CreateProductModal

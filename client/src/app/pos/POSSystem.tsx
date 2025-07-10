@@ -5,9 +5,9 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { useGetProductsQuery, useUpdateProductStockMutation, useCreateSaleMutation } from '@/state/api';
-import type { Customer } from '../types';
+import type { Customer } from '@/types';
 import ConfirmationModal from './ConfirmationModal';
-import BarcodeScanner from '@/components/BarcodeScanner';
+import BarcodeScanner from '@/app/components/BarcodeScanner';
 
 // Constants
 const TAX_RATE = 0.08; // 8% tax rate
@@ -521,24 +521,24 @@ export default function POSSystem({
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow-md"
               />
             </div>
 
-            <form onSubmit={handleBarcodeSubmit} className="flex items-center gap-2 bg-white rounded-lg shadow-sm px-3 py-2 border border-gray-200">
+            <form onSubmit={handleBarcodeSubmit} className="flex items-center gap-2 bg-white rounded-xl shadow-md px-3 py-2 border border-gray-100">
               <input
                 ref={barcodeInputRef}
                 type="text"
                 value={barcodeInput}
                 onChange={e => setBarcodeInput(e.target.value)}
                 placeholder="Scan or enter barcode"
-                className="flex-1 px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-gray-50"
+                className="flex-1 px-3 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base bg-white"
               />
-              <button type="submit" className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+              <button type="submit" className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 Add by Barcode
               </button>
-              <button type="button" className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-gray-100 text-blue-700 font-semibold border border-blue-200 shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" onClick={() => setScannerOpen(true)}>
+              <button type="button" className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-white text-blue-700 font-semibold border border-blue-200 shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" onClick={() => setScannerOpen(true)}>
                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#1976d2" strokeWidth="2"/><path d="M8 12h8M12 8v8" stroke="#1976d2" strokeWidth="2" strokeLinecap="round"/></svg>
                 Scan
               </button>
@@ -558,10 +558,11 @@ export default function POSSystem({
                 <button
                   key={category}
                   onClick={() => setFilterCategory(category)}
-                  className={`px-4 py-2 rounded text-sm whitespace-nowrap
+                  className={`px-4 py-2 rounded-xl text-sm whitespace-nowrap border shadow-md
                     ${filterCategory === category
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-800'}`}
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                      : 'bg-white text-gray-800 border-gray-200'}
+                  `}
                 >
                   {(typeof category === 'string' ? category.charAt(0).toUpperCase() + category.slice(1) : '')}
                 </button>
@@ -574,7 +575,7 @@ export default function POSSystem({
                 id="sort-products"
                 value={sortOption}
                 onChange={e => setSortOption(e.target.value as any)}
-                className="p-2 border rounded text-sm"
+                className="p-2 border rounded-xl text-sm border-gray-200 bg-white shadow"
               >
                 <option value="name-asc">Name (A-Z)</option>
                 <option value="name-desc">Name (Z-A)</option>
@@ -597,7 +598,7 @@ export default function POSSystem({
                 <div
                   key={product.id}
                   onClick={() => addToCart(product)}
-                  className="border rounded p-4 cursor-pointer hover:bg-gray-50 transition flex flex-col"
+                  className="border border-gray-100 rounded-xl p-4 cursor-pointer hover:bg-blue-50 transition flex flex-col bg-white shadow-md"
                 >
                   <div className="flex justify-center mb-2">
                     {product.imageUrl ? (
@@ -609,7 +610,7 @@ export default function POSSystem({
                       className="rounded-lg object-contain"
                     />
                     ) : (
-                    <div className="w-[100px] h-[100px] bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="w-[100px] h-[100px] bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100">
                         <EyewearIcon />
                     </div>
                     )}
@@ -636,11 +637,11 @@ export default function POSSystem({
         </div>
 
         {/* Right side - Cart and Checkout */}
-        <div className="w-1/3 bg-gray-50 p-4 flex flex-col">
+        <div className="w-1/3 bg-white p-4 flex flex-col border-l border-gray-100">
           {showInvoice ? (
             <div className="flex flex-col flex-1">
               <h2 className="text-xl font-bold mb-4">Invoice</h2>
-              <div className="bg-white p-4 rounded shadow-sm flex-1 overflow-y-auto" id="invoice-print">
+              <div className="bg-white p-4 rounded-xl shadow-md flex-1 overflow-y-auto border border-gray-100" id="invoice-print">
                 <div className="flex justify-between mb-4">
                   <div>
                     <h3 className="font-bold text-lg">Vision Loop Opticals</h3>
@@ -656,7 +657,7 @@ export default function POSSystem({
                 </div>
 
                 {selectedCustomer && (
-                  <div className="mb-4 p-2 bg-gray-50 rounded">
+                  <div className="mb-4 p-2 bg-white rounded-xl border border-gray-100 shadow-sm">
                     <h4 className="font-bold">Customer:</h4>
                     <p>{selectedCustomer.name}</p>
                     <p>{selectedCustomer.email}</p>
@@ -664,7 +665,7 @@ export default function POSSystem({
                 )}
 
                 <table className="w-full mb-4">
-                  <thead className="bg-gray-100">
+                  <thead className="bg-gray-50 border-b border-gray-100">
                     <tr>
                       <th className="text-left p-2">Item</th>
                       <th className="text-right p-2">Qty</th>
@@ -697,7 +698,7 @@ export default function POSSystem({
                     <span>Total:</span>
                     <span>₹{total.toFixed(2)}</span>
                   </div>
-                  <div className="mt-4 p-2 bg-gray-50 border-t">
+                  <div className="mt-4 p-2 bg-white border-t border-gray-100">
                     <p>Payment Method: {selectedPaymentMethod.toUpperCase()}</p>
                   </div>
                 </div>
@@ -711,19 +712,19 @@ export default function POSSystem({
               <div className="mt-4 flex space-x-2">
                 <button
                   onClick={handleCancelSale}
-                  className="flex-1 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+                  className="flex-1 bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition-colors shadow"
                 >
                   Cancel Sale
                 </button>
                 <button
                   onClick={handlePrintInvoice}
-                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition-colors shadow"
                 >
                   Print Invoice
                 </button>
                 <button
                   onClick={finalizeSale}
-                  className="flex-1 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                  className="flex-1 bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition-colors shadow"
                 >
                   Complete Sale
                 </button>
@@ -737,7 +738,7 @@ export default function POSSystem({
                 {cart.length > 0 ? (
                   <div className="space-y-2">
                     {cart.map(item => (
-                      <div key={item.id} className="flex justify-between bg-white p-3 rounded shadow-sm">
+                      <div key={item.id} className="flex justify-between bg-white p-3 rounded-xl shadow-md border border-gray-100">
                         <div className="flex-1">
                           <h4 className="font-medium">{item.name}</h4>
                           <p className="text-gray-500 text-sm">₹{item.price.toFixed(2)} each</p>
@@ -775,7 +776,7 @@ export default function POSSystem({
               </div>
 
               {/* Customer selection */}
-              <div className="mb-4 p-3 bg-white rounded shadow-sm">
+              <div className="mb-4 p-3 bg-white rounded-xl shadow-md border border-gray-100">
                 <h3 className="font-medium mb-2">Customer</h3>
                 {selectedCustomer ? (
                   <div>
@@ -788,14 +789,14 @@ export default function POSSystem({
                         {selectedCustomer && onPrescriptionOpen && (
                           <button
                             onClick={onPrescriptionOpen}
-                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors shadow"
                           >
                             {selectedCustomer.prescription ? 'Update Rx' : 'Add Rx'}
                           </button>
                         )}
                     <button
                       onClick={onCustomerChange}
-                          className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                          className="px-3 py-1 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors shadow"
                     >
                       Change
                     </button>
@@ -803,7 +804,7 @@ export default function POSSystem({
                     </div>
                     
                     {selectedCustomer.prescription && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded border border-gray-200">
+                      <div className="mt-3 p-3 bg-white rounded-xl border border-gray-100 shadow-md">
                         <div className="flex justify-between items-center mb-2">
                           <h4 className="font-semibold text-blue-600">Prescription Details</h4>
                           <span className="text-sm text-gray-500">
@@ -837,7 +838,7 @@ export default function POSSystem({
                           </div>
                         </div>
                         
-                        <div className="mt-3 pt-2 border-t border-gray-200">
+                        <div className="mt-3 pt-2 border-t border-gray-100">
                           <p className="text-sm"><span className="font-medium">Doctor:</span> {selectedCustomer.prescription.doctor}</p>
                           {selectedCustomer.prescription.notes && (
                             <p className="text-sm mt-1"><span className="font-medium">Notes:</span> {selectedCustomer.prescription.notes}</p>
@@ -850,7 +851,7 @@ export default function POSSystem({
                   <div className="flex justify-between items-center">
                     <p className="text-gray-500">No customer selected</p>
                     <button
-                      className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                      className="px-3 py-1 text-sm bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors shadow"
                       onClick={onCustomerSelect}
                     >
                       Select Customer
@@ -860,7 +861,7 @@ export default function POSSystem({
               </div>
 
               {/* Totals */}
-              <div className="bg-white p-3 rounded shadow-sm mb-4">
+              <div className="bg-white p-3 rounded-xl shadow-md mb-4 border border-gray-100">
                 <div className="flex justify-between mb-1">
                   <span>Subtotal:</span>
                   <span>₹{subtotal.toFixed(2)}</span>
@@ -883,10 +884,10 @@ export default function POSSystem({
                     <button
                       key={method}
                       onClick={() => setSelectedPaymentMethod(method)}
-                      className={`p-2 rounded border text-center capitalize
+                      className={`p-2 rounded-xl border text-center capitalize shadow-md
                         ${selectedPaymentMethod === method
                           ? 'bg-blue-50 border-blue-500 text-blue-700'
-                          : 'bg-white border-gray-300'}`}
+                          : 'bg-white border-gray-200'}`}
                     >
                       {method}
                     </button>
@@ -898,14 +899,14 @@ export default function POSSystem({
               <div className="flex space-x-2">
                 <button
                   onClick={clearCart}
-                  className="flex-1 bg-gray-300 text-gray-800 px-4 py-3 rounded hover:bg-gray-400 transition-colors"
+                  className="flex-1 bg-slate-500 text-white font-bold px-4 py-3 rounded-xl hover:bg-slate-600 transition-colors shadow"
                   disabled={cart.length === 0}
                 >
                   Clear Cart
                 </button>
                 <button
                   onClick={handleCheckout}
-                  className="flex-1 bg-green-500 text-white px-4 py-3 rounded hover:bg-green-600 transition-colors"
+                  className="flex-1 bg-green-500 text-white font-bold px-4 py-3 rounded-xl hover:bg-green-600 transition-colors shadow"
                   disabled={cart.length === 0}
                 >
                   Checkout

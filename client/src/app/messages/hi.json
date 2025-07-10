@@ -1,0 +1,19 @@
+{
+  "welcome": "स्वागत है",
+  "settings": "सेटिंग्स",
+  "logout": "लॉगआउट",
+  "profile": "प्रोफ़ाइल",
+  "language": "भाषा",
+  "save": "सहेजें",
+  "cancel": "रद्द करें",
+  "general": "सामान्य",
+  "appearance": "रूप",
+  "notifications": "सूचनाएं",
+  "security": "सुरक्षा",
+  "billing": "बिलिंग",
+  "store": "स्टोर",
+  "localization": "स्थानीयकरण",
+  "pos": "पीओएस",
+  "inventory": "इन्वेंटरी",
+  "back": "वापस"
+} 

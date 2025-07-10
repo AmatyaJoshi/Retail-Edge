@@ -15,7 +15,20 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/types": ["./src/app/types"],
+      "@/types/*": ["./src/app/types/*"],
+      "@/hooks": ["./src/app/hooks"],
+      "@/hooks/*": ["./src/app/hooks/*"],
+      "@/state": ["./src/app/state"],
+      "@/state/*": ["./src/app/state/*"],
+      "@/contexts": ["./src/app/contexts"],
+      "@/contexts/*": ["./src/app/contexts/*"],
+      "@/components/*": ["./src/app/components/*"],
+      "@/providers/*": ["./src/app/providers/*"],
+      "@/lib/*": ["./src/app/lib/*"],
+      "@/i18n/*": ["./src/app/i18n/*"],
+      "@/config/*": ["./src/app/config/*"]
     },
     "plugins": [
       {
@@ -47,7 +60,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "src",
+    "src/messages/*.json"
   ],
   "exclude": ["node_modules"]
 }

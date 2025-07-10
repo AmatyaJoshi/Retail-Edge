@@ -139,38 +139,63 @@ export default function BudgetSystem() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-2 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto py-6 px-4">
       {/* Income Management */}
-      <Card className="rounded-2xl shadow-md p-6 mb-10">
-        <CardHeader className="pb-4"><CardTitle className="text-xl font-semibold">Income Management</CardTitle></CardHeader>
+      <Card className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl font-semibold text-gray-900">Income Management</CardTitle>
+        </CardHeader>
         <CardContent className="pt-0">
           <div className="flex flex-col md:flex-row md:items-end gap-4 mb-4">
             <div className="flex flex-col gap-2 md:w-1/3">
-              <label className="text-sm font-medium">Source Name</label>
-              <Input value={newIncome.name} onChange={e => setNewIncome({ ...newIncome, name: e.target.value })} placeholder="e.g. Sales" />
+              <label className="text-sm font-medium text-gray-700">Source Name</label>
+              <Input 
+                value={newIncome.name} 
+                onChange={e => setNewIncome({ ...newIncome, name: e.target.value })} 
+                placeholder="e.g. Sales"
+                className="border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
             <div className="flex flex-col gap-2 md:w-1/3">
-              <label className="text-sm font-medium">Amount</label>
-              <Input type="number" value={newIncome.amount} onChange={e => setNewIncome({ ...newIncome, amount: e.target.value })} placeholder="e.g. 100000" />
+              <label className="text-sm font-medium text-gray-700">Amount</label>
+              <Input 
+                type="number" 
+                value={newIncome.amount} 
+                onChange={e => setNewIncome({ ...newIncome, amount: e.target.value })} 
+                placeholder="e.g. 100000"
+                className="border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
-            <Button className="md:w-auto" onClick={handleAddIncome}>Add Income</Button>
+            <Button 
+              className="md:w-auto bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" 
+              onClick={handleAddIncome}
+            >
+              Add Income
+            </Button>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left border-separate border-spacing-y-2">
+            <table className="min-w-full text-left border-separate border-spacing-y-2 bg-white rounded-lg border border-gray-200">
               <thead>
-                <tr className="text-gray-700 text-base">
-                  <th className="py-2 px-3">Source</th>
-                  <th className="py-2 px-3">Amount</th>
-                  <th className="py-2 px-3">Actions</th>
+                <tr className="bg-gray-50 text-gray-700 text-sm font-medium">
+                  <th className="py-3 px-4 border-b border-gray-200">Source</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Amount</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {incomeSources.map(src => (
-                  <tr key={src.id} className="bg-white">
-                    <td className="py-2 px-3 font-medium text-gray-900">{src.name}</td>
-                    <td className="py-2 px-3">{formatCurrency(Number(src.amount))}</td>
-                    <td className="py-2 px-3">
-                      <Button size="sm" variant="outline" onClick={() => handleRemoveIncome(src.id)}>Remove</Button>
+                  <tr key={src.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-3 px-4 font-medium text-gray-900">{src.name}</td>
+                    <td className="py-3 px-4 text-gray-700">{formatCurrency(Number(src.amount))}</td>
+                    <td className="py-3 px-4">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleRemoveIncome(src.id)}
+                        className="border-gray-300 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                      >
+                        Remove
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -181,33 +206,57 @@ export default function BudgetSystem() {
       </Card>
 
       {/* Budget Dashboard KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10">
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Total Income</CardTitle></CardHeader>
-          <CardContent className="pt-0"><div className="text-3xl font-bold">{formatCurrency(totalIncome)}</div></CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Income</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalIncome)}</div>
+          </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Total Budgeted</CardTitle></CardHeader>
-          <CardContent className="pt-0"><div className="text-3xl font-bold">{formatCurrency(totalBudget)}</div></CardContent>
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Budgeted</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalBudget)}</div>
+          </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Total Spent</CardTitle></CardHeader>
-          <CardContent className="pt-0"><div className="text-3xl font-bold">{formatCurrency(totalSpent)}</div></CardContent>
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Spent</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalSpent)}</div>
+          </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Remaining</CardTitle></CardHeader>
-          <CardContent className="pt-0"><div className="text-3xl font-bold">{formatCurrency(totalRemaining)}</div></CardContent>
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Remaining</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalRemaining)}</div>
+          </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Net Cash Flow</CardTitle></CardHeader>
-          <CardContent className="pt-0"><div className={`text-3xl font-bold ${netCashFlow < 0 ? 'text-red-600' : 'text-green-700'}`}>{formatCurrency(netCashFlow)}</div></CardContent>
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Net Cash Flow</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className={`text-2xl font-bold ${netCashFlow < 0 ? 'text-red-600' : 'text-green-600'}`}>
+              {formatCurrency(netCashFlow)}
+            </div>
+          </CardContent>
         </Card>
       </div>
 
       {/* Visualizations */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Income Sources</CardTitle></CardHeader>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold text-gray-900">Income Sources</CardTitle>
+          </CardHeader>
           <CardContent className="pt-0 h-[340px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -232,8 +281,10 @@ export default function BudgetSystem() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Budget vs Spent by Category</CardTitle></CardHeader>
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold text-gray-900">Budget vs Spent by Category</CardTitle>
+          </CardHeader>
           <CardContent className="pt-0 h-[340px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barChartData}>
@@ -248,8 +299,10 @@ export default function BudgetSystem() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="rounded-2xl shadow-md p-6">
-          <CardHeader className="pb-2"><CardTitle className="text-lg font-semibold">Income vs Expenses (Monthly)</CardTitle></CardHeader>
+        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold text-gray-900">Income vs Expenses (Monthly)</CardTitle>
+          </CardHeader>
           <CardContent className="pt-0 h-[340px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={lineChartData}>
@@ -267,26 +320,28 @@ export default function BudgetSystem() {
       </div>
 
       {/* Budget Table */}
-      <Card className="rounded-2xl shadow-md p-6 mb-10">
-        <CardHeader className="pb-4"><CardTitle className="text-xl font-semibold">Category Budgets</CardTitle></CardHeader>
+      <Card className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl font-semibold text-gray-900">Category Budgets</CardTitle>
+        </CardHeader>
         <CardContent className="pt-0">
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left border-separate border-spacing-y-2">
+            <table className="min-w-full text-left border-separate border-spacing-y-2 bg-white rounded-lg border border-gray-200">
               <thead>
-                <tr className="text-gray-700 text-base">
-                  <th className="py-2 px-3">Category</th>
-                  <th className="py-2 px-3">Allocated</th>
-                  <th className="py-2 px-3">Spent</th>
-                  <th className="py-2 px-3">Remaining</th>
-                  <th className="py-2 px-3">Utilization</th>
-                  <th className="py-2 px-3">Actions</th>
+                <tr className="bg-gray-50 text-gray-700 text-sm font-medium">
+                  <th className="py-3 px-4 border-b border-gray-200">Category</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Allocated</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Spent</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Remaining</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Utilization</th>
+                  <th className="py-3 px-4 border-b border-gray-200">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {budgetTable.map(row => (
-                  <tr key={row.categoryId ?? ''} className={row.overBudget ? "bg-red-50" : "bg-white"}>
-                    <td className="py-2 px-3 font-medium text-gray-900">{row.name}</td>
-                    <td className="py-2 px-3">
+                  <tr key={row.categoryId ?? ''} className={`hover:bg-gray-50 transition-colors ${row.overBudget ? "bg-red-50" : ""}`}>
+                    <td className="py-3 px-4 font-medium text-gray-900">{row.name}</td>
+                    <td className="py-3 px-4">
                       {editBudget[row.categoryId ?? ''] ? (
                         <div className="flex gap-2 items-center">
                           <Input
@@ -294,18 +349,32 @@ export default function BudgetSystem() {
                             min={row.spent}
                             value={budgetInputs[row.categoryId ?? ''] ?? ''}
                             onChange={e => setBudgetInputs(prev => ({ ...prev, [row.categoryId ?? '']: e.target.value }))}
-                            className="w-24"
+                            className="w-24 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
-                          <Button size="sm" variant="outline" onClick={() => handleCancel(row.categoryId ?? '')}>Cancel</Button>
-                          <Button size="sm" onClick={() => handleSave(row.categoryId ?? '', row.expenseId ?? '', row.spent)} disabled={parseFloat(budgetInputs[row.categoryId ?? ''] ?? '') < row.spent}>Save</Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => handleCancel(row.categoryId ?? '')}
+                            className="border-gray-300 hover:bg-gray-50"
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleSave(row.categoryId ?? '', row.expenseId ?? '', row.spent)} 
+                            disabled={parseFloat(budgetInputs[row.categoryId ?? ''] ?? '') < row.spent}
+                            className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                          >
+                            Save
+                          </Button>
                         </div>
                       ) : (
                         <span>{formatCurrency(row.allocated)}</span>
                       )}
                     </td>
-                    <td className="py-2 px-3">{formatCurrency(row.spent)}</td>
-                    <td className="py-2 px-3">{formatCurrency(row.remaining)}</td>
-                    <td className="py-2 px-3">
+                    <td className="py-3 px-4 text-gray-700">{formatCurrency(row.spent)}</td>
+                    <td className="py-3 px-4 text-gray-700">{formatCurrency(row.remaining)}</td>
+                    <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <span>{row.utilization.toFixed(1)}%</span>
                         <div className="w-24 bg-gray-200 rounded-full h-2.5">
@@ -314,9 +383,16 @@ export default function BudgetSystem() {
                       </div>
                       {row.overBudget && <div className="text-xs text-red-600 font-semibold mt-1">Over Budget!</div>}
                     </td>
-                    <td className="py-2 px-3">
+                    <td className="py-3 px-4">
                       {!editBudget[row.categoryId ?? ''] && (
-                        <Button size="sm" variant="outline" onClick={() => handleEdit(row.categoryId ?? '', row.allocated)}>Edit</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleEdit(row.categoryId ?? '', row.allocated)}
+                          className="border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                        >
+                          Edit
+                        </Button>
                       )}
                     </td>
                   </tr>

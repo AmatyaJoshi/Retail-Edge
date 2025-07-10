@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { EyePrescription, Prescription } from '../types/prescriptions';
+import type { EyePrescription, Prescription } from '@/types/prescriptions';
 
 interface PrescriptionFormProps {
   existingPrescription?: Prescription | undefined;
@@ -23,14 +23,6 @@ const getExpiryDate = (): string => {
   return formatDate(date);
 };
 
-const createEmptyEyePrescription = (): EyePrescription => ({
-  sphere: 0,
-  cylinder: undefined,
-  axis: undefined,
-  add: undefined,
-  pd: undefined
-});
-
 export default function PrescriptionForm({
   existingPrescription,
   customerId,
@@ -47,8 +39,20 @@ export default function PrescriptionForm({
       customerId,
       date: formatDate(new Date()),
       expiryDate: getExpiryDate(),
-      rightEye: createEmptyEyePrescription(),
-      leftEye: createEmptyEyePrescription(),
+      rightEye: {
+        sphere: 0,
+        cylinder: 0,
+        axis: 0,
+        add: 0,
+        pd: 0
+      },
+      leftEye: {
+        sphere: 0,
+        cylinder: 0,
+        axis: 0,
+        add: 0,
+        pd: 0
+      },
       doctor: '',
       notes: ''
     };
@@ -91,7 +95,7 @@ export default function PrescriptionForm({
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-lg max-w-2xl mx-auto">
+    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Eye Prescription</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,7 +109,7 @@ export default function PrescriptionForm({
               name="date"
               value={prescription.date}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               required
             />
           </div>
@@ -118,7 +122,7 @@ export default function PrescriptionForm({
               name="expiryDate"
               value={prescription.expiryDate}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               required
             />
           </div>
@@ -133,13 +137,13 @@ export default function PrescriptionForm({
             name="doctor"
             value={prescription.doctor}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
             required
           />
         </div>
         
         {/* Right Eye */}
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-md">
           <h3 className="font-bold mb-4">Right Eye (OD)</h3>
           <div className="grid grid-cols-5 gap-4">
             <div>
@@ -151,7 +155,7 @@ export default function PrescriptionForm({
                 step="0.25"
                 value={prescription.rightEye.sphere}
                 onChange={(e) => handleEyeChange('rightEye', 'sphere', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
                 required
               />
             </div>
@@ -164,7 +168,7 @@ export default function PrescriptionForm({
                 step="0.25"
                 value={prescription.rightEye.cylinder ?? ''}
                 onChange={(e) => handleEyeChange('rightEye', 'cylinder', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
             <div>
@@ -177,7 +181,7 @@ export default function PrescriptionForm({
                 max="180"
                 value={prescription.rightEye.axis ?? ''}
                 onChange={(e) => handleEyeChange('rightEye', 'axis', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
             <div>
@@ -189,7 +193,7 @@ export default function PrescriptionForm({
                 step="0.25"
                 value={prescription.rightEye.add ?? ''}
                 onChange={(e) => handleEyeChange('rightEye', 'add', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
             <div>
@@ -201,14 +205,14 @@ export default function PrescriptionForm({
                 step="0.5"
                 value={prescription.rightEye.pd ?? ''}
                 onChange={(e) => handleEyeChange('rightEye', 'pd', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
           </div>
         </div>
         
         {/* Left Eye */}
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-md">
           <h3 className="font-bold mb-4">Left Eye (OS)</h3>
           <div className="grid grid-cols-5 gap-4">
             <div>
@@ -220,7 +224,7 @@ export default function PrescriptionForm({
                 step="0.25"
                 value={prescription.leftEye.sphere}
                 onChange={(e) => handleEyeChange('leftEye', 'sphere', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
                 required
               />
             </div>
@@ -233,7 +237,7 @@ export default function PrescriptionForm({
                 step="0.25"
                 value={prescription.leftEye.cylinder ?? ''}
                 onChange={(e) => handleEyeChange('leftEye', 'cylinder', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
             <div>
@@ -246,7 +250,7 @@ export default function PrescriptionForm({
                 max="180"
                 value={prescription.leftEye.axis ?? ''}
                 onChange={(e) => handleEyeChange('leftEye', 'axis', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
             <div>
@@ -258,7 +262,7 @@ export default function PrescriptionForm({
                 step="0.25"
                 value={prescription.leftEye.add ?? ''}
                 onChange={(e) => handleEyeChange('leftEye', 'add', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
             <div>
@@ -270,7 +274,7 @@ export default function PrescriptionForm({
                 step="0.5"
                 value={prescription.leftEye.pd ?? ''}
                 onChange={(e) => handleEyeChange('leftEye', 'pd', e.target.value)}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
               />
             </div>
           </div>
@@ -284,7 +288,7 @@ export default function PrescriptionForm({
             name="notes"
             value={prescription.notes}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-xl border-gray-200 bg-white shadow"
             rows={3}
           ></textarea>
         </div>

@@ -1,0 +1,19 @@
+{
+  "welcome": "സ്വാഗതം",
+  "settings": "ക്രമീകരണങ്ങൾ",
+  "logout": "ലോഗൗട്ട്",
+  "profile": "പ്രൊഫൈൽ",
+  "language": "ഭാഷ",
+  "save": "സേവ് ചെയ്യുക",
+  "cancel": "റദ്ദാക്കുക",
+  "general": "സാധാരണ",
+  "appearance": "രൂപം",
+  "notifications": "അറിയിപ്പുകൾ",
+  "security": "സുരക്ഷ",
+  "billing": "ബില്ലിംഗ്",
+  "store": "സ്റ്റോർ",
+  "localization": "പ്രാദേശികവൽക്കരണം",
+  "pos": "പി.ഒ.എസ്.",
+  "inventory": "ഇൻവെന്ററി",
+  "back": "തിരികെ"
+} 

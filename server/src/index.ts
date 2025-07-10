@@ -22,6 +22,8 @@ import transactionsRoutes from './routes/transactions';
 import analyticsRoutes from './routes/analytics';
 import expenseTransactionsRoutes from './routes/expenseTransactionsRoutes';
 import barcodeRoutes from './routes/barcode';
+import employeesRoutes from './routes/employees';
+import storeRoutes from './routes/storeRoutes';
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -98,6 +100,8 @@ app.use('/api/analytics', analyticsRoutes);
 // Register expense transactions routes as part of expenses
 app.use("/api/expenses/transactions", expenseTransactionsRoutes);
 app.use('/api/barcode', barcodeRoutes);
+app.use('/api/employees', employeesRoutes);
+app.use('/api/store', storeRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

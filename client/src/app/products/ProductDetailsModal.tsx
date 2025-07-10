@@ -3,7 +3,7 @@
 import type { Product } from "@/state/api";
 import { X, Edit2, Check, X as XIcon } from "lucide-react";
 import { useState, useRef } from "react";
-import Rating from "@/app/(components)/Rating";
+import Rating from "@/app/components/Rating";
 import Barcode from "react-barcode";
 
 interface ProductDetailsModalProps {
@@ -154,13 +154,21 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
     <>
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
         <div
-          className="bg-white/95 backdrop-blur-md rounded-xl p-10 max-w-6xl w-full mx-auto relative shadow-2xl max-h-[95vh] overflow-y-auto"
+          className="bg-white border border-gray-200 rounded-2xl p-10 max-w-6xl w-full mx-auto relative shadow-2xl max-h-[95vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Floating close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 bg-white border border-gray-200 rounded-full p-2 shadow hover:bg-gray-100 transition z-20"
+            title="Close"
+          >
+            <X className="w-6 h-6 text-gray-500" />
+          </button>
           {/* Single edit pen icon at top right */}
           <button
             onClick={isEditing ? handleCancelAll : handleEditAll}
-            className="absolute top-6 right-6 text-blue-500 hover:text-blue-700 transition-colors z-10"
+            className="absolute top-4 right-16 text-blue-500 hover:text-blue-700 transition-colors z-10"
             title={isEditing ? 'Cancel Edit' : 'Edit All'}
           >
             {isEditing ? <XIcon className="w-6 h-6" /> : <Edit2 className="w-6 h-6" />}
@@ -169,7 +177,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
           {isEditing && (
             <button
               onClick={handleSaveAll}
-              className="absolute top-6 right-20 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-colors z-10 border border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              className="absolute top-4 right-32 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-colors z-10 border border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
             >
               <Check className="w-5 h-5 mr-1" />
               Save Changes
@@ -178,8 +186,8 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
 
           <div className="flex flex-col md:flex-row gap-12">
             {/* Product Image Section (Left Column) */}
-            <div className="w-full md:w-1/2 flex flex-col items-center justify-start bg-gray-50/50 rounded-xl p-8 space-y-8">
-              <div className="w-[450px] h-[450px] bg-gray-100/50 rounded-xl flex items-center justify-center overflow-hidden shadow-md relative">
+            <div className="w-full md:w-1/2 flex flex-col items-center justify-start bg-white rounded-xl p-8 space-y-8">
+              <div className={`w-[450px] h-[450px] rounded-xl flex items-center justify-center overflow-hidden shadow-md relative ${imagePreview || pendingImage ? 'bg-white border border-gray-200' : 'bg-gray-50 border-2 border-dashed border-gray-200'}`}>
                 {pendingImage ? (
                   <img src={pendingImage} alt="Product preview" className="object-contain w-full h-full" />
                 ) : imagePreview ? (
@@ -231,8 +239,9 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
               </div>
               {/* Product Overview (Description) - moved here */}
               <div className="w-full">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">About this item</h3>
-                {renderEditableField('description', 'Description', product.description, 'textarea', 'text-gray-700 text-lg leading-relaxed', { rows: 6 })}
+                <h3 className="text-xl font-bold text-gray-900 mb-3">About this item</h3>
+                <div className="border-b border-gray-100 mb-4" />
+                {renderEditableField('description', 'Description', product.description, 'textarea', 'text-gray-700 text-base leading-relaxed', { rows: 6 })}
               </div>
             </div>
 
@@ -240,18 +249,18 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
             <div className="w-full md:w-1/2 space-y-6">
               {/* Product Name & Brand */}
               <div>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1 tracking-wider">Product Info</h3>
                 {renderEditableField('brand', 'Brand', product.brand, 'text', 'text-base text-blue-700 uppercase font-semibold mb-2')}
-                {renderEditableField('name', 'Product Name', product.name, 'text', 'text-5xl font-extrabold text-gray-900 leading-tight')}
+                {renderEditableField('name', 'Product Name', product.name, 'text', 'text-3xl font-extrabold text-gray-900 leading-tight')}
               </div>
+              <div className="border-b border-gray-100 my-4" />
 
               {/* SKU */}
-              {renderEditableField('sku', 'SKU', product.sku, 'text', 'text-lg text-gray-700')}
+              {renderEditableField('sku', 'SKU', product.sku, 'text', 'text-base text-gray-700')}
 
               {/* Barcode (Real EAN) */}
               <div className="mb-4 flex flex-col gap-1">
-                <h3 className="text-sm font-medium text-gray-500 flex items-center gap-1">
-                  Barcode
-                </h3>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1 tracking-wider">Barcode</h3>
                 <div className="flex flex-col items-center">
                   {product.barcode && /^[0-9]{12}$/.test(product.barcode) ? (
                     <Barcode value={product.barcode} width={4} height={48} fontSize={16} displayValue background="#fff" lineColor="#222" />
@@ -266,12 +275,13 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
                   )}
                 </div>
               </div>
+              <div className="border-b border-gray-100 my-4" />
 
               {/* Rating */}
               {product.rating !== undefined && (
                 <div className="flex items-center gap-3">
                   <Rating rating={editingField === 'rating' ? (editValues.rating ?? product.rating) : product.rating} />
-                  <span className="text-blue-700 hover:text-blue-900 cursor-pointer text-lg font-semibold">
+                  <span className="text-blue-700 hover:text-blue-900 cursor-pointer text-base font-semibold">
                     {(editingField === 'rating' ? (editValues.rating ?? product.rating) : product.rating)?.toFixed(1)} out of 5 stars
                   </span>
                   {editingField === 'rating' ? (
@@ -283,7 +293,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
                         max="5"
                         value={editValues.rating ?? ''}
                         onChange={(e) => setEditValues({ ...editValues, rating: Number(e.target.value) })}
-                        className="w-28 p-2 border rounded-md text-lg"
+                        className="w-28 p-2 border rounded-md text-base"
                       />
                       <button
                         onClick={() => handleSave('rating')}
@@ -308,19 +318,23 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
                   )}
                 </div>
               )}
+              <div className="border-b border-gray-100 my-4" />
 
               {/* Price */}
-              {renderEditableField('price', 'Price', `₹${product.price.toFixed(2)}`, 'number', 'text-4xl font-extrabold text-gray-900', { step: "0.01" })}
+              {renderEditableField('price', 'Price', ` 9${product.price.toFixed(2)}`, 'number', 'text-2xl font-extrabold text-gray-900', { step: "0.01" })}
 
               {/* Stock Quantity */}
-              {renderEditableField('stockQuantity', 'Availability', product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of Stock', 'number', product.stockQuantity > 0 ? 'text-lg text-green-700 font-semibold' : 'text-lg text-red-700 font-semibold', { step: "1", min: "0" })}
+              {renderEditableField('stockQuantity', 'Availability', product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of Stock', 'number', product.stockQuantity > 0 ? 'text-base text-green-700 font-semibold' : 'text-base text-red-700 font-semibold', { step: "1", min: "0" })}
 
-              {/* Category */}
+              {/* Category and Product ID */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                {renderEditableField('category', 'Category', product.category, 'text', 'text-lg text-gray-800 capitalize')}
-                <div className="mb-4">
-                  <h3 className="text-base font-medium text-gray-500 mb-1">Product ID</h3>
-                  <p className="text-lg text-gray-800 break-all">{product.productId}</p>
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1 tracking-wider">Category</h3>
+                  <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold capitalize">{product.category}</span>
+                </div>
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1 tracking-wider">Product ID</h3>
+                  <p className="text-base text-gray-800 break-all">{product.productId}</p>
                 </div>
               </div>
 
@@ -328,7 +342,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
               <div className="mt-8">
                 <button
                   onClick={() => setShowDeleteWarning(true)}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-colors"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors"
                 >
                   Delete Product
                 </button>
@@ -336,7 +350,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
               {/* Caution Modal */}
               {showDeleteWarning && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                  <div className="bg-white rounded-xl p-8 shadow-2xl max-w-md w-full flex flex-col items-center">
+                  <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-2xl max-w-md w-full flex flex-col items-center">
                     <h2 className="text-2xl font-bold text-red-700 mb-4">Caution!</h2>
                     <p className="text-lg text-gray-700 mb-6 text-center">Are you sure you want to <span className='font-bold text-red-600'>delete this product</span>? This action <span className='font-bold'>cannot be undone</span>.</p>
                     <div className="flex gap-4">
@@ -351,13 +365,13 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
                             alert('Failed to delete product.');
                           }
                         }}
-                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow"
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow"
                       >
                         Yes, Delete
                       </button>
                       <button
                         onClick={() => setShowDeleteWarning(false)}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg shadow"
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full shadow"
                       >
                         Cancel
                       </button>

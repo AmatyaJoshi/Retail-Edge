@@ -1,0 +1,19 @@
+{
+  "welcome": "خوش آمدید",
+  "settings": "ترتیبات",
+  "logout": "لاگ آؤٹ",
+  "profile": "پروفائل",
+  "language": "زبان",
+  "save": "محفوظ کریں",
+  "cancel": "منسوخ کریں",
+  "general": "عام",
+  "appearance": "ظاہر",
+  "notifications": "اطلاعات",
+  "security": "سیکیورٹی",
+  "billing": "بلنگ",
+  "store": "اسٹور",
+  "localization": "مقامی کاری",
+  "pos": "پی او ایس",
+  "inventory": "انوینٹری",
+  "back": "واپس"
+} 

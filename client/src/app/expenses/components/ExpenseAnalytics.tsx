@@ -51,12 +51,8 @@ export function ExpenseAnalytics() {
   const endDate = format(dateRange.to, "yyyy-MM-dd");
   
   // Fetch expense data
-  const queryParams: { startDate: string; endDate: string; category?: string } = {
-    startDate,
-    endDate
-  };
-  if (categoryFilter) queryParams.category = categoryFilter;
-  const { data: expensesData, isLoading, error } = useGetExpensesByCategoryQuery(queryParams);
+  // Simplified query without date filtering initially to debug
+  const { data: expensesData, isLoading, error } = useGetExpensesByCategoryQuery({});
   
   // Fetch all categories for mapping
   const { data: categoriesData, isLoading: isCategoriesLoading } = useGetAllExpenseCategoriesQuery();
@@ -73,21 +69,27 @@ export function ExpenseAnalytics() {
   // Format data for category distribution pie chart
   const categoryData = useMemo(() => {
     if (!expensesData || !categoryMap) return [];
-    return expensesData.map((item) => ({
-      name: categoryMap[item.category] || item.category,
-      value: parseFloat(item.amount),
-      pending: item.pendingAmount || 0
-    }));
+    return expensesData.map((item) => {
+      const amount = typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount;
+      return {
+        name: categoryMap[item.category] || item.category,
+        value: amount || 0,
+        pending: item.pendingAmount || 0
+      };
+    });
   }, [expensesData, categoryMap]);
   
   // Format data for budget vs actual bar chart
   const budgetVsActualData = useMemo(() => {
     if (!expensesData || !categoryMap) return [];
-    return expensesData.map((item) => ({
-      name: categoryMap[item.category] || item.category,
-      budget: item.allocated || 0,
-      spent: parseFloat(item.amount)
-    }));
+    return expensesData.map((item) => {
+      const amount = typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount;
+      return {
+        name: categoryMap[item.category] || item.category,
+        budget: item.allocated || 0,
+        spent: amount || 0
+      };
+    });
   }, [expensesData, categoryMap]);
   
   // Find top category
@@ -113,7 +115,10 @@ export function ExpenseAnalytics() {
   
   const totalSpent = useMemo(() => {
     if (!expensesData) return 0;
-    return expensesData.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+    return expensesData.reduce((sum, item) => {
+      const amount = typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount;
+      return sum + (amount || 0);
+    }, 0);
   }, [expensesData]);
   
   const percentageSpent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
@@ -133,7 +138,11 @@ export function ExpenseAnalytics() {
   // KPI: Largest Single Expense
   const largestExpense = useMemo(() => {
     if (!expensesData) return 0;
-    return Math.max(...expensesData.map(item => parseFloat(item.amount)));
+    const amounts = expensesData.map(item => {
+      const amount = typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount;
+      return amount || 0;
+    });
+    return amounts.length > 0 ? Math.max(...amounts) : 0;
   }, [expensesData]);
   
   // Top 5 Categories by Pending Amount (for horizontal bar chart)
@@ -173,10 +182,13 @@ export function ExpenseAnalytics() {
   // Data for Treemap: Expense Distribution by Category
   const treemapData = useMemo(() => {
     if (!expensesData || !categoryMap) return [];
-    return expensesData.map((item) => ({
-      name: categoryMap[item.category] || item.category,
-      size: parseFloat(item.amount),
-    }));
+    return expensesData.map((item) => {
+      const amount = typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount;
+      return {
+        name: categoryMap[item.category] || item.category,
+        size: amount || 0,
+      };
+    });
   }, [expensesData, categoryMap]);
 
   // KPI: Most Used Payment Method
@@ -184,7 +196,8 @@ export function ExpenseAnalytics() {
     if (!allTransactions) return '-';
     const methodMap: Record<string, number> = {};
     allTransactions.forEach((txn) => {
-      methodMap[txn.paymentMethod] = (methodMap[txn.paymentMethod] || 0) + 1;
+      const method = txn.paymentMethod || 'Unknown';
+      methodMap[method] = (methodMap[method] || 0) + 1;
     });
     const sorted = Object.entries(methodMap).sort((a, b) => b[1] - a[1]);
     return sorted.length > 0 ? sorted[0][0] : '-';
@@ -193,7 +206,7 @@ export function ExpenseAnalytics() {
   // Loading state
   if (isLoading) {
     return (
-      <Card className="col-span-full">
+      <Card className="col-span-full bg-white rounded-xl shadow-sm border border-gray-200">
         <CardHeader>
           <div className="flex items-center gap-2 animate-pulse">
             <PieChartIcon className="w-6 h-6 text-primary" />
@@ -210,7 +223,7 @@ export function ExpenseAnalytics() {
   // Error state
   if (error) {
     return (
-      <Card className="col-span-full">
+      <Card className="col-span-full bg-white rounded-xl shadow-sm border border-gray-200">
         <CardHeader>
           <div className="flex items-center gap-2">
             <PieChartIcon className="w-6 h-6 text-primary" />
@@ -219,7 +232,34 @@ export function ExpenseAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-[350px]">
-            <p className="text-destructive">Failed to load expense data</p>
+            <p className="text-red-600">Failed to load expense data</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // No data state
+  if (!expensesData || expensesData.length === 0) {
+    return (
+      <Card className="col-span-full bg-white rounded-xl shadow-sm border border-gray-200">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <PieChartIcon className="w-6 h-6 text-primary" />
+            <CardTitle>Expense Analytics</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Temporary debug info */}
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+            <h4 className="font-semibold mb-2">Debug Info:</h4>
+            <p>Loading: {isLoading.toString()}</p>
+            <p>Error: {error ? JSON.stringify(error) : 'None'}</p>
+            <p>Data length: {expensesData ? expensesData.length : 0}</p>
+            <p>Categories length: {categoriesData ? categoriesData.length : 0}</p>
+          </div>
+          <div className="flex items-center justify-center h-[350px]">
+            <p className="text-gray-500">No expense data available for the selected period</p>
           </div>
         </CardContent>
       </Card>
@@ -227,17 +267,17 @@ export function ExpenseAnalytics() {
   }
   
   return (
-    <Card className="col-span-full bg-gradient-to-br from-white to-slate-50 shadow-xl border-0">
+    <Card className="col-span-full bg-white rounded-xl shadow-sm border border-gray-200">
       <CardHeader className="pb-2 border-b-0">
         <div className="flex items-center gap-3">
           <PieChartIcon className="w-7 h-7 text-primary" />
-          <CardTitle className="text-2xl font-semibold tracking-tight">Expense Analytics</CardTitle>
+          <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Expense Analytics</CardTitle>
         </div>
         <div className="flex flex-wrap gap-2 mt-4">
           {/* Date Range Picker */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 border-gray-300 hover:bg-gray-50">
                 <CalendarIcon className="w-4 h-4" />
                 {format(dateRange.from, 'MMM dd, yyyy')} - {format(dateRange.to, 'MMM dd, yyyy')}
                 <ChevronDown className="w-4 h-4" />
@@ -261,16 +301,16 @@ export function ExpenseAnalytics() {
       </CardHeader>
       <CardContent className="pt-4">
         {/* Professional KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
             <div className="flex items-center gap-2 text-primary"><TrendingUp className="w-5 h-5" /> <span className="font-medium">Total Spent</span></div>
             <div className="text-2xl font-bold animate-fade-in">{formatCurrency(totalSpent)}</div>
           </div>
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
+          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
             <div className="flex items-center gap-2 text-blue-500"><Layers className="w-5 h-5" /> <span className="font-medium">Total Budget</span></div>
             <div className="text-2xl font-bold animate-fade-in">{formatCurrency(totalBudget)}</div>
           </div>
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
+          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
             <div className="flex items-center gap-2 text-green-600"><Award className="w-5 h-5" /> <span className="font-medium">Utilization</span></div>
             <div className="text-2xl font-bold animate-fade-in">{percentageSpent.toFixed(1)}%</div>
             <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
@@ -283,27 +323,15 @@ export function ExpenseAnalytics() {
               ></div>
             </div>
           </div>
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
+          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
             <div className="flex items-center gap-2 text-fuchsia-600"><PieChartIcon className="w-5 h-5" /> <span className="font-medium">Top Category</span></div>
             <div className="text-lg font-semibold animate-fade-in">{topCategory ? topCategory.name : '-'}</div>
             <div className="text-xs text-muted-foreground">{topCategory ? formatCurrency(topCategory.value) : ''}</div>
           </div>
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
-            <div className="flex items-center gap-2 text-orange-600"><PieChartIcon className="w-5 h-5" /> <span className="font-medium">Pending Amount</span></div>
-            <div className="text-2xl font-bold animate-fade-in">{formatCurrency(totalPending)}</div>
-          </div>
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
-            <div className="flex items-center gap-2 text-cyan-600"><PieChartIcon className="w-5 h-5" /> <span className="font-medium">Categories</span></div>
-            <div className="text-2xl font-bold animate-fade-in">{numCategories}</div>
-          </div>
-          <div className="bg-white rounded-xl shadow flex flex-col items-start p-5 gap-2 border border-slate-100">
-            <div className="flex items-center gap-2 text-indigo-600"><PieChartIcon className="w-5 h-5" /> <span className="font-medium">Most Used Payment Method</span></div>
-            <div className="text-2xl font-bold animate-fade-in">{mostUsedPaymentMethod}</div>
-          </div>
         </div>
         {/* Main Visualizations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="h-[340px] bg-white rounded-xl shadow p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Category Distribution</h3>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -326,7 +354,7 @@ export function ExpenseAnalytics() {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="h-[340px] bg-white rounded-xl shadow p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><Layers className="w-4 h-4" /> Budget vs Actual</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={budgetVsActualData}>
@@ -342,7 +370,7 @@ export function ExpenseAnalytics() {
           </div>
         </div>
         {/* Top Pending Categories Visualization */}
-        <div className="h-[340px] bg-white rounded-xl shadow p-4 flex flex-col mt-8">
+        <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col mt-8">
           <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Top 5 Categories by Pending Amount</h3>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart layout="vertical" data={topPendingCategories}>
@@ -357,7 +385,7 @@ export function ExpenseAnalytics() {
         {/* New Interactive Visualizations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           {/* Stacked Bar Chart: Paid vs Pending by Category */}
-          <div className="h-[340px] bg-white rounded-xl shadow p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><Layers className="w-4 h-4" /> Paid vs Pending by Category</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={paidPendingByCategory}>
@@ -372,7 +400,7 @@ export function ExpenseAnalytics() {
             </ResponsiveContainer>
           </div>
           {/* Donut Chart: Payment Status Breakdown */}
-          <div className="h-[340px] bg-white rounded-xl shadow p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Payment Status Breakdown</h3>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -381,7 +409,7 @@ export function ExpenseAnalytics() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }: { name: string; percent: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   outerRadius={110}
                   innerRadius={60}
                   fill="#6366f1"
@@ -398,7 +426,7 @@ export function ExpenseAnalytics() {
           </div>
         </div>
         {/* Treemap: Expense Distribution by Category */}
-        <div className="h-[340px] bg-white rounded-xl shadow p-4 flex flex-col mt-8">
+        <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col mt-8">
           <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Expense Distribution by Category</h3>
           <ResponsiveContainer width="100%" height="100%">
             <Treemap

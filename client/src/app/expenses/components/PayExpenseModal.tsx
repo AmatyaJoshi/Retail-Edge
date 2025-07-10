@@ -91,7 +91,7 @@ export default function PayExpenseModal({ open, onOpenChange, expense }: PayExpe
         <DialogHeader>
           <DialogTitle>Pay Expense</DialogTitle>
           <DialogDescription>
-            Enter payment details for <b>{expense.category}</b> (Due: {expense.amount - (expense.paidAmount || 0)})
+            Enter payment details for <b>{expense.description || 'Unnamed Expense'}</b> (Due: ₹{expense.amount - (expense.paidAmount || 0)})
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">

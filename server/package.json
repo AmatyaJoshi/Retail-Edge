@@ -19,6 +19,7 @@
   "description": "",
   "dependencies": {
     "@clerk/clerk-react": "^5.32.3",
+    "@clerk/clerk-sdk-node": "^4.13.23",
     "@prisma/client": "^6.9.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-switch": "^1.2.5",

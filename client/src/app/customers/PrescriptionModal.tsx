@@ -2,7 +2,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { X } from 'lucide-react';
 
-import type { Prescription } from '../types/prescriptions';
+import type { Prescription } from '@/types/prescriptions';
 
 interface PrescriptionModalProps {
   isOpen: boolean;

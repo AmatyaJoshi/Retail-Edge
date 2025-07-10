@@ -1,6 +1,7 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { v4 } from "uuid";
-import Header from "@/app/(components)/Header";
+import Header from "@/app/components/Header";
 
 type ProductFormData = {
   name: string;

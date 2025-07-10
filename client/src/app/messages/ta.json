@@ -1,0 +1,19 @@
+{
+  "welcome": "வரவேற்கிறோம்",
+  "settings": "அமைப்புகள்",
+  "logout": "வெளியேறு",
+  "profile": "சுயவிவரம்",
+  "language": "மொழி",
+  "save": "சேமிக்கவும்",
+  "cancel": "ரத்து செய்க",
+  "general": "பொது",
+  "appearance": "தோற்றம்",
+  "notifications": "அறிவிப்புகள்",
+  "security": "பாதுகாப்பு",
+  "billing": "பில்லிங்",
+  "store": "கடை",
+  "localization": "உள்ளூர்",
+  "pos": "பிஓஎஸ்",
+  "inventory": "சரக்கு",
+  "back": "மீண்டும்"
+} 

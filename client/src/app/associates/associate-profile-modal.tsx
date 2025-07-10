@@ -387,7 +387,7 @@ export function AssociateProfileModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-gray-100">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -396,26 +396,15 @@ export function AssociateProfileModal({
                 View and manage associate details and analytics
               </DialogDescription>
             </div>
-            <div className="flex items-center space-x-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>More actions</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            {/* Removed 3 dots MoreVertical action button */}
           </div>
         </DialogHeader>
 
         <div className="flex items-center space-x-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg shadow-md">
-          <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
-            <AvatarFallback className="text-lg">{associate.name.charAt(0)}</AvatarFallback>
+          <Avatar className="h-24 w-24 bg-gradient-to-br from-blue-100 via-white to-gray-100 border-4 border-white ring-2 ring-blue-400 shadow-xl">
+            <AvatarFallback className="text-3xl font-bold text-blue-700 flex items-center justify-center h-full w-full">
+              {associate.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center space-x-2">
@@ -436,8 +425,10 @@ export function AssociateProfileModal({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" className="bg-white/10 hover:bg-white/20">
-                    <MessageSquare className="mr-2 h-4 w-4" />
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 focus:bg-blue-800 text-white border-none shadow-md transition-colors"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4 text-white" />
                     Message
                   </Button>
                 </TooltipTrigger>
@@ -449,8 +440,10 @@ export function AssociateProfileModal({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" className="bg-white/10 hover:bg-white/20">
-                    <Phone className="mr-2 h-4 w-4" />
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 focus:bg-blue-800 text-white border-none shadow-md transition-colors"
+                  >
+                    <Phone className="mr-2 h-4 w-4 text-white" />
                     Call
                   </Button>
                 </TooltipTrigger>

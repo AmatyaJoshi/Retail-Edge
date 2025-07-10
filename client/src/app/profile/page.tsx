@@ -3,6 +3,15 @@
 import { Calendar, Edit3, Mail, Phone, User } from "lucide-react";
 import { useUser } from '@clerk/nextjs';
 import { useState, useEffect, useRef } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import QRCode from 'react-qr-code';
 
 interface UserData {
   id: string;
@@ -26,30 +35,19 @@ const ProfilePage = () => {
   const [editPhoto, setEditPhoto] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showRemovePhotoConfirm, setShowRemovePhotoConfirm] = useState(false);
 
-  // Fetch user data from database
+  // Fetch user data from database using clerkId
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (user?.id) {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/user-profile?clerkId=${user.id}`);
-          if (response.ok) {
-            const data = await response.json();
-            setUserData(data);
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
+    if (!isLoaded || !user?.id) return;
+    setLoading(true);
+    fetch(`/api/user-profile?clerkId=${user.id}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        setUserData(data);
         setLoading(false);
-      }
-    };
-
-    if (isLoaded && user) {
-      fetchUserData();
-    }
+      })
+      .catch(() => setLoading(false));
   }, [user, isLoaded]);
 
   useEffect(() => {
@@ -108,6 +106,18 @@ const ProfilePage = () => {
     }
   };
 
+  // Handle remove profile photo
+  const handleRemovePhoto = async () => {
+    setShowRemovePhotoConfirm(false);
+    setEditPhoto(null);
+  };
+
+  // Handle remove photo from main profile view
+  const handleRemovePhotoFromProfile = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handleRemovePhoto();
+  };
+
   // Save profile changes
   const handleSave = async () => {
     setSaving(true);
@@ -118,7 +128,7 @@ const ProfilePage = () => {
         address: editAddress,
         photoUrl: editPhoto,
       };
-      const res = await fetch(`/api/auth/user-profile`, {
+      const res = await fetch(`/api/user-profile`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -127,12 +137,14 @@ const ProfilePage = () => {
         setEditOpen(false);
         // Refetch user data
         if (user?.id) {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/user-profile?clerkId=${user.id}`);
+          const response = await fetch(`/api/user-profile?clerkId=${user.id}`);
           if (response.ok) {
             const data = await response.json();
             setUserData(data);
           }
         }
+        // Trigger profile update event for navbar
+        window.dispatchEvent(new Event('profile-updated'));
       }
     } finally {
       setSaving(false);
@@ -192,6 +204,43 @@ const ProfilePage = () => {
                   onChange={handlePhotoChange}
                 />
               </div>
+              {editPhoto && (
+                <>
+                  <button
+                    className="mt-2 text-xs text-gray-500 hover:underline hover:text-red-500 transition-colors"
+                    onClick={() => setShowRemovePhotoConfirm(true)}
+                    type="button"
+                  >
+                    Remove photo
+                  </button>
+                  <Dialog open={showRemovePhotoConfirm} onOpenChange={setShowRemovePhotoConfirm}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Remove Profile Photo</DialogTitle>
+                        <DialogDescription>
+                          Are you sure you want to remove your profile photo?
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <button
+                          className="px-4 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          onClick={() => setShowRemovePhotoConfirm(false)}
+                          type="button"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+                          onClick={handleRemovePhoto}
+                          type="button"
+                        >
+                          Remove
+                        </button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
@@ -255,6 +304,13 @@ const ProfilePage = () => {
                 <span className="text-base">Joined {new Date(userData.createdAt).toLocaleDateString('en-GB')}</span>
               </div>
             </div>
+            {/* QR Code for Owner ID */}
+            <div className="flex flex-col items-center justify-center mt-4 mb-1">
+              <div className="bg-white border border-gray-200 rounded p-2 shadow-sm">
+                <QRCode value={userData.id} size={64} bgColor="#fff" fgColor="#222" />
+              </div>
+              <span className="text-[10px] text-gray-400 mt-1">Scan Owner ID</span>
+            </div>
           </div>
           
           {/* Edit Button */}
@@ -311,11 +367,11 @@ const ProfilePage = () => {
               <div className="text-sm text-gray-500">{new Date(userData.createdAt).toLocaleDateString('en-GB')}</div>
             </div>
             <div className="flex justify-between items-start pb-3 border-b border-gray-100">
-              <div>
+                <div>
                 <div className="font-medium text-gray-800">Last Login</div>
               </div>
               <div className="text-sm text-gray-500">{new Date().toLocaleDateString('en-GB')}</div>
-            </div>
+                </div>
             <div className="flex justify-between items-start pb-3 border-b border-gray-100">
               <div>
                 <div className="font-medium text-gray-800">Account Status</div>

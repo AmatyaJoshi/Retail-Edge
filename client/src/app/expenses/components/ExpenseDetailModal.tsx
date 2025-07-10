@@ -16,7 +16,7 @@ import PayExpenseModal from "./PayExpenseModal";
 import { CalendarIcon, CreditCard, FileText, Tag, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import type { Expense } from "../types";
+import type { Expense } from "@/state/api";
 import type { ExpenseTransaction } from "@/state/api";
 
 interface ExpenseDetailModalProps {

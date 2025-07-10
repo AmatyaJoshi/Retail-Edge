@@ -1,0 +1,19 @@
+{
+  "welcome": "ようこそ",
+  "settings": "設定",
+  "logout": "ログアウト",
+  "profile": "プロフィール",
+  "language": "言語",
+  "save": "保存",
+  "cancel": "キャンセル",
+  "general": "一般",
+  "appearance": "外観",
+  "notifications": "通知",
+  "security": "セキュリティ",
+  "billing": "請求",
+  "store": "店舗",
+  "localization": "ローカリゼーション",
+  "pos": "POS",
+  "inventory": "在庫",
+  "back": "戻る"
+} 

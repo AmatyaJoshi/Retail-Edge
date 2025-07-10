@@ -1,0 +1,19 @@
+{
+  "welcome": "સ્વાગત છે",
+  "settings": "સેટિંગ્સ",
+  "logout": "લૉગઆઉટ",
+  "profile": "પ્રોફાઇલ",
+  "language": "ભાષા",
+  "save": "સાચવો",
+  "cancel": "રદ કરો",
+  "general": "સામાન્ય",
+  "appearance": "દેખાવ",
+  "notifications": "સૂચનાઓ",
+  "security": "સુરક્ષા",
+  "billing": "બિલિંગ",
+  "store": "સ્ટોર",
+  "localization": "સ્થાનિકીકરણ",
+  "pos": "પીઓએસ",
+  "inventory": "ઇન્વેન્ટરી",
+  "back": "પાછળ"
+} 

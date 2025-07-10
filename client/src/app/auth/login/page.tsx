@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import EyeIcon from "@/components/ui/EyeIcon";
 import styles from './auth.module.css';
-import { useSignIn, useUser } from '@clerk/nextjs';
+import { useSignIn, useUser, useClerk } from '@clerk/nextjs';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn, isLoaded } = useSignIn();
   const { isSignedIn } = useUser();
+  const clerk = useClerk();
   const [formData, setFormData] = useState({
     identifier: '', // email only for Clerk authentication
     password: '',
@@ -23,19 +24,32 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [authSuccess, setAuthSuccess] = useState(false);
 
   // Debug authentication state
   useEffect(() => {
     console.log('Login page - isSignedIn:', isSignedIn, 'isLoaded:', isLoaded);
-  }, [isSignedIn, isLoaded]);
+    console.log('Clerk configuration check:', {
+      hasSignIn: !!signIn,
+      hasRouter: !!router,
+      pathname: window.location.pathname,
+      searchParams: window.location.search
+    });
+  }, [isSignedIn, isLoaded, signIn, router]);
 
-  // Redirect authenticated users away from login page
+  // Handle automatic redirect if user is already signed in
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      console.log('User is already signed in, redirecting to POS');
-      router.push('/pos');
+      console.log('User is already signed in, redirecting to /pos');
+      const returnUrl = searchParams?.get('returnUrl') || '/pos';
+      
+      // Add a delay to ensure state is stable
+      setTimeout(() => {
+        console.log('Executing automatic redirect to:', returnUrl);
+        window.location.href = returnUrl;
+      }, 500);
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, router, searchParams]);
 
   // Set initial_session cookie and check for various error params
   useEffect(() => {
@@ -68,6 +82,10 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     
+    console.log('Form submission started');
+    console.log('Form data:', formData);
+    console.log('Clerk state:', { isLoaded, hasSignIn: !!signIn });
+    
     if (!isLoaded || !signIn) {
       setError('Authentication system is not ready. Please try again.');
       setLoading(false);
@@ -83,16 +101,33 @@ export default function LoginPage() {
       });
 
       console.log('Sign in result:', result);
+      console.log('Sign in status:', result.status);
 
       if (result.status === 'complete') {
         // Sign in successful
         console.log('Sign in completed successfully');
-        const returnUrl = searchParams?.get('returnUrl') || null;
-        if (returnUrl) {
-          router.push(returnUrl);
-        } else {
-          router.push('/pos');
+        setAuthSuccess(true);
+        
+        // Set the session as active if we have a session ID
+        if (result.createdSessionId) {
+          try {
+            await clerk.setActive({ session: result.createdSessionId });
+            console.log('Session set as active');
+          } catch (error) {
+            console.error('Error setting active session:', error);
+          }
         }
+        
+        // Get the return URL or default to /pos
+        const returnUrl = searchParams?.get('returnUrl') || '/pos';
+        console.log('Redirecting to:', returnUrl);
+        
+        // Add a delay to ensure authentication state is fully updated
+        setTimeout(() => {
+          console.log('Executing redirect to:', returnUrl);
+          // Use window.location for a full page reload to ensure clean state
+          window.location.href = returnUrl;
+        }, 1000); // 1 second delay to ensure state is updated
       } else {
         // Handle multi-factor authentication or other steps if needed
         console.log('Sign in not complete, status:', result.status);
@@ -100,6 +135,12 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error('Login error:', err);
+      console.error('Error details:', {
+        message: err.message,
+        errors: err.errors,
+        status: err.status,
+        statusCode: err.statusCode
+      });
       setError(err.errors?.[0]?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
@@ -193,12 +234,13 @@ export default function LoginPage() {
                   </div>
                 </div>
                 {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+                {authSuccess && <p className="text-green-500 text-center text-sm">Authentication successful! Redirecting to POS...</p>}
                 <Button 
                   type="submit" 
                   className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
-                  disabled={loading || !isLoaded}
+                  disabled={loading || !isLoaded || authSuccess}
                 >
-                  {loading ? 'Logging in...' : 'Login'}
+                  {authSuccess ? 'Authentication Successful! Redirecting...' : loading ? 'Logging in...' : 'Login'}
                 </Button>
               </form>
             </CardContent>

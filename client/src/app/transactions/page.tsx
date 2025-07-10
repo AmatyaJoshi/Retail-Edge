@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import type { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
-import Header from "@/app/(components)/Header";
+import Header from "@/app/components/Header";
 import { useAppSelector } from "@/app/redux";
-import { Search, Download, Eye, Columns, XCircle } from "lucide-react";
+import { Search, Download, Eye, Columns, XCircle, Upload } from "lucide-react";
 import axios from "axios";
 import { format } from "date-fns";
 import { Box, Typography, Button } from '@mui/material';
@@ -317,194 +317,140 @@ const Transactions = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="mx-auto pb-5 w-full bg-gray-50 min-h-screen">
       <Header name="" />
-      <div className="px-2 py-6 flex-1">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              color: isDarkMode ? '#ffffff' : '#111827',
-              marginBottom: '0.5rem'
-            }}
-          >
-            Sales History
-          </Typography>
-          <div className="flex gap-2">
-            <Button 
-              variant="contained" 
-              color="primary" 
-              onClick={fetchSales}
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 mt-6">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography 
+              variant="h4" 
+              component="h1" 
               sx={{
-                backgroundColor: '#2563eb',
-                '&:hover': {
-                  backgroundColor: '#1d4ed8'
-                },
-                color: '#ffffff',
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
+                fontSize: '1.5rem',
+                fontWeight: 700,
+                color: isDarkMode ? '#ffffff' : '#111827',
+                marginBottom: '0.5rem'
               }}
             >
-              <Eye className="w-4 h-4" />
-              Refresh
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => setShowColumnModal(true)}
-              sx={{
-                borderColor: isDarkMode ? '#4b5563' : '#d1d5db',
-                color: isDarkMode ? '#e5e7eb' : '#374151',
-                '&:hover': {
-                  borderColor: isDarkMode ? '#6b7280' : '#9ca3af'
-                },
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
+              Sales History
+            </Typography>
+            <div className="flex gap-2">
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={fetchSales}
+                sx={{
+                  backgroundColor: '#2563eb',
+                  '&:hover': {
+                    backgroundColor: '#1d4ed8'
+                  },
+                  color: '#ffffff',
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                <Eye className="w-4 h-4" />
+                Refresh
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => setShowColumnModal(true)}
+                sx={{
+                  borderColor: isDarkMode ? '#4b5563' : '#d1d5db',
+                  color: isDarkMode ? '#e5e7eb' : '#374151',
+                  '&:hover': {
+                    borderColor: isDarkMode ? '#6b7280' : '#9ca3af'
+                  },
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                <Columns className="w-4 h-4" />
+                Columns
+              </Button>
+            </div>
+          </Box>
+
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+
+          {/* Filters and Search */}
+          <div className="mb-6 flex gap-4 items-center">
+            <div className="relative flex-1 min-w-[400px]">
+              <input
+                type="text"
+                placeholder="Search sales..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
+              />
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
+              />
+            </div>
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <Columns className="w-4 h-4" />
-              Columns
-            </Button>
+              <Upload className="w-4 h-4" />
+              Export
+            </button>
           </div>
-        </Box>
 
-        {error && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {error}
-          </Typography>
-        )}
-
-        {/* Filters and Search */}
-        <div className="mb-6 flex gap-4 items-center">
-          <div className="relative flex-1 min-w-[400px]">
-            <input
-              type="text"
-              placeholder="Search sales..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          {/* Content */}
+          <div className="mt-6">
+            <div style={{ height: 600, width: '100%' }}>
+              <DataGrid
+                rows={filteredSales}
+                columns={columns}
+                loading={loading}
+                slots={{ toolbar: GridToolbar }}
+                getRowId={(row) => row.saleId}
+                sx={{
+                  fontFamily: 'inherit',
+                  fontSize: '1rem',
+                  color: isDarkMode ? '#e0e1dd' : '#22223b',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  '& .MuiDataGrid-row:hover': {
+                    backgroundColor: isDarkMode ? '#334155' : '#f0f7ff',
+                  },
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: isDarkMode ? '#334155' : '#f3f4f6',
+                    fontWeight: 700,
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    backgroundColor: isDarkMode ? '#334155' : '#f3f4f6',
+                  },
+                }}
+                disableRowSelectionOnClick
+              />
+            </div>
           </div>
-          <div className="flex gap-2">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
-            />
-          </div>
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </button>
         </div>
 
-        {/* Content */}
-        <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <DataGrid
-            rows={filteredSales}
-            columns={columns}
-            getRowId={(row) => row.saleId}
-            loading={loading}
-            className="!text-gray-700 dark:!text-gray-300 font-sans"
-            slots={{
-              toolbar: GridToolbar,
-            }}
-            columnVisibilityModel={columnVisibilityModel}
-            onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-            sx={{
-              height: 'calc(100vh - 280px)',
-              '& .MuiDataGrid-cell': {
-                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-                color: isDarkMode ? '#e5e7eb' : '#374151',
-                padding: '0',
-                fontSize: '0.95rem',
-                fontFamily: 'var(--font-geist-sans)',
-                lineHeight: '1.5',
-                borderBottom: 'none',
-              },
-              '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-                color: isDarkMode ? '#e5e7eb' : '#374151',
-                padding: '0',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                borderBottom: 'none',
-                fontFamily: 'var(--font-geist-sans)',
-                lineHeight: '1.5',
-              },
-              '& .MuiDataGrid-footerContainer': {
-                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-                color: isDarkMode ? '#e5e7eb' : '#374151',
-                borderTop: `2px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                padding: '12px 16px',
-                fontFamily: 'var(--font-geist-sans)',
-                fontSize: '0.875rem',
-              },
-              '& .MuiDataGrid-row': {
-                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
-                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                borderBottom: 'none',
-                minHeight: '60px !important',
-                '&:hover': {
-                  backgroundColor: isDarkMode ? '#374151' : '#f3f4f6',
-                  transition: 'background-color 0.2s ease',
-                },
-              },
-              '& .MuiDataGrid-columnSeparator': {
-                display: 'none',
-              },
-              '& .MuiDataGrid-virtualScroller': {
-                marginTop: '0 !important',
-              },
-              '& .MuiDataGrid-virtualScrollerContent': {
-                height: '100% !important',
-                minHeight: '100% !important',
-              },
-              '& .MuiDataGrid-virtualScrollerRenderZone': {
-                transform: 'none !important',
-              },
-              '& .MuiDataGrid-toolbarContainer': {
-                padding: '12px 16px',
-                borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-              },
-              '& .MuiButton-root': {
-                color: isDarkMode ? '#e5e7eb' : '#374151',
-                '&:hover': {
-                  backgroundColor: isDarkMode ? '#374151' : '#f3f4f6',
-                },
-              },
-            }}
-            pageSizeOptions={[5, 10, 25]}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 10 },
-              },
-            }}
-            disableRowSelectionOnClick
-          />
-        </div>
+        {/* Column Management Modal */}
+        <ColumnManagementModal />
       </div>
-
-      {/* Column Management Modal */}
-      <ColumnManagementModal />
     </div>
   );
 };

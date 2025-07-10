@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { type Customer } from '../types';
+import { type Customer } from '@/types';
 import { useGetCustomersQuery } from '@/state/api';
 import AddCustomerModal from './AddCustomerModal';
 import { Search, Plus, X } from 'lucide-react';
@@ -83,7 +83,7 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-4xl mx-auto transform transition-all duration-300 ease-in-out">
+              <Dialog.Panel className="bg-white rounded-xl shadow-md border border-gray-100 p-10 w-full max-w-4xl mx-auto transform transition-all duration-300 ease-in-out">
                 <div className="flex justify-between items-center mb-6 border-b pb-4">
         <h2 className="text-2xl font-bold text-gray-800">Select Customer</h2>
                   <button
@@ -101,7 +101,7 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                     <input
                       type="text"
                       placeholder="Search customers..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-md bg-white"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -110,7 +110,7 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                     <label htmlFor="sort" className="text-gray-700 text-sm font-medium">Sort by:</label>
                     <select
                       id="sort"
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow bg-white"
                       value={sortOption}
                       onChange={e => setSortOption(e.target.value)}
                     >
@@ -122,14 +122,14 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                   </div>
                 </div>
                 
-                <div className="max-h-80 overflow-y-auto border border-gray-200 rounded-lg shadow-inner">
+                <div className="max-h-80 overflow-y-auto border border-gray-100 rounded-xl shadow-inner bg-white">
                   {
                     filteredCustomers.length > 0 ? (
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-gray-100">
             {filteredCustomers.map(customer => (
               <li 
                             key={customer.customerId}
-                            className="p-4 hover:bg-blue-50 cursor-pointer transition-colors flex items-center gap-4"
+                            className="p-4 hover:bg-blue-50 cursor-pointer transition-colors flex items-center gap-4 rounded-xl bg-white shadow-md m-2 border border-gray-100"
                             onClick={() => {
                               onCustomerSelect(customer);
                               onClose();

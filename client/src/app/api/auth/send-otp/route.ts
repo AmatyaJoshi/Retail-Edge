@@ -2,21 +2,21 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { phoneNumber } = await request.json();
+    const { email } = await request.json();
 
-    if (!phoneNumber) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Phone number is required' },
+        { error: 'Email is required' },
         { status: 400 }
       );
     }
 
-    const response = await fetch(`${process.env.SERVER_URL}/api/auth/send-otp`, {
+    const response = await fetch(`${process.env.SERVER_URL}/api/auth/send-email-otp`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ phoneNumber }),
+      body: JSON.stringify({ email }),
     });
 
     const data = await response.json();

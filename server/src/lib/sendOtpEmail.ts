@@ -15,9 +15,7 @@ const messaging = new Messaging(client);
 const users = new Users(client);
 
 /**
- * Enterprise-grade OTP email sender using Appwrite
- * Creates a temporary user in Appwrite and sends an OTP via email
- * 
+ * Sends an OTP email using Appwrite's Messaging API directly to the email address (no user creation).
  * @param to - Email address to send the OTP to
  * @param otp - The OTP code to send
  * @returns Boolean indicating success or failure
@@ -36,106 +34,52 @@ export async function sendOtpEmail({ to, otp }: { to: string; otp: string }): Pr
       </div>
     </div>
   `;
-  
-  let userId: string | null = null;
-  
+
   try {
-    // Clean up any existing user first to avoid conflicts
-    await deleteAppwriteUserByEmail(to);
-    
-    // Create a new temporary user
-    try {
-      const newUser = await users.create(ID.unique(), to, undefined, to);
-      userId = newUser.$id;
-      console.log(`Created temporary Appwrite user for OTP delivery: ${userId}`);
-    } catch (createError: any) {
-      console.error('Error creating Appwrite user:', createError);
-      
-      if (createError.type === 'user_already_exists' || createError.code === 409) {
-        // If user already exists despite our cleanup, try to fetch and use it
-        const userList = await users.list([Query.equal('email', to)]);
-        if (userList.total > 0) {
-          userId = userList.users[0].$id;
-          console.log(`Using existing Appwrite user for OTP delivery: ${userId}`);
-        } else {
-          throw new Error('User exists according to error but could not be found');
-        }
-      } else {
-        throw createError;
-      }
-    }
-
-    if (!userId) {
-      throw new Error('No userId found for OTP email');
-    }
-
-    // Send the email with OTP
-    const emailResult = await messaging.createEmail(
+    // Send the email directly to the address (no user creation)
+    await messaging.createEmail(
       ID.unique(),  // Unique ID for this email
       subject,      // Email subject
       content,      // HTML content
       [],           // Topics (not used)
-      [userId],     // Target users by ID
-      [],           // Additional targets (not used)
-      [],           // CC recipients (not used)
-      [],           // BCC recipients (not used)
-      [],           // Attachments (not used)
+      [],           // Target users by ID (not used)
+      [to],         // Target emails directly
+      [],           // CC
+      [],           // BCC
+      [],           // Attachments
       false,        // Is draft?
       true          // Is HTML?
     );
-
-    console.log(`OTP email sent successfully to ${to} with message ID: ${emailResult.$id}`);
+    console.log(`OTP email sent successfully to ${to}`);
     return true;
   } catch (error: any) {
     console.error('Appwrite sendOtpEmail error:', error);
-    
-    // Cleanup on error
-    if (userId) {
-      try {
-        await users.delete(userId);
-        console.log(`Cleaned up Appwrite user ${userId} after error`);
-      } catch (cleanupError) {
-        console.error('Error cleaning up Appwrite user after error:', cleanupError);
-      }
-    }
-    
     return false;
   }
 }
 
 /**
- * Enterprise-grade utility to delete Appwrite user by email
- * Used for cleanup during OTP operations
- * 
+ * Delete an Appwrite user by email address
  * @param email - Email address of the user to delete
  * @returns Boolean indicating success or failure
  */
 export async function deleteAppwriteUserByEmail(email: string): Promise<boolean> {
   try {
-    // Find all users matching the email
+    // Find the user by email
     const userList = await users.list([Query.equal('email', email)]);
     
     if (userList.total === 0) {
       console.log(`No Appwrite user found with email: ${email}`);
-      return true; // No user to delete is still a success
+      return true; // Consider this a success since the goal is achieved (no user exists)
     }
     
-    // Delete all matching users (should normally be just one)
-    let deletedCount = 0;
-    for (const user of userList.users) {
-      try {
-        await users.delete(user.$id);
-        deletedCount++;
-        console.log(`Deleted Appwrite user with ID: ${user.$id} and email: ${email}`);
-      } catch (deleteErr: any) {
-        console.error(`Error deleting Appwrite user ${user.$id}:`, deleteErr);
-      }
-    }
-    
-    console.log(`Deleted ${deletedCount}/${userList.total} Appwrite users for email: ${email}`);
-    return deletedCount === userList.total;
-  } catch (err) {
-    console.error(`Error deleting Appwrite users for email: ${email}`, err);
+    // Delete the user
+    const user = userList.users[0];
+    await users.delete(user.$id);
+    console.log(`Successfully deleted Appwrite user with ID: ${user.$id} for email: ${email}`);
+    return true;
+  } catch (error: any) {
+    console.error('Error deleting Appwrite user by email:', error);
     return false;
   }
 }

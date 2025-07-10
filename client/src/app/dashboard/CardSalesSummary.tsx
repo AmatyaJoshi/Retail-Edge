@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { useAppSelector } from "@/state/hooks";
 
 const formatIndianNumber = (num: number) => {
   if (num >= 10000000) {
@@ -17,12 +18,13 @@ const formatIndianNumber = (num: number) => {
 };
 
 const CardSalesSummary = () => {
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data, isLoading, error } = useGetDashboardMetricsQuery();
   const [showPrediction, setShowPrediction] = useState(false);
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
         <CardContent>
           <div className="flex items-center justify-center h-[300px]">Loading...</div>
         </CardContent>
@@ -32,7 +34,7 @@ const CardSalesSummary = () => {
 
   if (error) {
     return (
-      <Card>
+      <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
         <CardContent>
           <div className="flex items-center justify-center h-[300px] text-red-500">Error loading data</div>
         </CardContent>
@@ -64,7 +66,7 @@ const CardSalesSummary = () => {
   }
 
   return (
-    <Card>
+    <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
       <CardContent className="flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
           <CardTitle>Sales Overview</CardTitle>
@@ -80,15 +82,15 @@ const CardSalesSummary = () => {
         <div className="grid gap-4 flex-grow">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Sales</p>
+              <p className={isDarkMode ? "text-sm font-medium text-gray-400" : "text-sm font-medium text-gray-500"}>Total Sales</p>
               <p className="text-2xl font-bold">{formatIndianNumber(totalSales)}</p>
             </div>
-          <div>
-              <p className="text-sm font-medium text-muted-foreground">Average Change</p>
-              <p className="text-2xl font-bold">{averageChange.toFixed(1)}%</p>
-              </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Highest Sales</p>
+              <p className={isDarkMode ? "text-sm font-medium text-gray-400" : "text-sm font-medium text-gray-500"}>Average Change</p>
+              <p className="text-2xl font-bold">{averageChange.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className={isDarkMode ? "text-sm font-medium text-gray-400" : "text-sm font-medium text-gray-500"}>Highest Sales</p>
               <p className="text-2xl font-bold">{formatIndianNumber(highestSales.totalValue)}</p>
             </div>
           </div>
@@ -118,7 +120,7 @@ const CardSalesSummary = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-            </div>
+        </div>
       </CardContent>
     </Card>
   );

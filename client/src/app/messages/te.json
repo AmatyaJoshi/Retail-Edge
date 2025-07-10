@@ -1,0 +1,19 @@
+{
+  "welcome": "స్వాగతం",
+  "settings": "సెట్టింగ్స్",
+  "logout": "లాగౌట్",
+  "profile": "ప్రొఫైల్",
+  "language": "భాష",
+  "save": "సేవ్ చేయండి",
+  "cancel": "రద్దు చేయండి",
+  "general": "సాధారణం",
+  "appearance": "రూపం",
+  "notifications": "నోటిఫికేషన్లు",
+  "security": "భద్రత",
+  "billing": "బిల్లింగ్",
+  "store": "స్టోర్",
+  "localization": "ప్రాంతీకరణ",
+  "pos": "పీఓఎస్",
+  "inventory": "ఇన్వెంటరీ",
+  "back": "వెనక్కి"
+} 

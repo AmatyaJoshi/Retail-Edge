@@ -50,7 +50,7 @@ router.get('/user-profile', async (req, res) => {
 
     const user = await prisma.users.findUnique({
       where: { clerkId: clerkId as string },
-      select: { 
+      select: {
         id: true,
         firstName: true,
         lastName: true,

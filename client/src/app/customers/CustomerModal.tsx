@@ -1,9 +1,12 @@
-import { X, Phone, Mail, Calendar, Star, RefreshCw, AlertCircle, Eye, Receipt, Trash2, Edit2, Search, ArrowUpDown, Filter } from 'lucide-react';
-import { useGetCustomerSalesQuery, Sale, useGetPrescriptionsByCustomerQuery } from '@/state/api';
+import { useGetCustomerSalesQuery, useGetPrescriptionsByCustomerQuery, useGetProductsQuery } from '@/state/api';
+import type { Sale } from '@/state/api';
+import type { Prescription } from '@/types/prescriptions';
 import { useState, Fragment, useEffect, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { Dialog, Transition } from '@headlessui/react';
 import PrescriptionModal from './PrescriptionModal';
+import { X, Phone, Mail, Calendar, Star, RefreshCw, AlertCircle, Eye, Receipt, Trash2, Edit2, Search, ArrowUpDown, Filter } from 'lucide-react';
+import { useAppSelector } from "@/state/hooks";
 
 interface EyeData {
   sphere: number;
@@ -13,16 +16,6 @@ interface EyeData {
   pd: number;
 }
 
-interface Prescription {
-  id: string;
-  date: string;
-  expiryDate: string;
-  rightEye: EyeData;
-  leftEye: EyeData;
-  doctor: string;
-  notes?: string;
-}
-
 interface CustomerModalProps {
   user: {
     customerId: string;
@@ -30,25 +23,7 @@ interface CustomerModalProps {
     email: string;
     phone: string;
     joinedDate: string;
-    prescription?: {
-      rightEye: {
-        sphere: number;
-        cylinder: number;
-        axis: number;
-        add: number;
-        pd: number;
-      };
-      leftEye: {
-        sphere: number;
-        cylinder: number;
-        axis: number;
-        add: number;
-        pd: number;
-      };
-      doctor: string;
-      expiryDate: string;
-      notes?: string;
-    };
+    prescription?: Prescription;
   } | null;
   isOpen: boolean;
   onClose: () => void;
@@ -66,12 +41,14 @@ const EyewearIcon = () => (
 );
 
 const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerModalProps) => {
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: sales, isLoading: isLoadingSales } = useGetCustomerSalesQuery(user?.customerId || '', {
     skip: !user?.customerId
   });
   const { data: prescriptions, isLoading: isLoadingPrescriptions } = useGetPrescriptionsByCustomerQuery(user?.customerId || '', {
     skip: !user?.customerId
   });
+  const { data: products } = useGetProductsQuery();
 
   // State for sales filtering and sorting
   const [salesSearchTerm, setSalesSearchTerm] = useState('');
@@ -233,359 +210,346 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
   return (
     <>
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-50" onClose={onClose}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-6xl transform overflow-hidden rounded-2xl bg-white/90 backdrop-blur-xl p-8 shadow-2xl transition-all border border-white/20">
-                  {/* Header */}
-                  <div className="border-b border-gray-100/50 flex justify-between items-center bg-gradient-to-r from-blue-50/50 to-indigo-50/50 -mx-8 -mt-8 px-8 pt-8 pb-6">
-                    <h2 className="text-3xl font-semibold text-gray-900">Customer Details</h2>
-                    <div className="flex items-center space-x-3">
+        <Dialog as="div" className={`fixed inset-0 z-50 overflow-y-auto ${isDarkMode ? 'dark' : ''}`} onClose={onClose}>
+          <div className={`min-h-screen px-4 text-center bg-gray-100/70 backdrop-blur flex items-center justify-center ${isDarkMode ? 'dark' : ''}`}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className={`w-full max-w-3xl p-0 my-8 overflow-hidden text-left align-middle transition-all transform shadow-2xl rounded-2xl border border-gray-200 bg-white relative`}>
+                {/* Floating close button */}
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 bg-white border border-gray-200 rounded-full p-2 shadow hover:bg-gray-100 transition z-30"
+                  title="Close"
+                  style={{ zIndex: 30 }}
+                >
+                  <X className="w-6 h-6 text-gray-500" />
+                </button>
+                {/* Header */}
+                <div className="border-b border-gray-100/50 flex items-center bg-gradient-to-r from-blue-50/50 to-indigo-50/50 px-8 pt-8 pb-6 relative z-10">
+                  <h2 className="text-3xl font-semibold text-gray-900 flex-1">Customer Details</h2>
+                </div>
+                {/* Content */}
+                <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
+                  {/* Basic Info Section */}
+                  <div className="p-8 border-b border-gray-100/50">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-semibold text-gray-900">Basic Information</h3>
                       {!isEditing && (
-                        <>
+                        <div className="flex flex-row gap-3">
                           <button
                             onClick={() => setIsEditing(true)}
-                            className="p-2.5 hover:bg-white/50 rounded-full transition-colors text-blue-600 hover:shadow-md"
+                            className="p-2.5 hover:bg-blue-50 rounded-full transition-colors text-blue-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                             title="Edit Customer"
                           >
                             <Edit2 className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="p-2.5 hover:bg-white/50 rounded-full transition-colors text-red-600 hover:shadow-md"
+                            className="p-2.5 hover:bg-red-50 rounded-full transition-colors text-red-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-400"
                             title="Delete Customer"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
-                        </>
+                        </div>
                       )}
-                      <button
-                        onClick={onClose}
-                        className="p-2.5 hover:bg-white/50 rounded-full transition-colors hover:shadow-md"
-                      >
-                        <X className="w-6 h-6 text-gray-500" />
-                      </button>
                     </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
-                    {/* Basic Info Section */}
-                    <div className="p-8 border-b border-gray-100/50">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h3>
-                      {isEditing ? (
-                        <div className="space-y-6 max-w-2xl">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                            <input
-                              type="text"
-                              value={editedCustomer?.name || ''}
-                              onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, name: e.target.value } : null)}
-                              className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm"
-                            />
+                    {isEditing ? (
+                      <div className="space-y-6 max-w-2xl">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                          <input
+                            type="text"
+                            value={editedCustomer?.name || ''}
+                            onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, name: e.target.value } : null)}
+                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                          <input
+                            type="email"
+                            value={editedCustomer?.email || ''}
+                            onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, email: e.target.value } : null)}
+                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                          <input
+                            type="tel"
+                            value={editedCustomer?.phone || ''}
+                            onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, phone: e.target.value } : null)}
+                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-4 mt-6">
+                          <button
+                            onClick={() => {
+                              setIsEditing(false);
+                              setEditedCustomer(user);
+                            }}
+                            className="px-6 py-3 text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleUpdate}
+                            className="px-6 py-3 text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          >
+                            Save Changes
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 flex flex-col md:flex-row md:items-center gap-6 transition-all">
+                        <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
+                          <div className="relative w-16 h-16 flex items-center justify-center mb-2">
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 via-blue-200 to-indigo-200 shadow-lg border-4 border-blue-100 flex items-center justify-center" />
+                            <div className="absolute inset-1 rounded-full bg-white/70" />
+                            <span className="relative z-10 text-2xl font-bold text-blue-700 flex items-center justify-center">
+                              {user.name.charAt(0).toUpperCase()}
+                            </span>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input
-                              type="email"
-                              value={editedCustomer?.email || ''}
-                              onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, email: e.target.value } : null)}
-                              className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm"
-                            />
+                          <p className="text-xl font-semibold text-gray-900 text-center truncate">{user.name}</p>
+                          <p className="text-xs text-gray-400 break-all text-center">Customer ID: {user.customerId}</p>
+                        </div>
+                        <div className="flex flex-col gap-3 flex-[2] min-w-0">
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                            <Mail className="w-5 h-5 text-blue-500 shrink-0" />
+                            <span className="text-base text-gray-700 truncate">{user.email}</span>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                            <input
-                              type="tel"
-                              value={editedCustomer?.phone || ''}
-                              onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, phone: e.target.value } : null)}
-                              className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm"
-                            />
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                            <Phone className="w-5 h-5 text-blue-500 shrink-0" />
+                            <span className="text-base text-gray-700 truncate">{user.phone}</span>
                           </div>
-                          <div className="flex justify-end space-x-4 mt-6">
-                            <button
-                              onClick={() => {
-                                setIsEditing(false);
-                                setEditedCustomer(user);
-                              }}
-                              className="px-6 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors hover:shadow-md"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={handleUpdate}
-                              className="px-6 py-3 text-white bg-blue-500 rounded-xl hover:bg-blue-600 transition-colors hover:shadow-md"
-                            >
-                              Save Changes
-                            </button>
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                            <Calendar className="w-5 h-5 text-blue-500 shrink-0" />
+                            <span className="text-base text-gray-700 truncate">Joined {new Date(user.joinedDate).toLocaleDateString('en-GB')}</span>
                           </div>
                         </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sales History Section */}
+                  <div className="p-8 border-b border-gray-100/50">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Sales History</h3>
+                    {isLoadingSales ? (
+                      <p className="text-gray-500">Loading sales history...</p>
+                    ) : sales && sales.length > 0 ? (
+                      <>
+                        <div className="mb-6 space-y-4">
                           <div className="flex items-center space-x-4">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shadow-md">
-                              <span className="text-2xl font-semibold text-blue-600">
-                                {user.name.charAt(0).toUpperCase()}
-                              </span>
+                            <div className="flex-1">
+                              <div className="relative">
+                                <input
+                                  type="text"
+                                  placeholder="Search sales..."
+                                  value={salesSearchTerm}
+                                  onChange={(e) => setSalesSearchTerm(e.target.value)}
+                                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                />
+                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-xl font-medium text-gray-900">{user.name}</p>
-                              <p className="text-sm text-gray-500">Customer ID: {user.customerId}</p>
-                            </div>
-                          </div>
-                          <div className="space-y-3">
-                            <div className="flex items-center text-gray-600 p-3 bg-white/50 rounded-xl">
-                              <Mail className="w-5 h-5 mr-3 text-blue-500" />
-                              <span className="text-lg">{user.email}</span>
-                            </div>
-                            <div className="flex items-center text-gray-600 p-3 bg-white/50 rounded-xl">
-                              <Phone className="w-5 h-5 mr-3 text-blue-500" />
-                              <span className="text-lg">{user.phone}</span>
-                            </div>
-                            <div className="flex items-center text-gray-600 p-3 bg-white/50 rounded-xl">
-                              <Calendar className="w-5 h-5 mr-3 text-blue-500" />
-                              <span className="text-lg">Joined {new Date(user.joinedDate).toLocaleDateString('en-GB')}</span>
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="date"
+                                value={salesDateFilter.start}
+                                onChange={(e) => setSalesDateFilter(prev => ({ ...prev, start: e.target.value }))}
+                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                              />
+                              <span className="text-gray-500">to</span>
+                              <input
+                                type="date"
+                                value={salesDateFilter.end}
+                                onChange={(e) => setSalesDateFilter(prev => ({ ...prev, end: e.target.value }))}
+                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                              />
                             </div>
                           </div>
                         </div>
-                      )}
-                    </div>
-
-                    {/* Sales History Section */}
-                    <div className="p-8 border-b border-gray-100/50">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Sales History</h3>
-                      {isLoadingSales ? (
-                        <p className="text-gray-500">Loading sales history...</p>
-                      ) : sales && sales.length > 0 ? (
-                        <>
-                          <div className="mb-6 space-y-4">
-                            <div className="flex items-center space-x-4">
-                              <div className="flex-1">
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    placeholder="Search sales..."
-                                    value={salesSearchTerm}
-                                    onChange={(e) => setSalesSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
-                                  />
-                                  <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <input
-                                  type="date"
-                                  value={salesDateFilter.start}
-                                  onChange={(e) => setSalesDateFilter(prev => ({ ...prev, start: e.target.value }))}
-                                  className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
-                                />
-                                <span className="text-gray-500">to</span>
-                                <input
-                                  type="date"
-                                  value={salesDateFilter.end}
-                                  onChange={(e) => setSalesDateFilter(prev => ({ ...prev, end: e.target.value }))}
-                                  className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="overflow-x-auto rounded-xl border border-gray-100/50 max-h-[400px] overflow-y-auto">
-                            <table className="min-w-full divide-y divide-gray-200/50">
-                              <thead className="bg-gray-50/50 sticky top-0">
-                                <tr>
-                                  <th 
-                                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
-                                    onClick={() => {
-                                      setSalesSortField('timestamp');
-                                      setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                    }}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <span>Date</span>
-                                      <ArrowUpDown className="w-4 h-4" />
-                                    </div>
-                                  </th>
-                                  <th 
-                                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
-                                    onClick={() => {
-                                      setSalesSortField('productId');
-                                      setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                    }}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <span>Product ID</span>
-                                      <ArrowUpDown className="w-4 h-4" />
-                                    </div>
-                                  </th>
-                                  <th 
-                                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
-                                    onClick={() => {
-                                      setSalesSortField('quantity');
-                                      setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                    }}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <span>Quantity</span>
-                                      <ArrowUpDown className="w-4 h-4" />
-                                    </div>
-                                  </th>
-                                  <th 
-                                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
-                                    onClick={() => {
-                                      setSalesSortField('unitPrice');
-                                      setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                    }}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <span>Unit Price</span>
-                                      <ArrowUpDown className="w-4 h-4" />
-                                    </div>
-                                  </th>
-                                  <th 
-                                    className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
-                                    onClick={() => {
-                                      setSalesSortField('totalAmount');
-                                      setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-                                    }}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <span>Total Amount</span>
-                                      <ArrowUpDown className="w-4 h-4" />
-                                    </div>
-                                  </th>
-                                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                        <div className="overflow-x-auto rounded-xl border border-gray-100/50 max-h-[400px] overflow-y-auto">
+                          <table className="min-w-full divide-y divide-gray-200/50">
+                            <thead className="bg-gray-50/50 sticky top-0">
+                              <tr>
+                                <th 
+                                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
+                                  onClick={() => {
+                                    setSalesSortField('timestamp');
+                                    setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                  }}
+                                >
+                                  <div className="flex items-center space-x-1">
+                                    <span>Date</span>
+                                    <ArrowUpDown className="w-4 h-4" />
+                                  </div>
+                                </th>
+                                <th 
+                                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
+                                  onClick={() => {
+                                    setSalesSortField('productId');
+                                    setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                  }}
+                                >
+                                  <div className="flex items-center space-x-1">
+                                    <span>Product Name</span>
+                                    <ArrowUpDown className="w-4 h-4" />
+                                  </div>
+                                </th>
+                                <th 
+                                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
+                                  onClick={() => {
+                                    setSalesSortField('quantity');
+                                    setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                  }}
+                                >
+                                  <div className="flex items-center space-x-1">
+                                    <span>Quantity</span>
+                                    <ArrowUpDown className="w-4 h-4" />
+                                  </div>
+                                </th>
+                                <th 
+                                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
+                                  onClick={() => {
+                                    setSalesSortField('unitPrice');
+                                    setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                  }}
+                                >
+                                  <div className="flex items-center space-x-1">
+                                    <span>Unit Price</span>
+                                    <ArrowUpDown className="w-4 h-4" />
+                                  </div>
+                                </th>
+                                <th 
+                                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100/50"
+                                  onClick={() => {
+                                    setSalesSortField('totalAmount');
+                                    setSalesSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+                                  }}
+                                >
+                                  <div className="flex items-center space-x-1">
+                                    <span>Total Amount</span>
+                                    <ArrowUpDown className="w-4 h-4" />
+                                  </div>
+                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white/50 divide-y divide-gray-200/50">
+                              {filteredSales.map((sale) => (
+                                <tr
+                                  key={sale.saleId}
+                                  className="hover:bg-blue-50 transition-colors cursor-pointer"
+                                  onClick={() => setSelectedSale(sale)}
+                                >
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {new Date(sale.timestamp).toLocaleDateString('en-GB')}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {products?.find(p => p.productId === sale.productId)?.name || sale.productId}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sale.quantity}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{sale.unitPrice.toFixed(2)}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{sale.totalAmount.toFixed(2)}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
                                 </tr>
-                              </thead>
-                              <tbody className="bg-white/50 divide-y divide-gray-200/50">
-                                {filteredSales.map((sale) => (
-                                  <tr key={sale.saleId} className="hover:bg-white/80 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                      {new Date(sale.timestamp).toLocaleDateString('en-GB')}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sale.productId}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{sale.quantity}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{sale.unitPrice.toFixed(2)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{sale.totalAmount.toFixed(2)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                      <button
-                                        onClick={() => setSelectedSale(sale)}
-                                        className="text-blue-600 hover:text-blue-800 font-medium"
-                                      >
-                                        View Details
-                                      </button>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </>
-                      ) : (
-                        <p className="text-gray-500">No sales history available.</p>
-                      )}
-                    </div>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-gray-500">No sales history available.</p>
+                    )}
+                  </div>
 
-                    {/* Prescription History Section */}
-                    <div className="p-8">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Prescription History</h3>
-                      {isLoadingPrescriptions ? (
-                        <p className="text-gray-500">Loading prescription history...</p>
-                      ) : prescriptions && prescriptions.length > 0 ? (
-                        <>
-                          <div className="mb-6 space-y-4">
-                            <div className="flex items-center space-x-4">
-                              <div className="flex-1">
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    placeholder="Search prescriptions..."
-                                    value={prescriptionsSearchTerm}
-                                    onChange={(e) => setPrescriptionsSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
-                                  />
-                                  <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2">
+                  {/* Prescription History Section */}
+                  <div className="p-8">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Prescription History</h3>
+                    {isLoadingPrescriptions ? (
+                      <p className="text-gray-500">Loading prescription history...</p>
+                    ) : prescriptions && prescriptions.length > 0 ? (
+                      <>
+                        <div className="mb-6 space-y-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="flex-1">
+                              <div className="relative">
                                 <input
-                                  type="date"
-                                  value={prescriptionsDateFilter.start}
-                                  onChange={(e) => setPrescriptionsDateFilter(prev => ({ ...prev, start: e.target.value }))}
-                                  className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                  type="text"
+                                  placeholder="Search prescriptions..."
+                                  value={prescriptionsSearchTerm}
+                                  onChange={(e) => setPrescriptionsSearchTerm(e.target.value)}
+                                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
                                 />
-                                <span className="text-gray-500">to</span>
-                                <input
-                                  type="date"
-                                  value={prescriptionsDateFilter.end}
-                                  onChange={(e) => setPrescriptionsDateFilter(prev => ({ ...prev, end: e.target.value }))}
-                                  className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
-                                />
+                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
                               </div>
                             </div>
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="date"
+                                value={prescriptionsDateFilter.start}
+                                onChange={(e) => setPrescriptionsDateFilter(prev => ({ ...prev, start: e.target.value }))}
+                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                              />
+                              <span className="text-gray-500">to</span>
+                              <input
+                                type="date"
+                                value={prescriptionsDateFilter.end}
+                                onChange={(e) => setPrescriptionsDateFilter(prev => ({ ...prev, end: e.target.value }))}
+                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                              />
+                            </div>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[500px] overflow-y-auto pr-2">
-                            {filteredPrescriptions.map((prescription) => (
-                              <div key={prescription.id} className="bg-white/50 backdrop-blur-sm border border-gray-100/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow relative">
-                                <div className="flex items-center space-x-4 mb-4">
-                                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
-                                    <EyewearIcon />
-                                  </div>
-                                  <div>
-                                    <p className="font-semibold text-gray-900">Prescription from {new Date(prescription.date).toLocaleDateString('en-GB')}</p>
-                                    <p className="text-sm text-gray-600">Expires: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}</p>
-                                  </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[500px] overflow-y-auto pr-2">
+                          {filteredPrescriptions.map((prescription) => (
+                            <div key={prescription.id} className="bg-white/50 backdrop-blur-sm border border-gray-100/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow relative">
+                              <div className="flex items-center space-x-4 mb-4">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                                  <EyewearIcon />
                                 </div>
-                                <div className="space-y-3">
-                                  <p className="text-gray-700"><strong>Doctor:</strong> {prescription.doctor}</p>
-                                  <p className="text-gray-700"><strong>Right Eye:</strong> Sph {prescription.rightEye.sphere}, Cyl {prescription.rightEye.cylinder}, Axis {prescription.rightEye.axis}, Add {prescription.rightEye.add}, PD {prescription.rightEye.pd}</p>
-                                  <p className="text-gray-700"><strong>Left Eye:</strong> Sph {prescription.leftEye.sphere}, Cyl {prescription.leftEye.cylinder}, Axis {prescription.leftEye.axis}, Add {prescription.leftEye.add}, PD {prescription.leftEye.pd}</p>
-                                  {prescription.notes && <p className="text-gray-700"><strong>Notes:</strong> {prescription.notes}</p>}
-                                </div>
-                                <div className="absolute top-4 right-4">
-                                  <button
-                                    onClick={() => {
-                                      setSelectedPrescription(prescription);
-                                      setShowPrescriptionModal(true);
-                                    }}
-                                    className="p-2 rounded-full hover:bg-white/80 transition-colors"
-                                    title="View Details"
-                                  >
-                                    <Eye className="w-5 h-5 text-blue-500" />
-                                  </button>
+                                <div>
+                                  <p className="font-semibold text-gray-900">Prescription from {new Date(prescription.date).toLocaleDateString('en-GB')}</p>
+                                  <p className="text-sm text-gray-600">Expires: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}</p>
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        </>
-                      ) : (
-                        <p className="text-gray-500">No prescription history available.</p>
-                      )}
-                    </div>
+                              <div className="space-y-3">
+                                <p className="text-gray-700"><strong>Doctor:</strong> {prescription.doctor}</p>
+                                <p className="text-gray-700"><strong>Right Eye:</strong> Sph {prescription.rightEye.sphere}, Cyl {prescription.rightEye.cylinder}, Axis {prescription.rightEye.axis}, Add {prescription.rightEye.add}, PD {prescription.rightEye.pd}</p>
+                                <p className="text-gray-700"><strong>Left Eye:</strong> Sph {prescription.leftEye.sphere}, Cyl {prescription.leftEye.cylinder}, Axis {prescription.leftEye.axis}, Add {prescription.leftEye.add}, PD {prescription.leftEye.pd}</p>
+                                {prescription.notes && <p className="text-gray-700"><strong>Notes:</strong> {prescription.notes}</p>}
+                              </div>
+                              <div className="absolute top-4 right-4">
+                                <button
+                                  onClick={() => {
+                                    setSelectedPrescription(prescription);
+                                    setShowPrescriptionModal(true);
+                                  }}
+                                  className="p-2 rounded-full hover:bg-white/80 transition-colors"
+                                  title="View Details"
+                                >
+                                  <Eye className="w-5 h-5 text-blue-500" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-gray-500">No prescription history available.</p>
+                    )}
                   </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </Dialog>
       </Transition>
@@ -596,21 +560,70 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
           prescription={selectedPrescription}
         />
       )}
+      {selectedSale && (
+        <Dialog open={!!selectedSale} onClose={() => setSelectedSale(null)}>
+          <div className="fixed inset-0 bg-transparent z-[70] flex items-center justify-center p-4">
+            <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl p-10 shadow-2xl relative">
+              <button
+                onClick={() => setSelectedSale(null)}
+                className="absolute top-4 right-4 bg-white border border-gray-200 rounded-full p-2 shadow hover:bg-gray-100 transition z-30"
+                title="Close"
+              >
+                <X className="w-6 h-6 text-gray-500" />
+              </button>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Transaction Details</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Date:</span>
+                  <span className="font-medium">{new Date(selectedSale.timestamp).toLocaleString('en-GB')}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Product:</span>
+                  <span className="font-medium">{products?.find(p => p.productId === selectedSale.productId)?.name || selectedSale.productId}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Quantity:</span>
+                  <span className="font-medium">{selectedSale.quantity}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Unit Price:</span>
+                  <span className="font-medium">₹{selectedSale.unitPrice.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Total Amount:</span>
+                  <span className="font-bold text-blue-700">₹{selectedSale.totalAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Sale ID:</span>
+                  <span className="font-mono text-xs text-gray-700">{selectedSale.saleId}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      )}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Confirm Delete</h3>
+        <div className="fixed inset-0 bg-gray-100/70 backdrop-blur z-[70] flex items-center justify-center p-4">
+          <div className="bg-white border border-gray-200 rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <AlertCircle className="w-6 h-6 text-yellow-500" />
+              Caution: Deleting Customer
+            </h3>
+            <p className="text-yellow-700 font-medium mb-2 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-yellow-500" />
+              This action is irreversible. All data related to this customer will be permanently deleted.
+            </p>
             <p className="text-gray-600 mb-6">Are you sure you want to delete this customer? This action cannot be undone.</p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
+                className="px-4 py-2 text-white bg-red-600 rounded-full hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
               >
                 Delete
               </button>

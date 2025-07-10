@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { type Customer } from '../types';
+import { type Customer } from '@/types';
 import { useCreateCustomerMutation } from '@/state/api';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';

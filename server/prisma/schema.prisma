@@ -318,7 +318,40 @@ model AssociateCommunication {
   @@map("AssociateCommunications")
 }
 
-
+model Stores {
+  id                    String   @id @default(uuid())
+  name                  String
+  owner                 String
+  address               String?
+  phone                 String?
+  email                 String?
+  website               String?
+  supportEmail          String?
+  supportPhone          String?
+  logoUrl               String?
+  logoDarkUrl           String?
+  timezone              String?
+  currency              String?
+  language              String?
+  dateFormat            String?
+  numberFormat          String?
+  gstNumber             String?
+  taxId                 String?
+  invoicePrefix         String?
+  receiptFooter         String?
+  defaultPaymentMethod  String?
+  taxRate               Float?
+  lowStockThreshold     Int?
+  autoReorder           Boolean? @default(false)
+  sessionTimeout        Int?     @default(30)
+  enable2FA             Boolean? @default(false)
+  roleBasedAccess       Boolean? @default(true)
+  notificationEmail     String?
+  sendLowStockEmail     Boolean? @default(false)
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
 
 enum PartnerType {
   SUPPLIER

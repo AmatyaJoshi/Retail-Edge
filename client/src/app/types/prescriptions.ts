@@ -11,8 +11,20 @@ export interface Prescription {
   customerId: string;
   date: string;
   expiryDate: string;
-  rightEye: EyePrescription;
-  leftEye: EyePrescription;
+  rightEye: {
+    sphere: number;
+    cylinder: number;
+    axis: number;
+    add: number;
+    pd: number;
+  };
+  leftEye: {
+    sphere: number;
+    cylinder: number;
+    axis: number;
+    add: number;
+    pd: number;
+  };
   doctor: string;
-  notes: string;
+  notes?: string;
 }
