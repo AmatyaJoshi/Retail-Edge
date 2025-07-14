@@ -40,12 +40,12 @@ const StatCard = ({ title, value, description, icon, dateRange }: StatCardProps)
   const isNegative = description.includes("-");
 
   return (
-    <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
+    <Card className={isDarkMode ? "bg-[#232e41] border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className={isDarkMode ? "h-4 w-4 text-gray-400" : "h-4 w-4 text-gray-600"} />
       </CardHeader>
-      <CardContent>
+      <CardContent className="bg-gray-50 dark:bg-[#232e41]">
         <div className="text-2xl font-bold mb-1">
           {typeof value === "number" ? formatIndianNumber(value) : value}
         </div>

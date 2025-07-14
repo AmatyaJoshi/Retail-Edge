@@ -2,9 +2,54 @@ import express from 'express';
 import { sendEmailOTP, verifyEmailOTP, registerUser, loginUser, logoutUser } from '../controllers/authController';
 import { checkSession } from '../controllers/checkSessionController';
 import { PrismaClient } from '@prisma/client';
+import { diagnoseAppwriteConfiguration, testEmailOTPFlow } from '../lib/appwriteDiagnostics';
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Diagnostic route for Appwrite configuration
+router.get('/diagnose-appwrite', async (req, res) => {
+  try {
+    console.log('Running Appwrite diagnostics...');
+    const result = await diagnoseAppwriteConfiguration();
+    
+    if (result) {
+      res.json({ success: true, message: 'Appwrite configuration is working correctly' });
+    } else {
+      res.status(500).json({ success: false, message: 'Appwrite configuration has issues. Check server logs for details.' });
+    }
+  } catch (error: any) {
+    console.error('Error running diagnostics:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Test Email OTP flow
+router.post('/test-email-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email is required' });
+    }
+    
+    const result = await testEmailOTPFlow(email);
+    
+    if (result && typeof result === 'object' && result.success) {
+      res.json({ 
+        success: true, 
+        message: 'Email OTP test successful',
+        userId: result.userId,
+        secretLength: result.secret ? result.secret.length : 0
+      });
+    } else {
+      res.status(500).json({ success: false, message: 'Email OTP test failed. Check server logs for details.' });
+    }
+  } catch (error: any) {
+    console.error('Error testing Email OTP:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Email authentication routes
 router.post('/send-email-otp', sendEmailOTP);

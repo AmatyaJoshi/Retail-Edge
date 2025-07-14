@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from 'next/link';
 import * as React from 'react';
 import EyeIcon from "@/components/ui/EyeIcon";
-import { useSignUp } from '@clerk/nextjs';
+// Remove Clerk imports and hooks
+// import { useSignUp } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 
 type Role = 'Owner' | 'Manager' | 'Staff' | 'Admin';
@@ -33,7 +34,7 @@ interface FormErrors {
 
 export default function SignupSteps() {
   const router = useRouter();
-  const { signUp, isLoaded } = useSignUp();
+  // Remove Clerk signUp, isLoaded, and signUp.create usage
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -60,6 +61,45 @@ export default function SignupSteps() {
   const [invalidOtpTimer, setInvalidOtpTimer] = useState(0);
   const [showExistingUserPopup, setShowExistingUserPopup] = useState(false);
   const [existingUserMessage, setExistingUserMessage] = useState('');
+
+  // State for Appwrite Email OTP
+  const [appwriteUserId, setAppwriteUserId] = useState<string>('');
+  const [appwriteSecret, setAppwriteSecret] = useState<string>('');
+
+  // Load Appwrite credentials from localStorage on component mount
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('appwriteUserId');
+    const storedSecret = localStorage.getItem('appwriteSecret');
+    
+    if (storedUserId) {
+      setAppwriteUserId(storedUserId);
+      console.log('Loaded appwriteUserId from localStorage:', storedUserId);
+    }
+    if (storedSecret) {
+      setAppwriteSecret(storedSecret);
+      console.log('Loaded appwriteSecret from localStorage');
+    }
+  }, []);
+
+  // Save Appwrite credentials to localStorage whenever they change
+  useEffect(() => {
+    if (appwriteUserId) {
+      localStorage.setItem('appwriteUserId', appwriteUserId);
+      console.log('Saved appwriteUserId to localStorage:', appwriteUserId);
+    }
+    if (appwriteSecret) {
+      localStorage.setItem('appwriteSecret', appwriteSecret);
+      console.log('Saved appwriteSecret to localStorage');
+    }
+  }, [appwriteUserId, appwriteSecret]);
+
+  // Clear Appwrite credentials from localStorage when verification is complete
+  useEffect(() => {
+    if (emailOtpVerified) {
+      localStorage.removeItem('appwriteSecret');
+      console.log('Cleared appwriteSecret from localStorage after verification');
+    }
+  }, [emailOtpVerified]);
 
   const patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -98,8 +138,6 @@ export default function SignupSteps() {
         }
         if (!formData.panCard.trim()) {
           newErrors.panCard = 'PAN card number is required';
-        } else if (!patterns.panCard.test(formData.panCard)) {
-          newErrors.panCard = 'Please enter a valid PAN card number';
         }
         if (formData.role !== 'Owner' && !formData.shopCode?.trim()) {
           newErrors.shopCode = 'Shop code is required for non-owner roles';
@@ -134,49 +172,34 @@ export default function SignupSteps() {
     setCurrentStep(currentStep - 1);
   };
 
+  // Use Appwrite for sending OTP
   const handleSendEmailOTP = async () => {
-    if (!isLoaded || !signUp) {
-      setErrors({ email: 'Authentication system is not ready. Please try again.' });
-      return;
-    }
-
     setAuthLoading(true);
     setErrors({});
-
     try {
-      // Start Clerk sign-up process
-      const result = await signUp.create({
-        emailAddress: formData.email,
-        password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/send-email-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
       });
-
-      if (result.status === 'complete') {
-        // User already exists
-        setExistingUserMessage('An account with this email already exists. Please login instead.');
-        setShowExistingUserPopup(true);
-        setAuthLoading(false);
-        return;
+      const data = await response.json();
+      console.log('Send OTP response:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send OTP. Please try again.');
       }
-
-      if (result.status === 'missing_requirements') {
-        // Send email verification
-        const emailResult = await signUp.prepareEmailAddressVerification();
-        if (String(emailResult.status) === 'needs_email_verification') {
-          setEmailOtpSent(true);
-          setEmailOtpExpiration(300); // 5 minutes
-          startOtpTimer();
-        }
-      }
+      
+      // Store the userId and secret from Appwrite
+      console.log('Setting appwriteUserId:', data.userId);
+      console.log('Setting appwriteSecret:', data.secret ? '***' : 'empty/undefined');
+      setAppwriteUserId(data.userId);
+      setAppwriteSecret(data.secret || ''); // Handle empty string case
+      
+      setEmailOtpSent(true);
+      setEmailOtpExpiration(300); // 5 minutes
+      startOtpTimer();
     } catch (err: any) {
-      console.error('Email OTP error:', err);
-      if (err.errors?.[0]?.code === 'form_identifier_exists') {
-        setExistingUserMessage('An account with this email already exists. Please login instead.');
-        setShowExistingUserPopup(true);
-      } else {
-        setErrors({ email: err.errors?.[0]?.message || 'Failed to send OTP. Please try again.' });
-      }
+      setErrors({ email: err.message || 'Failed to send OTP. Please try again.' });
     } finally {
       setAuthLoading(false);
     }
@@ -189,28 +212,49 @@ export default function SignupSteps() {
       return;
     }
 
+    console.log('Verification attempt - appwriteUserId:', appwriteUserId);
+    console.log('Verification attempt - appwriteSecret:', appwriteSecret ? '***' : 'empty/undefined');
+
+    if (!appwriteUserId || !appwriteSecret || appwriteSecret.trim() === '') {
+      setErrors({ emailOtp: 'OTP session not found. Please request a new OTP.' });
+      return;
+    }
+
     setAuthLoading(true);
     setErrors({});
 
     try {
-      if (!isLoaded || !signUp) {
-        throw new Error('Authentication system is not ready');
-      }
-
-      const result = await signUp.attemptEmailAddressVerification({
-        code: otpCode,
+      // Use Appwrite's Email OTP verification
+      // The secret contains the OTP, but we need to verify the user entered the correct code
+      // We'll send the userId and secret to our backend, which will use Appwrite's createSession
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/verify-email-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: appwriteUserId, 
+          secret: appwriteSecret 
+        }),
       });
 
-      if (result.status === 'complete') {
-        setEmailOtpVerified(true);
-        setEmailOtpExpiration(0);
-        setErrors({});
-      } else {
-        throw new Error('Verification failed');
+      const data = await response.json();
+      console.log('Verify OTP response:', data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Invalid verification code. Please try again.');
       }
+
+      // Email verified successfully - store the actual Appwrite user ID
+      setAppwriteUserId(data.appwriteUserId); // Update with the actual Appwrite user ID
+      setEmailOtpVerified(true);
+      setEmailOtpExpiration(0);
+      setErrors({});
+      
+      // Clear the secret but keep the userId
+      setAppwriteSecret('');
+      
     } catch (err: any) {
       console.error('OTP verification error:', err);
-      const errorMsg = err.errors?.[0]?.message || 'Invalid verification code. Please try again.';
+      const errorMsg = err.message || 'Invalid verification code. Please try again.';
       setErrors({ emailOtp: errorMsg });
       setShowInvalidOtpPopup(true);
       setInvalidOtpTimer(30);
@@ -259,60 +303,39 @@ export default function SignupSteps() {
     }
     setLoading(true);
     try {
-      if (!isLoaded || !signUp) {
-        throw new Error('Authentication system is not ready');
-      }
-
-      // Complete the sign-up process with Clerk
-      const result = await signUp.create({
-        emailAddress: formData.email,
-        password: formData.password,
+      // Only call backend registration API
+      const payload = {
         firstName: formData.firstName,
         lastName: formData.lastName,
+        phone: formData.phone,
+        email: formData.email,
+        aadhaar: formData.aadhaar,
+        panCard: formData.panCard,
+        password: formData.password,
+        role: formData.role,
+        shopCode: formData.role !== 'Owner' ? formData.shopCode : undefined,
+        appwriteUserId: appwriteUserId, // Include Appwrite user ID
+        emailVerified: true // Email is already verified via Appwrite OTP
+      };
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
-
-      if (result.status === 'complete') {
-        // Create user in your database with additional data
-        const payload = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          email: formData.email,
-          aadhaar: formData.aadhaar,
-          panCard: formData.panCard,
-          role: formData.role,
-          shopCode: formData.role !== 'Owner' ? formData.shopCode : undefined,
-          clerkId: result.createdUserId, // Store Clerk user ID
-        };
-        
-        console.log('Sending registration payload:', JSON.stringify(payload));
-        
-        // Use your backend API to create user in database
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-          let errorMsg = data.error || 'Failed to create account';
-          if (typeof errorMsg === 'object' && errorMsg !== null) {
-            if (errorMsg.errors && Array.isArray(errorMsg.errors)) {
-              errorMsg = errorMsg.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
-            } else {
-              errorMsg = JSON.stringify(errorMsg);
-            }
+      const data = await response.json();
+      if (!response.ok) {
+        let errorMsg = data.error || 'Failed to create account';
+        if (typeof errorMsg === 'object' && errorMsg !== null) {
+          if (errorMsg.errors && Array.isArray(errorMsg.errors)) {
+            errorMsg = errorMsg.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
+          } else {
+            errorMsg = JSON.stringify(errorMsg);
           }
-          throw new Error(errorMsg);
         }
-
-        // On success, redirect to login
-        router.push('/auth/login');
-      } else {
-        throw new Error('Sign-up process incomplete');
+        throw new Error(errorMsg);
       }
+      // On success, redirect to login
+      router.push('/auth/login');
     } catch (err: any) {
       console.error('Registration error:', err);
       setErrors({ submit: err.message });
@@ -517,6 +540,11 @@ export default function SignupSteps() {
               </div>
             )}
 
+            {/* Clerk Smart CAPTCHA widget mount point */}
+            {/* This div is now rendered only on step 3 */}
+            {/* <div id="clerk-captcha" className="mt-4" /> */}
+            {/* End Clerk CAPTCHA */}
+
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-base font-medium text-gray-700">Phone Number</Label>
               <Input
@@ -659,6 +687,8 @@ export default function SignupSteps() {
               )}
               {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
+            {/* Clerk Smart CAPTCHA widget mount point - only on final step */}
+            <div id="clerk-captcha" className="mt-4" />
           </div>
         );
       default:

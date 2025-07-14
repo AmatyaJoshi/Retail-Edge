@@ -42,30 +42,18 @@ const SidebarLink = ({
   const pathname = usePathname();
   const isActive =
     pathname === href || (pathname === "/" && href === "/pos");
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   return (
     <Link href={href}>
       <div
-        className={`cursor-pointer flex items-center ${isCollapsed ? "justify-center py-4" : "justify-start px-8 py-4"
-          }
-        transition-colors gap-3 ${isDarkMode
-            ? "hover:bg-gray-700 hover:text-blue-300"
-            : "hover:bg-blue-100 hover:text-blue-500"
-          } ${isActive
-            ? isDarkMode
-              ? "bg-blue-900 text-blue-100"
-              : "bg-blue-200 text-blue-900"
-            : ""
-          }
-      }`}
+        className={`cursor-pointer flex items-center w-full ${isCollapsed ? "justify-center py-4" : "justify-start px-6 py-4"}
+          transition-colors gap-3 rounded-lg
+          hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-700 dark:hover:text-blue-200
+          ${isActive ? "bg-blue-200 text-blue-900 dark:bg-blue-900 dark:text-blue-100" : ""}
+        `}
       >
-        <Icon className={`w-6 h-6 ${isDarkMode ? "!text-gray-300" : "!text-gray-700"}`} />
-
-        <span
-          className={`${isCollapsed ? "hidden" : "block"
-            } font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}
-        >
+        <Icon className="w-6 h-6 text-gray-700 dark:!text-gray-300" />
+        <span className={`${isCollapsed ? "hidden" : "block text-base font-semibold tracking-wide text-gray-700 dark:text-gray-300"}`}>
           {label}
         </span>
       </div>
@@ -109,8 +97,7 @@ const Sidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
 
-  const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
-    } ${isDarkMode ? "bg-gray-800" : "bg-white"} transition-all duration-300 overflow-hidden h-screen shadow-md z-40`;
+  const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"} bg-white dark:bg-gray-800 border-r-2 border-gray-300 dark:border-gray-700 transition-all duration-300 overflow-hidden h-screen z-40 custom-scrollbar`;
 
   return (
     <div className={sidebarClassNames}>
@@ -134,11 +121,10 @@ const Sidebar = () => {
         </div>
 
         <button
-          className={`md:hidden px-3 py-3 rounded-full hover:bg-blue-100 ${isDarkMode ? "bg-gray-700" : "bg-gray-100"
-            }`}
+          className="md:hidden px-3 py-3 rounded-full hover:bg-blue-100 bg-gray-100 dark:bg-gray-700"
           onClick={toggleSidebar}
         >
-          <Menu className={`w-4 h-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`} />
+          <Menu className="w-4 h-4 text-gray-700 dark:text-gray-300" />
         </button>
       </div>
 

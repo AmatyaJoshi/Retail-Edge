@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataTable } from "@/app/components/ui/data-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import type { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import Header from "@/app/components/Header";
 import { useAppSelector } from "@/app/redux";
-import { Search, Download, Eye, Columns, XCircle, Upload } from "lucide-react";
+import { Search, Download, ArrowUpDown, Columns, XCircle, Upload } from "lucide-react";
 import axios from "axios";
 import { format } from "date-fns";
 import { Box, Typography, Button } from '@mui/material';
@@ -51,6 +52,14 @@ const Transactions = () => {
     paymentMethod: true,
     status: true,
   });
+  // Add pagination state
+  const [pageSize, setPageSize] = useState(5);
+  // Add state and handler for sort dropdown at the top of the component
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const handleSort = (key: string) => {
+    // Implement sorting logic here
+    setShowSortDropdown(false);
+  };
 
   const fetchSales = async () => {
     try {
@@ -113,135 +122,91 @@ const Transactions = () => {
     link.click();
   };
 
-  const columns: GridColDef<Sale>[] = [
-    { 
-      field: 'saleId', 
-      headerName: 'Transaction ID', 
-      width: 120,
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-600 dark:text-gray-400",
-      renderCell: (params) => (
-        <div className="p-2 w-full">
-          <span className="font-medium text-sm whitespace-pre-wrap break-all">
-            {params.value}
+  // Define columns for TanStack Table
+  const columns: ColumnDef<Sale>[] = [
+    {
+      accessorKey: 'saleId',
+      header: 'Transaction ID',
+      cell: ({ row }) => (
+        <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{row.original.saleId}</span>
+      ),
+    },
+    {
+      accessorKey: 'customer',
+      header: 'Customer',
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{row.original.customer?.name || 'Walk-in Customer'}</span>
+          {row.original.customer?.phone && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">{row.original.customer.phone}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'product',
+      header: 'Product Details',
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">{row.original.product.name}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {row.original.product.category} • {row.original.quantity} × ₹{row.original.unitPrice.toFixed(2)}
           </span>
         </div>
-      )
+      ),
     },
-    { 
-      field: 'customer', 
-      headerName: 'Customer', 
-      width: 200,
-      align: 'center',
-      headerAlign: 'center',
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      renderCell: (params) => {
-        const customer = params.row?.customer;
-        return (
-          <div className="flex flex-col items-center p-2">
-            <span className="font-medium text-base">{customer?.name || 'Walk-in Customer'}</span>
-            {customer?.phone && (
-              <span className="text-sm text-gray-500 mt-1">{customer.phone}</span>
-            )}
-          </div>
-        );
-      }
-    },
-    { 
-      field: 'product', 
-      headerName: 'Product Details', 
-      width: 250,
-      align: 'center',
-      headerAlign: 'center',
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      renderCell: (params) => (
-        <div className="flex flex-col items-center p-2">
-          <span className="font-medium text-base">{params.row.product.name}</span>
-          <span className="text-sm text-gray-500 mt-1">
-            {params.row.product.category} • {params.row.quantity} × ₹{params.row.unitPrice.toFixed(2)}
+    {
+      accessorKey: 'timestamp',
+      header: 'Date & Time',
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+            {format(new Date(row.original.timestamp), 'PP')}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {format(new Date(row.original.timestamp), 'p')}
           </span>
         </div>
-      )
+      ),
     },
-    { 
-      field: 'timestamp', 
-      headerName: 'Date & Time', 
-      width: 200,
-      align: 'center',
-      headerAlign: 'center',
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      renderCell: (params) => (
-        <div className="flex flex-col items-center p-2">
-          <span className="font-medium text-base">
-            {format(new Date(params.row.timestamp), 'PP')}
-          </span>
-          <span className="text-sm text-gray-500 mt-1">
-            {format(new Date(params.row.timestamp), 'p')}
-          </span>
-        </div>
-      )
+    {
+      accessorKey: 'totalAmount',
+      header: 'Amount',
+      cell: ({ row }) => (
+        <span className="font-semibold text-green-600 dark:text-green-400 text-base">
+          ₹{row.original.totalAmount.toLocaleString()}
+        </span>
+      ),
     },
-    { 
-      field: 'totalAmount', 
-      headerName: 'Amount', 
-      width: 130,
-      align: 'center',
-      headerAlign: 'center',
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-green-600 dark:text-green-400",
-      renderCell: (params) => (
-        <div className="p-2">
-          <span className="font-medium text-lg">
-            ₹{params.row.totalAmount.toFixed(2)}
-          </span>
-        </div>
-      )
+    {
+      accessorKey: 'paymentMethod',
+      header: () => <div className="text-center w-full">Payment Method</div>,
+      cell: ({ row }) => (
+        <span className={
+          (row.original.paymentMethod === 'CARD'
+            ? 'text-blue-600 dark:text-blue-400 font-semibold'
+            : 'text-green-600 dark:text-green-400 font-semibold') +
+          ' block text-center w-full'
+        }>
+          {row.original.paymentMethod}
+        </span>
+      ),
     },
-    { 
-      field: 'paymentMethod', 
-      headerName: 'Payment Method', 
-      width: 150,
-      align: 'center',
-      headerAlign: 'center',
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      renderCell: (params) => (
-        <div className="p-2">
-          <span className={`font-medium text-lg ${
-            params.row.paymentMethod === 'CARD' 
-              ? 'text-blue-600 dark:text-blue-400' 
-              : 'text-green-600 dark:text-green-400'
-          }`}>
-            {params.row.paymentMethod}
-          </span>
-        </div>
-      )
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+          row.original.status === 'COMPLETED'
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+            : row.original.status === 'PENDING'
+            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+        }`}>
+          {row.original.status}
+        </span>
+      ),
     },
-    { 
-      field: 'status', 
-      headerName: 'Status', 
-      width: 150,
-      align: 'center',
-      headerAlign: 'center',
-      headerClassName: "font-semibold text-gray-700 dark:text-gray-300 text-center",
-      cellClassName: "font-medium text-gray-800 dark:text-gray-200",
-      renderCell: (params) => (
-        <div className="p-2">
-          <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-            params.row.status === 'COMPLETED' 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' :
-            params.row.status === 'PENDING' 
-              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100' :
-              'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-          }`}>
-            {params.row.status}
-          </span>
-        </div>
-      )
-    }
   ];
 
   const filteredSales = sales.filter(sale => {
@@ -317,140 +282,112 @@ const Transactions = () => {
   };
 
   return (
-    <div className="mx-auto pb-5 w-full bg-gray-50 min-h-screen">
-      <Header name="" />
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 mt-6">
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography 
-              variant="h4" 
-              component="h1" 
-              sx={{
-                fontSize: '1.5rem',
-                fontWeight: 700,
-                color: isDarkMode ? '#ffffff' : '#111827',
-                marginBottom: '0.5rem'
-              }}
-            >
-              Sales History
-            </Typography>
-            <div className="flex gap-2">
-              <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={fetchSales}
-                sx={{
-                  backgroundColor: '#2563eb',
-                  '&:hover': {
-                    backgroundColor: '#1d4ed8'
-                  },
-                  color: '#ffffff',
-                  fontWeight: 500,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <Eye className="w-4 h-4" />
-                Refresh
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setShowColumnModal(true)}
-                sx={{
-                  borderColor: isDarkMode ? '#4b5563' : '#d1d5db',
-                  color: isDarkMode ? '#e5e7eb' : '#374151',
-                  '&:hover': {
-                    borderColor: isDarkMode ? '#6b7280' : '#9ca3af'
-                  },
-                  fontWeight: 500,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <Columns className="w-4 h-4" />
-                Columns
-              </Button>
-            </div>
-          </Box>
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 overflow-x-hidden pt-20">
+      {/* Professional Header Section */}
+      <div className="px-2 py-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-1">Transactions</h1>
+        <p className="text-gray-500 dark:text-gray-300 text-base">View, search, and export your sales transactions. Filter by date, customer, or payment method for detailed analysis and reporting.</p>
+      </div>
 
-          {error && (
-            <Typography color="error" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
-          )}
-
-          {/* Filters and Search */}
-          <div className="mb-6 flex gap-4 items-center">
-            <div className="relative flex-1 min-w-[400px]">
+      {/* Controls Card and DataTable aligned */}
+      <div className="flex flex-col w-full flex-1 px-2 md:px-6 gap-2">
+        <div className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 flex flex-col w-full bg-gray-50 dark:bg-gray-800">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="relative flex-grow max-w-xs">
               <input
-                type="text"
+                className="w-full pl-9 pr-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-gray-50 dark:bg-gray-900 shadow font-sans text-sm transition focus:outline-none dark:text-gray-100"
                 placeholder="Search sales..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
             </div>
-            <div className="flex gap-2">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
-              />
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white shadow-sm font-sans"
-              />
-            </div>
-            <button
-              onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Upload className="w-4 h-4" />
-              Export
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="mt-6">
-            <div style={{ height: 600, width: '100%' }}>
-              <DataGrid
-                rows={filteredSales}
-                columns={columns}
-                loading={loading}
-                slots={{ toolbar: GridToolbar }}
-                getRowId={(row) => row.saleId}
-                sx={{
-                  fontFamily: 'inherit',
-                  fontSize: '1rem',
-                  color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  '& .MuiDataGrid-row:hover': {
-                    backgroundColor: isDarkMode ? '#334155' : '#f0f7ff',
-                  },
-                  '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: isDarkMode ? '#334155' : '#f3f4f6',
-                    fontWeight: 700,
-                  },
-                  '& .MuiDataGrid-footerContainer': {
-                    backgroundColor: isDarkMode ? '#334155' : '#f3f4f6',
-                  },
+            <div className="flex gap-1 items-center">
+              {/* Rows per page dropdown */}
+              <select
+                value={pageSize}
+                onChange={e => {
+                  const size = Number(e.target.value);
+                  setPageSize(size);
                 }}
-                disableRowSelectionOnClick
-              />
+                className="py-1.5 px-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none mr-2"
+              >
+                {[5, 10, 25, 50].map(size => (
+                  <option key={size} value={size}>{size} rows</option>
+                ))}
+              </select>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="py-1.5 pl-9 pr-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none appearance-none custom-date-input"
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                />
+                <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2"/></svg>
+              </div>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="py-1.5 pl-9 pr-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none appearance-none custom-date-input"
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                />
+                <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2"/></svg>
+              </div>
+              {/* Sort Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowSortDropdown((prev) => !prev)}
+                  className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1 text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap shadow-sm cursor-pointer text-sm"
+                >
+                  <ArrowUpDown className="w-4 h-4" />
+                  Sort
+                </button>
+                {showSortDropdown && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
+                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('date')}>Date</button>
+                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('amount')}>Amount</button>
+                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('customer')}>Customer</button>
+                  </div>
+                )}
+              </div>
+              {/* Columns Button */}
+              <button
+                onClick={() => setShowColumnModal(true)}
+                className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1 text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap shadow-sm cursor-pointer text-sm"
+              >
+                <Columns className="w-4 h-4" />
+                Columns
+              </button>
+              {/* Export Button (moved to right of Columns) */}
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-sm text-sm"
+              >
+                <Upload className="w-4 h-4" />
+                Export
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Column Management Modal */}
-        <ColumnManagementModal />
+        {/* Main Content: DataTable */}
+        <div className="h-[400px] overflow-y-auto rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 custom-scrollbar w-full shadow-lg bg-gray-50 dark:bg-gray-800">
+          <DataTable
+            columns={columns}
+            data={filteredSales}
+            searchKey="customer"
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            hideToolbar
+          />
+        </div>
       </div>
+
+      {/* Column Management Modal */}
+      <ColumnManagementModal />
     </div>
   );
 };

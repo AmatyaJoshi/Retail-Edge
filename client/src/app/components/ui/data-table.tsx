@@ -41,6 +41,9 @@ interface DataTableProps<TData, TValue> {
   onTableReady?: (table: ReturnType<typeof useReactTable<TData>>) => void;
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
+  pageSize?: number;
+  onPageSizeChange?: (size: number) => void;
+  hideToolbar?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -51,11 +54,19 @@ export function DataTable<TData, TValue>({
   onTableReady,
   sorting,
   onSortingChange,
+  pageSize = 5,
+  onPageSizeChange,
+  hideToolbar = false,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>(sorting || []);
-  const [pagination, setPagination] = useState<LocalPaginationState>({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = useState<LocalPaginationState>({ pageIndex: 0, pageSize });
+
+  // Sync pageSize prop with local pagination state
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageSize }));
+  }, [pageSize]);
 
   const table = useReactTable({
     data,
@@ -75,7 +86,8 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       sorting: internalSorting,
-    },
+      pagination: pagination as any,
+    } as any,
   });
 
   useEffect(() => {
@@ -88,77 +100,85 @@ export function DataTable<TData, TValue>({
     }
   }, [sorting]);
 
+  // Handle page size change from pagination controls
+  const handlePageSizeChange = (size: number) => {
+    setPagination((prev) => ({ ...prev, pageSize: size, pageIndex: 0 }));
+    onPageSizeChange?.(size);
+  };
+
   return (
-    <div>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder={`Filter ${searchKey}s...`}
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn(searchKey)?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <div className="ml-auto flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <ArrowUpDown className="h-4 w-4" />
-                Sort
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanSort() && column.id !== "actions")
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsSorted() !== false}
-                      onCheckedChange={() => column.toggleSorting()}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Columns className="h-4 w-4" />
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) => column.getCanHide() && column.id !== "actions"
-                )
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className="flex flex-col w-full">
+      {!hideToolbar && (
+        <div className="flex items-center py-2 w-full gap-1">
+          <Input
+            placeholder={`Filter ${searchKey}s...`}
+            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(searchKey)?.setFilterValue(event.target.value)
+            }
+            className="max-w-xs h-8 text-sm px-2"
+          />
+          <div className="ml-auto flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 px-2 text-sm">
+                  <ArrowUpDown className="h-4 w-4" />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanSort() && column.id !== "actions")
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsSorted() !== false}
+                        onCheckedChange={() => column.toggleSorting()}
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 px-2 text-sm">
+                  <Columns className="h-4 w-4" />
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) => column.getCanHide() && column.id !== "actions"
+                  )
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
-      <div className="rounded-md border">
+      )}
+      <div className="rounded-md border w-full overflow-y-auto custom-scrollbar h-[340px] bg-transparent">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -179,15 +199,15 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row: any) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => onRowClick && onRowClick(row.original)}
-                  className={onRowClick ? "cursor-pointer" : ""}
+                  className={`border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900 ${onRowClick ? "cursor-pointer" : ""}`}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell: any) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -204,21 +224,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between w-full px-4 py-2 bg-white border-t border-gray-200 rounded-b-xl mt-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Rows per page:</span>
-          <select
-            className="rounded-full border border-gray-300 px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={pagination.pageSize}
-            onChange={e => {
-              setPagination({ ...pagination, pageSize: Number(e.target.value), pageIndex: 0 });
-            }}
-          >
-            {[5, 10, 25, 50].map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
+      <div className="flex items-center justify-center w-full px-4 py-1 bg-white rounded-b-xl mt-2 dark:bg-gray-800 dark:text-gray-100">
         <div className="flex items-center gap-4">
           <button
             className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
@@ -231,7 +237,7 @@ export function DataTable<TData, TValue>({
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-sm text-gray-700">
+          <span className="text-sm text-gray-700 dark:text-gray-100">
             <span className="font-semibold">{pagination.pageIndex + 1}</span> / {Math.ceil(data.length / pagination.pageSize) || 1}
           </span>
           <button

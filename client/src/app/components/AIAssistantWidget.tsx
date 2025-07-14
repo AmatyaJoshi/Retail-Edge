@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Markdown from 'markdown-to-jsx';
 import { useAIAssistant } from '../contexts/AIAssistantContext';
+import { usePageData } from '../contexts/PageDataContext';
+import { useUser } from '@clerk/nextjs';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -27,7 +29,9 @@ interface ChatBoxPosition {
 }
 
 export default function AIAssistantWidget() {
+  const { user, isLoaded } = useUser();
   const { isOpen, openAssistant, closeAssistant } = useAIAssistant();
+  const { answerDataQuery } = usePageData();
   const [open, setOpen] = useState(isOpen);
   const [messages, setMessages] = useState<Message[]>([initialMessage]);
   const [input, setInput] = useState('');
@@ -37,6 +41,7 @@ export default function AIAssistantWidget() {
   const [isTranslucent, setIsTranslucent] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
   // Draggable state - start at bottom-right corner
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -59,6 +64,7 @@ export default function AIAssistantWidget() {
   const translucentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+
   // Chat box dimensions
   const CHAT_BOX_WIDTH = 380;
   const CHAT_BOX_HEIGHT = 600;
@@ -78,53 +84,62 @@ export default function AIAssistantWidget() {
     });
   }, []);
 
-  // Hide intro when widget is opened
+  // Hide intro when widget is opened or after timeout
   useEffect(() => {
-    if (open && showIntro) setShowIntro(false);
+    if (open && showIntro) {
+      setShowIntro(false);
+    } else if (showIntro) {
+      // Auto-hide intro bubble after 10 seconds
+      const introTimeout = setTimeout(() => {
+        setShowIntro(false);
+      }, 10000);
+      
+      return () => clearTimeout(introTimeout);
+    }
   }, [open, showIntro]);
 
   // Activity tracking for translucent behavior
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  const handleActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
     
-    const handleActivity = () => {
-      lastActivityRef.current = Date.now();
-      
-      // Clear existing timeouts
-      if (translucentTimeoutRef.current) {
-        clearTimeout(translucentTimeoutRef.current);
-      }
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-      if (indicatorTimeoutRef.current) {
-        clearTimeout(indicatorTimeoutRef.current);
-      }
+    // Clear existing timeouts
+    if (translucentTimeoutRef.current) {
+      clearTimeout(translucentTimeoutRef.current);
+    }
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+    }
+    if (indicatorTimeoutRef.current) {
+      clearTimeout(indicatorTimeoutRef.current);
+    }
 
-      // Make widget more translucent immediately when user is active
-      if (!open && !dragging) {
-        setIsTranslucent(true);
-        setIsHidden(false);
-        setShowIndicator(false);
-      }
+    // Only start translucent behavior if intro bubble is gone
+    if (!open && !dragging && !showIntro) {
+      setIsTranslucent(true);
+      setIsHidden(false);
+      setShowIndicator(false);
 
       // Set timeout to make widget fully visible again after inactivity
       translucentTimeoutRef.current = setTimeout(() => {
-        if (!open && !dragging) {
+        if (!open && !dragging && !showIntro) {
           setIsTranslucent(false);
         }
       }, 3000); // Wait 3 seconds of inactivity to become fully visible
 
       // Set hide timeout (8 seconds after activity stops)
       hideTimeoutRef.current = setTimeout(() => {
-        if (!open && !dragging) {
+        if (!open && !dragging && !showIntro) {
           setIsHidden(true);
           setShowIndicator(true);
           setIsTranslucent(false);
         }
       }, 8000);
-    };
+    }
+  }, [open, dragging, showIntro]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // More specific events for better activity detection
     const events = [
       'mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click',
@@ -135,8 +150,10 @@ export default function AIAssistantWidget() {
       document.addEventListener(event, handleActivity, { passive: true });
     });
 
-    // Start with translucent widget to be less intrusive
-    setIsTranslucent(true);
+    // Only start translucent if intro bubble is not showing
+    if (!showIntro) {
+      setIsTranslucent(true);
+    }
 
     return () => {
       events.forEach(event => {
@@ -146,7 +163,56 @@ export default function AIAssistantWidget() {
       if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
       if (indicatorTimeoutRef.current) clearTimeout(indicatorTimeoutRef.current);
     };
-  }, [open, isHidden, dragging]);
+  }, [handleActivity]);
+
+  // Separate effect to handle state updates when open/dragging changes
+  useEffect(() => {
+    if (open || dragging) {
+      // Clear timeouts when widget is open or being dragged
+      if (translucentTimeoutRef.current) {
+        clearTimeout(translucentTimeoutRef.current);
+      }
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+      if (indicatorTimeoutRef.current) {
+        clearTimeout(indicatorTimeoutRef.current);
+      }
+      
+      // Reset states
+      setIsHidden(false);
+      setShowIndicator(false);
+      setIsTranslucent(false);
+    }
+  }, [open, dragging]);
+
+  // Fetch user profile photo (same as navbar)
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user?.id) {
+        try {
+          const profileResponse = await fetch(`/api/user-profile?clerkId=${user.id}`);
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            setUserPhotoUrl(profileData.photoUrl || null);
+            return;
+          }
+        } catch (error) {
+          // ignore
+        }
+      }
+      setUserPhotoUrl(null);
+    };
+    if (isLoaded && user) fetchUserData();
+  }, [user, isLoaded]);
+
+  // Get user initials (same as navbar)
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    const firstName = user.firstName || '';
+    const lastName = user.lastName || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U';
+  };
 
   // Smart positioning for chat box
   const getChatBoxPosition = (): ChatBoxPosition => {
@@ -381,14 +447,24 @@ export default function AIAssistantWidget() {
     setMessages(newMessages);
     setInput('');
     setLoading(true);
+    
     try {
-      const res = await fetch('/api/ai-assistant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages.slice(-5) })
-      });
-      const data = await res.json();
-      setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
+      // First, try to answer from page data
+      const dataAnswer = answerDataQuery(input);
+      
+      if (dataAnswer) {
+        // If we found a data answer, use it directly
+        setMessages([...newMessages, { role: 'assistant', content: dataAnswer }]);
+      } else {
+        // Fallback to LLM for general questions
+        const res = await fetch('/api/ai-assistant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: newMessages.slice(-5) })
+        });
+        const data = await res.json();
+        setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
+      }
     } catch (e) {
       setMessages([...newMessages, { role: 'assistant', content: 'Sorry, something went wrong.' }]);
     }
@@ -540,13 +616,25 @@ export default function AIAssistantWidget() {
             width: chatBoxPosition.width,
             height: chatBoxPosition.height,
             position: 'fixed',
+            cursor: dragging ? 'grabbing' : undefined,
           }}
         >
-          <div className="w-full h-full bg-gradient-to-br from-white via-[#f3f4fa] to-[#e9eafd] border border-[#d1d5fa] rounded-2xl flex flex-col">
+          <div className="w-full h-full bg-gradient-to-br from-white via-[#f3f4fa] to-[#e9eafd] border border-[#d1d5fa] rounded-2xl flex flex-col shadow-2xl dark:bg-gradient-to-br dark:from-[#232b3e] dark:via-[#334155] dark:to-[#1a223a] dark:border-blue-500 dark:ring-2 dark:ring-blue-700">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#d1d5fa] bg-gradient-to-r from-[#2e3cff] via-[#6c38ff] to-[#a259ff] rounded-t-2xl cursor-move select-none"
-                 onMouseDown={onMouseDown}
-                 style={{ cursor: 'grab' }}>
+            <div
+              className="flex items-center justify-between px-5 py-4 border-b border-[#d1d5fa] bg-gradient-to-r from-[#2e3cff] via-[#6c38ff] to-[#a259ff] rounded-t-2xl cursor-move select-none dark:border-blue-500 dark:bg-gradient-to-r dark:from-blue-700 dark:via-indigo-600 dark:to-indigo-400"
+              onMouseDown={e => {
+                setDragging(true);
+                dragOffset.current = {
+                  x: e.clientX - chatBoxPosition.x,
+                  y: e.clientY - chatBoxPosition.y,
+                };
+                dragStartPos.current = { x: e.clientX, y: e.clientY };
+                setJustDragged(false);
+                document.body.style.userSelect = 'none';
+              }}
+              style={{ cursor: dragging ? 'grabbing' : 'grab' }}
+            >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md border-2 border-[#6c38ff] overflow-hidden">
                   <img src="/zayra-logo.svg" alt="Zayra Logo" className="w-full h-full object-contain" />
@@ -560,7 +648,7 @@ export default function AIAssistantWidget() {
           </div>
             
           {/* Chat Body */}
-            <div className="flex-1 p-5 overflow-y-auto bg-gradient-to-br from-white via-[#f3f4fa] to-[#e9eafd]">
+            <div className="flex-1 p-5 overflow-y-auto bg-gradient-to-br from-white via-[#f3f4fa] to-[#e9eafd] dark:bg-gradient-to-br dark:from-[#181f2a] dark:via-[#232b3e] dark:to-[#1a223a] custom-scrollbar">
             {messages.map((m, i) => (
               <div key={i} className={`mb-4 flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {m.role === 'assistant' && (
@@ -568,16 +656,24 @@ export default function AIAssistantWidget() {
                     <span className="text-white font-bold">Z</span>
                   </div>
                 )}
-                  <span className={`inline-block px-4 py-2 rounded-2xl shadow-lg text-base max-w-[75%] break-words whitespace-pre-wrap ${
+                  <span className={`inline-block px-4 py-2 rounded-2xl shadow text-base max-w-[75%] break-words whitespace-pre-wrap ${
                     m.role === 'user' 
-                      ? 'bg-gradient-to-r from-[#6c38ff] to-[#2e3cff] text-white rounded-br-none' 
-                      : 'bg-white text-[#23234d] rounded-bl-none border border-[#d1d5fa]'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-br-none dark:from-blue-600 dark:to-indigo-700' 
+                      : 'bg-white text-[#23234d] rounded-bl-none border border-[#d1d5fa] dark:bg-[#232b3e] dark:text-[#e0eaff] dark:border-[#334155]'
                   }`}>
                   {m.role === 'assistant' ? <Markdown options={{ forceBlock: true }}>{m.content}</Markdown> : m.content}
                 </span>
                 {m.role === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-[#e9eafd] flex items-center justify-center ml-2 shadow-md">
-                    <span className="text-[#a259ff] font-bold">U</span>
+                  <div className="w-8 h-8 rounded-full bg-[#e9eafd] flex items-center justify-center ml-2 shadow-md overflow-hidden">
+                    {userPhotoUrl ? (
+                      <img src={userPhotoUrl} alt="User Avatar" className="w-full h-full object-cover" />
+                    ) : user && user.imageUrl ? (
+                      <img src={user.imageUrl} alt="User Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[#a259ff] font-bold">
+                        {getUserInitials()}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -587,9 +683,9 @@ export default function AIAssistantWidget() {
           </div>
             
           {/* Input */}
-          <div className="flex items-center gap-2 p-4 border-t border-[#d1d5fa] bg-white rounded-b-2xl">
+          <div className="flex items-center gap-2 p-4 border-t border-[#d1d5fa] bg-white rounded-b-2xl dark:bg-[#181f2a] dark:border-[#334155]">
             <input
-              className="flex-1 border border-[#d1d5fa] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#6c38ff] text-base bg-[#f3f4fa] text-[#23234d] placeholder-[#a59cff]"
+              className="flex-1 border border-[#d1d5fa] rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base bg-[#f3f4fa] text-[#23234d] placeholder-[#a59cff] dark:bg-[#232b3e] dark:text-[#e0eaff] dark:border-[#334155] dark:placeholder-[#475569] focus:dark:ring-blue-500"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !loading && sendMessage()}
@@ -610,14 +706,14 @@ export default function AIAssistantWidget() {
       )}
 
       {/* Widget Button */}
-      <div
-        ref={widgetRef}
-        className="fixed z-50 font-sans"
-        style={{ left: position.x, top: position.y, position: 'fixed' }}
-      >
-        <div style={{ position: 'relative' }}>
-          {showIntro && !open && (
-            (() => {
+      {!open && (
+        <div
+          ref={widgetRef}
+          className="fixed z-50 font-sans"
+          style={{ left: position.x, top: position.y, position: 'fixed' }}
+        >
+          <div style={{ position: 'relative' }}>
+            {showIntro && !open && (() => {
               const bubblePos = getIntroBubblePosition();
               return (
                 <div
@@ -629,13 +725,13 @@ export default function AIAssistantWidget() {
                     width: bubblePos.width
                   }}
                 >
-                  <div className="bg-white border border-[#a259ff] shadow-lg rounded-xl px-4 py-3 text-sm text-[#2e3cff] flex items-start gap-2 relative">
+                  <div className="bg-white dark:bg-gray-800 border border-[#a259ff] dark:border-blue-500 shadow-lg dark:shadow-gray-900/50 rounded-xl px-4 py-3 text-sm text-[#2e3cff] dark:text-gray-100 flex items-start gap-2 relative">
                     <div className="flex-1">
-                      <div className="font-semibold mb-1">👋 Hi, I'm <span className='text-[#a259ff]'>Zayra</span>!</div>
-                      <div>I'm here to help you around the app.<br/>You can drag me to a new place if I'm in the way!</div>
+                      <div className="font-semibold mb-1">👋 Hi, I'm <span className='text-[#a259ff] dark:text-blue-400'>Zayra</span>!</div>
+                      <div className="dark:text-gray-300">I'm here to help you around the app.<br/>You can drag me to a new place if I'm in the way!</div>
                     </div>
                     <button
-                      className="ml-2 text-[#a259ff] hover:text-[#2e3cff] text-lg font-bold focus:outline-none"
+                      className="ml-2 text-[#a259ff] dark:text-blue-400 hover:text-[#2e3cff] dark:hover:text-blue-300 text-lg font-bold focus:outline-none"
                       aria-label="Close introduction"
                       onClick={() => setShowIntro(false)}
                       tabIndex={0}
@@ -643,73 +739,73 @@ export default function AIAssistantWidget() {
                   </div>
                 </div>
               );
-            })()
-          )}
-          <button
-            className={`rounded-full p-0 flex items-center justify-center border-4 border-[#a259ff] w-16 h-16 group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#6c38ff] hover:border-[#2e3cff] hover:opacity-100 ${
-              isTranslucent ? 'bg-white/20 backdrop-blur-md opacity-60' : 'bg-white opacity-100'
-            }`}
-            onClick={handleOpen}
-            title="Open Zayra Assistant"
-            onMouseDown={onMouseDown}
-            onMouseEnter={() => {
-              // Clear any pending timeouts
-              if (hoverTimeoutRef.current) {
-                clearTimeout(hoverTimeoutRef.current);
-              }
-              if (translucentTimeoutRef.current) {
-                clearTimeout(translucentTimeoutRef.current);
-              }
-              
-              // Make widget fully visible when hovering
-              setIsTranslucent(false);
-              if (isHidden) {
-                setIsHidden(false);
-                setShowIndicator(false);
-              }
-              lastActivityRef.current = Date.now();
-            }}
-            onMouseLeave={() => {
-              // Start translucent timer when mouse leaves
-              if (translucentTimeoutRef.current) {
-                clearTimeout(translucentTimeoutRef.current);
-              }
-              translucentTimeoutRef.current = setTimeout(() => {
-                if (!open && !dragging) {
-                  setIsTranslucent(true);
+            })()}
+            <button
+              className={`rounded-full p-0 flex items-center justify-center border-4 border-[#a259ff] w-16 h-16 group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#6c38ff] hover:border-[#2e3cff] hover:opacity-100 ${
+                isTranslucent ? 'bg-white/20 backdrop-blur-md opacity-60' : 'bg-white opacity-100'
+              }`}
+              onClick={handleOpen}
+              title="Open Zayra Assistant"
+              onMouseDown={onMouseDown}
+              onMouseEnter={() => {
+                // Clear any pending timeouts
+                if (hoverTimeoutRef.current) {
+                  clearTimeout(hoverTimeoutRef.current);
                 }
-              }, 500); // Become translucent after 0.5 seconds of no hover
-            }}
-            style={{ cursor: 'grab' }}
-          >
-            <span className="flex items-center justify-center w-full h-full">
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="18" cy="18" r="16" fill="url(#zayraBtnBg)" />
-                <g filter="url(#glow)">
-                  <path d="M18 8 L20 16 L28 18 L20 20 L18 28 L16 20 L8 18 L16 16 Z" fill="url(#zayraBtnStar)" />
-                </g>
-                <defs>
-                  <radialGradient id="zayraBtnBg" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5" gradientTransform="matrix(36 0 0 36 0 0)" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#fff" />
-                    <stop offset="1" stopColor="#e9eafd" />
-                  </radialGradient>
-                  <linearGradient id="zayraBtnStar" x1="8" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#2e3cff" stopOpacity="0.95" />
-                    <stop offset="1" stopColor="#a259ff" stopOpacity="0.8" />
-                  </linearGradient>
-                  <filter id="glow" x="0" y="0" width="36" height="36" filterUnits="userSpaceOnUse">
-                    <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
-                    <feMerge>
-                      <feMergeNode in="coloredBlur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-              </svg>
-            </span>
-          </button>
-        </div>
-    </div>
+                if (translucentTimeoutRef.current) {
+                  clearTimeout(translucentTimeoutRef.current);
+                }
+                
+                // Make widget fully visible when hovering
+                setIsTranslucent(false);
+                if (isHidden) {
+                  setIsHidden(false);
+                  setShowIndicator(false);
+                }
+                lastActivityRef.current = Date.now();
+              }}
+              onMouseLeave={() => {
+                // Start translucent timer when mouse leaves
+                if (translucentTimeoutRef.current) {
+                  clearTimeout(translucentTimeoutRef.current);
+                }
+                translucentTimeoutRef.current = setTimeout(() => {
+                  if (!open && !dragging) {
+                    setIsTranslucent(true);
+                  }
+                }, 500); // Become translucent after 0.5 seconds of no hover
+              }}
+              style={{ cursor: 'grab' }}
+            >
+              <span className="flex items-center justify-center w-full h-full">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="18" cy="18" r="16" fill="url(#zayraBtnBg)" />
+                  <g filter="url(#glow)">
+                    <path d="M18 8 L20 16 L28 18 L20 20 L18 28 L16 20 L8 18 L16 16 Z" fill="url(#zayraBtnStar)" />
+                  </g>
+                  <defs>
+                    <radialGradient id="zayraBtnBg" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5" gradientTransform="matrix(36 0 0 36 0 0)" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#fff" />
+                      <stop offset="1" stopColor="#e9eafd" />
+                    </radialGradient>
+                    <linearGradient id="zayraBtnStar" x1="8" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#2e3cff" stopOpacity="0.95" />
+                      <stop offset="1" stopColor="#a259ff" stopOpacity="0.8" />
+                    </linearGradient>
+                    <filter id="glow" x="0" y="0" width="36" height="36" filterUnits="userSpaceOnUse">
+                      <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+                      <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                </svg>
+              </span>
+            </button>
+          </div>
+      </div>
+      )}
     </>
   );
 }

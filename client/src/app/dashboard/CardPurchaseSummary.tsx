@@ -13,12 +13,12 @@ import {
 
 const CardPurchaseSummary = () => {
   const { data, isLoading } = useGetDashboardMetricsQuery();
-  const purchaseData = data?.purchaseSummary || [];
-
-  const lastDataPoint = purchaseData[purchaseData.length - 1] || null;
+  // DashboardMetrics does not have purchaseSummary, so we use salesSummary as a placeholder
+  const salesData = data?.salesSummary || [];
+  const lastDataPoint = salesData[salesData.length - 1] || null;
 
   return (
-    <div className="flex flex-col justify-between row-span-2 xl:row-span-3 col-span-1 md:col-span-2 xl:col-span-1 bg-white dark:bg-gray-800 shadow-md rounded-2xl">
+    <div className="flex flex-col justify-between row-span-2 xl:row-span-3 col-span-1 md:col-span-2 xl:col-span-1 bg-gray-50 dark:bg-[#232e41] border border-gray-200 dark:border-gray-700 shadow-md rounded-2xl text-gray-900 dark:text-gray-100">
       {isLoading ? (
         <div className="m-5 text-gray-700 dark:text-gray-300">Loading...</div>
       ) : (
@@ -35,27 +35,27 @@ const CardPurchaseSummary = () => {
           <div>
             {/* BODY HEADER */}
             <div className="mb-4 mt-7 px-7">
-              <p className="text-xs text-gray-400 dark:text-gray-500">Purchased</p>
+              <p className="text-xs text-gray-400 dark:text-gray-400">Purchased</p>
               <div className="flex items-center">
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {lastDataPoint
-                    ? numeral(lastDataPoint.totalPurchased).format("$0.00a")
+                    ? numeral(lastDataPoint.totalValue).format("$0.00a")
                     : "0"}
                 </p>
-                {lastDataPoint && (
+                {lastDataPoint && lastDataPoint.changePercentage !== undefined && (
                   <p
                     className={`text-sm ${
-                      lastDataPoint.changePercentage! >= 0
+                      lastDataPoint.changePercentage >= 0
                         ? "text-green-500"
                         : "text-red-500"
                     } flex ml-3`}
                   >
-                    {lastDataPoint.changePercentage! >= 0 ? (
+                    {lastDataPoint.changePercentage >= 0 ? (
                       <TrendingUp className="w-5 h-5 mr-1" />
                     ) : (
                       <TrendingDown className="w-5 h-5 mr-1" />
                     )}
-                    {Math.abs(lastDataPoint.changePercentage!)}%
+                    {Math.abs(lastDataPoint.changePercentage)}%
                   </p>
                 )}
               </div>
@@ -63,7 +63,7 @@ const CardPurchaseSummary = () => {
             {/* CHART */}
             <ResponsiveContainer width="100%" height={200} className="p-2">
               <AreaChart
-                data={purchaseData}
+                data={salesData}
                 margin={{ top: 0, right: 0, left: -50, bottom: 45 }}
               >
                 <XAxis dataKey="date" tick={false} axisLine={false} />
@@ -88,7 +88,7 @@ const CardPurchaseSummary = () => {
                 />
                 <Area
                   type="linear"
-                  dataKey="totalPurchased"
+                  dataKey="totalValue"
                   stroke="#8884d8"
                   fill="#8884d8"
                   dot={true}

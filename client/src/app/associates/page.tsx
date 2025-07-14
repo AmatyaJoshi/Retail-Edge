@@ -191,7 +191,7 @@ export default function AssociatesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white w-full p-6">
+    <div className="min-h-screen w-full pt-28 px-2 md:px-6 py-12 bg-white dark:bg-gray-900 overflow-y-auto max-h-[calc(100vh-5rem)] custom-scrollbar">
       <PageHeader
         onAddClick={() => {
           setSelectedAssociate(null);
@@ -209,42 +209,44 @@ export default function AssociatesPage() {
           </div>
         )}
       </div>
-      {isLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : associates?.length > 0 ? (
-        <DataTable
-          columns={createColumns({ 
-            onEdit: handleEdit, 
-            onDelete: handleDelete,
-            onView: handleOpenProfile 
-          })}
-          data={associates}
-          searchKey="name"
-          onRowClick={handleOpenProfile}
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
-      ) : (
-        <div className="text-center py-8 text-gray-500">
-          No associates found.
-        </div>
-      )}
-      <AssociateForm
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        associate={selectedAssociate}
-        onSubmit={handleCreateOrUpdate}
-      />
-      {isProfileModalOpen && selectedAssociate && (
-        <AssociateProfileModal
-          open={isProfileModalOpen}
-          onOpenChange={setIsProfileModalOpen}
+      <div className="rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 p-4 mt-8">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
+          </div>
+        ) : associates?.length > 0 ? (
+          <DataTable
+            columns={createColumns({ 
+              onEdit: handleEdit, 
+              onDelete: handleDelete,
+              onView: handleOpenProfile 
+            })}
+            data={associates}
+            searchKey="name"
+            onRowClick={handleOpenProfile}
+            sorting={sorting}
+            onSortingChange={setSorting}
+          />
+        ) : (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            No associates found.
+          </div>
+        )}
+      </div>
+        <AssociateForm
+          open={isFormOpen}
+          onOpenChange={setIsFormOpen}
           associate={selectedAssociate}
+          onSubmit={handleCreateOrUpdate}
         />
-      )}
-      <Toaster />
+        {isProfileModalOpen && selectedAssociate && (
+          <AssociateProfileModal
+            open={isProfileModalOpen}
+            onOpenChange={setIsProfileModalOpen}
+            associate={selectedAssociate}
+          />
+        )}
+        <Toaster />
     </div>
   );
 }

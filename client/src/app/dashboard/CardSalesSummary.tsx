@@ -24,7 +24,7 @@ const CardSalesSummary = () => {
 
   if (isLoading) {
     return (
-      <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
+      <Card className={isDarkMode ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
         <CardContent>
           <div className="flex items-center justify-center h-[300px]">Loading...</div>
         </CardContent>
@@ -34,7 +34,7 @@ const CardSalesSummary = () => {
 
   if (error) {
     return (
-      <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
+      <Card className={isDarkMode ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
         <CardContent>
           <div className="flex items-center justify-center h-[300px] text-red-500">Error loading data</div>
         </CardContent>
@@ -66,10 +66,10 @@ const CardSalesSummary = () => {
   }
 
   return (
-    <Card className={isDarkMode ? "bg-gray-900 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
-      <CardContent className="flex flex-col h-full">
+    <Card className={isDarkMode ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
+      <CardContent className="flex flex-col h-full bg-gray-50 dark:bg-[#232e41] pt-4">
         <div className="flex items-center justify-between mb-4">
-          <CardTitle>Sales Overview</CardTitle>
+          <CardTitle className="text-lg md:text-xl font-semibold">Sales Overview</CardTitle>
           <div className="flex items-center space-x-2">
             <Switch
               id="prediction"
@@ -82,15 +82,15 @@ const CardSalesSummary = () => {
         <div className="grid gap-4 flex-grow">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className={isDarkMode ? "text-sm font-medium text-gray-400" : "text-sm font-medium text-gray-500"}>Total Sales</p>
+              <p className={isDarkMode ? "text-base md:text-lg font-medium text-gray-400" : "text-base md:text-lg font-medium text-gray-500"}>Total Sales</p>
               <p className="text-2xl font-bold">{formatIndianNumber(totalSales)}</p>
             </div>
             <div>
-              <p className={isDarkMode ? "text-sm font-medium text-gray-400" : "text-sm font-medium text-gray-500"}>Average Change</p>
+              <p className={isDarkMode ? "text-base md:text-lg font-medium text-gray-400" : "text-base md:text-lg font-medium text-gray-500"}>Average Change</p>
               <p className="text-2xl font-bold">{averageChange.toFixed(1)}%</p>
             </div>
             <div>
-              <p className={isDarkMode ? "text-sm font-medium text-gray-400" : "text-sm font-medium text-gray-500"}>Highest Sales</p>
+              <p className={isDarkMode ? "text-base md:text-lg font-medium text-gray-400" : "text-base md:text-lg font-medium text-gray-500"}>Highest Sales</p>
               <p className="text-2xl font-bold">{formatIndianNumber(highestSales.totalValue)}</p>
             </div>
           </div>

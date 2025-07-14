@@ -51,24 +51,37 @@ const LanguageSwitcher: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition min-w-[48px]"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors min-w-[40px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 hover:dark:bg-gray-700"
           aria-label="Select language"
         >
-          <span className="text-base font-bold uppercase">{current?.code ?? '??'}</span>
-          <ChevronDown className="w-4 h-4 ml-1 text-gray-400" />
+          <span className="text-sm font-semibold uppercase tracking-wide">{current?.code ?? '??'}</span>
+          <ChevronDown className="w-3 h-3 text-gray-400" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
+        <div className="w-48 max-h-48 overflow-y-auto custom-scrollbar">
           {LANGUAGES.map(lang => (
-            <DropdownMenuItem
+            <button
               key={lang.code}
               onClick={() => handleSelect(lang.code)}
+              className={`w-full flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                locale === lang.code 
+                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200' 
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}
             >
-              <span className={`mr-2 text-base font-bold uppercase ${locale === lang.code ? 'text-blue-700' : ''}`}>{lang.code}</span>
-              <span className={locale === lang.code ? 'text-blue-700 font-semibold' : ''}>{lang.label}</span>
-              {locale === lang.code && <span className="ml-2 text-xs text-blue-500">(Selected)</span>}
-            </DropdownMenuItem>
+              <div className="flex items-center gap-2">
+                <span className={`font-medium ${locale === lang.code ? 'text-blue-700 dark:text-blue-200' : 'text-gray-700 dark:text-gray-300'}`}>
+                  {lang.code.toUpperCase()}
+                </span>
+                <span className={`text-xs ${locale === lang.code ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                  {lang.label}
+                </span>
+              </div>
+              {locale === lang.code && (
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              )}
+            </button>
           ))}
         </div>
       </DropdownMenuContent>

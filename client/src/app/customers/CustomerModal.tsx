@@ -211,7 +211,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
     <>
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className={`fixed inset-0 z-50 overflow-y-auto ${isDarkMode ? 'dark' : ''}`} onClose={onClose}>
-          <div className={`min-h-screen px-4 text-center bg-gray-100/70 backdrop-blur flex items-center justify-center ${isDarkMode ? 'dark' : ''}`}>
+          <div className={`min-h-screen px-4 text-center bg-gray-100/70 dark:bg-[#10192A]/80 backdrop-blur flex items-center justify-center`}>
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -221,26 +221,26 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={`w-full max-w-3xl p-0 my-8 overflow-hidden text-left align-middle transition-all transform shadow-2xl rounded-2xl border border-gray-200 bg-white relative`}>
+              <Dialog.Panel className={`w-full max-w-3xl p-0 my-8 overflow-hidden text-left align-middle transition-all transform shadow-2xl rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#16213C] relative`}>
                 {/* Floating close button */}
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 bg-white border border-gray-200 rounded-full p-2 shadow hover:bg-gray-100 transition z-30"
+                  className="absolute top-4 right-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full p-2 shadow hover:bg-gray-100 dark:hover:bg-gray-800 transition z-30"
                   title="Close"
                   style={{ zIndex: 30 }}
                 >
-                  <X className="w-6 h-6 text-gray-500" />
+                  <X className="w-6 h-6 text-gray-500 dark:text-gray-300" />
                 </button>
                 {/* Header */}
-                <div className="border-b border-gray-100/50 flex items-center bg-gradient-to-r from-blue-50/50 to-indigo-50/50 px-8 pt-8 pb-6 relative z-10">
-                  <h2 className="text-3xl font-semibold text-gray-900 flex-1">Customer Details</h2>
+                <div className="border-b border-gray-100/50 dark:border-gray-700 flex items-center bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/30 dark:to-indigo-900/30 px-8 pt-8 pb-6 relative z-10">
+                  <h2 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 flex-1">Customer Details</h2>
                 </div>
                 {/* Content */}
-                <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
+                <div className="overflow-y-auto max-h-[calc(90vh-100px)] bg-white dark:bg-[#16213C] custom-scrollbar">
                   {/* Basic Info Section */}
-                  <div className="p-8 border-b border-gray-100/50">
+                  <div className="p-8 border-b border-gray-100/50 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-semibold text-gray-900">Basic Information</h3>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Basic Information</h3>
                       {!isEditing && (
                         <div className="flex flex-row gap-3">
                           <button
@@ -263,30 +263,30 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                     {isEditing ? (
                       <div className="space-y-6 max-w-2xl">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Name</label>
                           <input
                             type="text"
                             value={editedCustomer?.name || ''}
                             onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, name: e.target.value } : null)}
-                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Email</label>
                           <input
                             type="email"
                             value={editedCustomer?.email || ''}
                             onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, email: e.target.value } : null)}
-                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Phone</label>
                           <input
                             type="tel"
                             value={editedCustomer?.phone || ''}
                             onChange={(e) => setEditedCustomer(prev => prev ? { ...prev, phone: e.target.value } : null)}
-                            className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                           />
                         </div>
                         <div className="flex justify-end space-x-4 mt-6">
@@ -295,7 +295,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                               setIsEditing(false);
                               setEditedCustomer(user);
                             }}
-                            className="px-6 py-3 text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 transition-colors hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+                            className="px-6 py-3 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-700"
                           >
                             Cancel
                           </button>
@@ -308,30 +308,40 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                         </div>
                       </div>
                     ) : (
-                      <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 flex flex-col md:flex-row md:items-center gap-6 transition-all">
+                      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow border border-gray-100 dark:border-gray-700 p-6 flex flex-col md:flex-row md:items-center gap-6 transition-all">
                         <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-                          <div className="relative w-16 h-16 flex items-center justify-center mb-2">
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 via-blue-200 to-indigo-200 shadow-lg border-4 border-blue-100 flex items-center justify-center" />
-                            <div className="absolute inset-1 rounded-full bg-white/70" />
-                            <span className="relative z-10 text-2xl font-bold text-blue-700 flex items-center justify-center">
-                              {user.name.charAt(0).toUpperCase()}
-                            </span>
+                          <div className="relative w-14 h-14 mb-2">
+                            <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/40 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 shadow">
+                              <span className="text-xl font-semibold text-blue-600 dark:text-blue-400">
+                                {(() => {
+                                  const name = user.name || '';
+                                  const words = name.trim().split(' ');
+                                  if (words.length > 1) {
+                                    const first = words[0]?.[0] || '';
+                                    const last = words[words.length - 1]?.[0] || '';
+                                    return (first + last).toUpperCase();
+                                  } else {
+                                    return name.slice(0, 2).toUpperCase();
+                                  }
+                                })()}
+                              </span>
+                            </div>
                           </div>
-                          <p className="text-xl font-semibold text-gray-900 text-center truncate">{user.name}</p>
-                          <p className="text-xs text-gray-400 break-all text-center">Customer ID: {user.customerId}</p>
+                          <p className="text-xl font-semibold text-gray-900 dark:text-gray-100 text-center truncate">{user.name}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 break-all text-center">Customer ID: {user.customerId}</p>
                         </div>
                         <div className="flex flex-col gap-3 flex-[2] min-w-0">
-                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                             <Mail className="w-5 h-5 text-blue-500 shrink-0" />
-                            <span className="text-base text-gray-700 truncate">{user.email}</span>
+                            <span className="text-base text-gray-700 dark:text-gray-100 truncate">{user.email}</span>
                           </div>
-                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                             <Phone className="w-5 h-5 text-blue-500 shrink-0" />
-                            <span className="text-base text-gray-700 truncate">{user.phone}</span>
+                            <span className="text-base text-gray-700 dark:text-gray-100 truncate">{user.phone}</span>
                           </div>
-                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                             <Calendar className="w-5 h-5 text-blue-500 shrink-0" />
-                            <span className="text-base text-gray-700 truncate">Joined {new Date(user.joinedDate).toLocaleDateString('en-GB')}</span>
+                            <span className="text-base text-gray-700 dark:text-gray-100 truncate">Joined {new Date(user.joinedDate).toLocaleDateString('en-GB')}</span>
                           </div>
                         </div>
                       </div>
@@ -339,8 +349,8 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                   </div>
 
                   {/* Sales History Section */}
-                  <div className="p-8 border-b border-gray-100/50">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Sales History</h3>
+                  <div className="p-8 border-b border-gray-100/50 dark:border-gray-700">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Sales History</h3>
                     {isLoadingSales ? (
                       <p className="text-gray-500">Loading sales history...</p>
                     ) : sales && sales.length > 0 ? (
@@ -354,7 +364,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                                   placeholder="Search sales..."
                                   value={salesSearchTerm}
                                   onChange={(e) => setSalesSearchTerm(e.target.value)}
-                                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                                 />
                                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
                               </div>
@@ -364,14 +374,14 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                                 type="date"
                                 value={salesDateFilter.start}
                                 onChange={(e) => setSalesDateFilter(prev => ({ ...prev, start: e.target.value }))}
-                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                               />
                               <span className="text-gray-500">to</span>
                               <input
                                 type="date"
                                 value={salesDateFilter.end}
                                 onChange={(e) => setSalesDateFilter(prev => ({ ...prev, end: e.target.value }))}
-                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                               />
                             </div>
                           </div>
@@ -473,9 +483,9 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
 
                   {/* Prescription History Section */}
                   <div className="p-8">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Prescription History</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Prescription History</h3>
                     {isLoadingPrescriptions ? (
-                      <p className="text-gray-500">Loading prescription history...</p>
+                      <p className="text-gray-500 dark:text-gray-400">Loading prescription history...</p>
                     ) : prescriptions && prescriptions.length > 0 ? (
                       <>
                         <div className="mb-6 space-y-4">
@@ -487,7 +497,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                                   placeholder="Search prescriptions..."
                                   value={prescriptionsSearchTerm}
                                   onChange={(e) => setPrescriptionsSearchTerm(e.target.value)}
-                                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                                 />
                                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
                               </div>
@@ -497,35 +507,35 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                                 type="date"
                                 value={prescriptionsDateFilter.start}
                                 onChange={(e) => setPrescriptionsDateFilter(prev => ({ ...prev, start: e.target.value }))}
-                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                               />
                               <span className="text-gray-500">to</span>
                               <input
                                 type="date"
                                 value={prescriptionsDateFilter.end}
                                 onChange={(e) => setPrescriptionsDateFilter(prev => ({ ...prev, end: e.target.value }))}
-                                className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50"
+                                className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                               />
                             </div>
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[500px] overflow-y-auto pr-2">
                           {filteredPrescriptions.map((prescription) => (
-                            <div key={prescription.id} className="bg-white/50 backdrop-blur-sm border border-gray-100/50 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow relative">
+                            <div key={prescription.id} className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-100/50 dark:border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow relative">
                               <div className="flex items-center space-x-4 mb-4">
                                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
                                   <EyewearIcon />
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-900">Prescription from {new Date(prescription.date).toLocaleDateString('en-GB')}</p>
-                                  <p className="text-sm text-gray-600">Expires: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}</p>
+                                  <p className="font-semibold text-gray-900 dark:text-gray-100">Prescription from {new Date(prescription.date).toLocaleDateString('en-GB')}</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">Expires: {new Date(prescription.expiryDate).toLocaleDateString('en-GB')}</p>
                                 </div>
                               </div>
                               <div className="space-y-3">
-                                <p className="text-gray-700"><strong>Doctor:</strong> {prescription.doctor}</p>
-                                <p className="text-gray-700"><strong>Right Eye:</strong> Sph {prescription.rightEye.sphere}, Cyl {prescription.rightEye.cylinder}, Axis {prescription.rightEye.axis}, Add {prescription.rightEye.add}, PD {prescription.rightEye.pd}</p>
-                                <p className="text-gray-700"><strong>Left Eye:</strong> Sph {prescription.leftEye.sphere}, Cyl {prescription.leftEye.cylinder}, Axis {prescription.leftEye.axis}, Add {prescription.leftEye.add}, PD {prescription.leftEye.pd}</p>
-                                {prescription.notes && <p className="text-gray-700"><strong>Notes:</strong> {prescription.notes}</p>}
+                                <p className="text-gray-700 dark:text-gray-200"><strong>Doctor:</strong> {prescription.doctor}</p>
+                                <p className="text-gray-700 dark:text-gray-200"><strong>Right Eye:</strong> Sph {prescription.rightEye.sphere}, Cyl {prescription.rightEye.cylinder}, Axis {prescription.rightEye.axis}, Add {prescription.rightEye.add}, PD {prescription.rightEye.pd}</p>
+                                <p className="text-gray-700 dark:text-gray-200"><strong>Left Eye:</strong> Sph {prescription.leftEye.sphere}, Cyl {prescription.leftEye.cylinder}, Axis {prescription.leftEye.axis}, Add {prescription.leftEye.add}, PD {prescription.leftEye.pd}</p>
+                                {prescription.notes && <p className="text-gray-700 dark:text-gray-200"><strong>Notes:</strong> {prescription.notes}</p>}
                               </div>
                               <div className="absolute top-4 right-4">
                                 <button
@@ -544,7 +554,7 @@ const CustomerModal = ({ user, isOpen, onClose, onDelete, onUpdate }: CustomerMo
                         </div>
                       </>
                     ) : (
-                      <p className="text-gray-500">No prescription history available.</p>
+                      <p className="text-gray-500 dark:text-gray-400">No prescription history available.</p>
                     )}
                   </div>
                 </div>

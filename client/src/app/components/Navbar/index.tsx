@@ -132,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
 
   return (
     <div
-      className={`flex justify-between items-center mb-7 bg-white fixed top-0 z-30 shadow-sm h-20 px-8 transition-all duration-300 ${leftOffset} ${widthClass}`}
+      className={`flex justify-between items-center mb-7 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-b dark:border-gray-900 fixed top-0 z-30 shadow-sm h-20 px-8 transition-all duration-300 ${leftOffset} ${widthClass}`}
       style={{ minHeight: '5rem' }}
     >
       {/* LEFT SIDE */}
@@ -141,13 +141,12 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
           {showBackButton ? (
             <div className="relative group">
               <button
-                className={`flex items-center justify-center w-11 h-11 rounded-full shadow-sm border border-gray-200 bg-white hover:bg-blue-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${isDarkMode ? "bg-gray-800 border-gray-700 hover:bg-gray-700" : ""}`}
+                className="flex items-center justify-center w-11 h-11 rounded-full shadow-md border-none bg-[#1e293b] hover:bg-[#334155] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                 onClick={() => router.back()}
                 aria-label="Back"
               >
-                <ArrowLeft className={`w-6 h-6 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`} />
+                <ArrowLeft className="w-7 h-7 text-white" />
               </button>
-              <span className="absolute left-1/2 -bottom-8 -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-gray-900 text-white text-xs rounded px-2 py-1 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">Back</span>
             </div>
           ) : (
         <button
@@ -165,8 +164,8 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
         <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
           <EyewearIcon />
         </div>
-        <span className="ml-2 text-xl font-semibold">
-          {pathname === "/settings" ? "Retail Edge" : "Vision Loop"}
+        <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {pathname === "/settings" ? "Retail Edge" : <span className="text-gray-900 dark:text-white">Vision Loop</span>}
         </span>
       </div>
 

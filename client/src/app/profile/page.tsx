@@ -36,8 +36,10 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showRemovePhotoConfirm, setShowRemovePhotoConfirm] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  const [sidebarHeight, setSidebarHeight] = useState<number | undefined>(undefined);
 
-  // Fetch user data from database using clerkId
   useEffect(() => {
     if (!isLoaded || !user?.id) return;
     setLoading(true);
@@ -58,7 +60,12 @@ const ProfilePage = () => {
     }
   }, [userData]);
 
-  // Get user initials for avatar
+  useEffect(() => {
+    if (rightRef.current) {
+      setSidebarHeight(rightRef.current.offsetHeight);
+    }
+  }, [userData]);
+
   const getUserInitials = () => {
     if (!user) return 'U';
     const firstName = user.firstName || '';
@@ -66,7 +73,6 @@ const ProfilePage = () => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U';
   };
 
-  // Get user display name
   const getUserDisplayName = () => {
     if (!user) return 'User';
     const firstName = user.firstName || '';
@@ -74,7 +80,6 @@ const ProfilePage = () => {
     return `${firstName} ${lastName}`.trim() || user.emailAddresses[0]?.emailAddress || 'User';
   };
 
-  // Section title based on role
   const getSectionTitle = () => {
     if (!userData) return "Employee Information";
     const role = userData.role?.toLowerCase();
@@ -84,7 +89,6 @@ const ProfilePage = () => {
     return "Employee Information";
   };
 
-  // ID label based on role
   const getIdLabel = () => {
     if (!userData) return "Employee ID";
     const role = userData.role?.toLowerCase();
@@ -94,7 +98,6 @@ const ProfilePage = () => {
     return "Employee ID";
   };
 
-  // Handle profile photo upload
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -106,19 +109,16 @@ const ProfilePage = () => {
     }
   };
 
-  // Handle remove profile photo
   const handleRemovePhoto = async () => {
     setShowRemovePhotoConfirm(false);
     setEditPhoto(null);
   };
 
-  // Handle remove photo from main profile view
   const handleRemovePhotoFromProfile = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     handleRemovePhoto();
   };
 
-  // Save profile changes
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -135,7 +135,6 @@ const ProfilePage = () => {
       });
       if (res.ok) {
         setEditOpen(false);
-        // Refetch user data
         if (user?.id) {
           const response = await fetch(`/api/user-profile?clerkId=${user.id}`);
           if (response.ok) {
@@ -143,7 +142,6 @@ const ProfilePage = () => {
             setUserData(data);
           }
         }
-        // Trigger profile update event for navbar
         window.dispatchEvent(new Event('profile-updated'));
       }
     } finally {
@@ -153,10 +151,10 @@ const ProfilePage = () => {
 
   if (!isLoaded || loading) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[calc(100vh-80px)]">
+      <div className="flex items-center justify-center h-full min-h-[calc(100vh-80px)] dark:bg-gray-950">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading profile...</p>
         </div>
       </div>
     );
@@ -164,22 +162,127 @@ const ProfilePage = () => {
 
   if (!user || !userData) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[calc(100vh-80px)]">
+      <div className="flex items-center justify-center h-full min-h-[calc(100vh-80px)] dark:bg-gray-950">
         <div className="text-center">
-          <p className="text-gray-600">User not found</p>
+          <p className="text-gray-600 dark:text-gray-300">User not found</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 h-full min-h-[calc(100vh-80px)] bg-gray-50 px-4">
-      {/* Edit Profile Modal */}
+    <>
+      <div className="h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+        <div className="flex w-full max-w-7xl mx-auto gap-8 items-stretch" style={{alignItems: 'stretch'}}>
+          {/* Left Sidebar */}
+          <aside ref={sidebarRef} style={sidebarHeight ? { height: sidebarHeight } : {}} className="flex flex-col bg-gray-100 dark:bg-gray-800 border-l border-gray-300 dark:border-gray-700 shadow-lg rounded-2xl min-w-[320px] max-w-xs w-full">
+            {/* Profile Info */}
+            <div className="flex flex-col items-center px-4 py-6 border-b border-gray-100 dark:border-gray-800">
+              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-900 mb-4 overflow-hidden">
+                {userData.photoUrl ? (
+                  <img src={userData.photoUrl} alt="Profile" className="w-28 h-28 rounded-full object-cover" />
+                ) : (
+                  <span className="text-white font-bold text-4xl select-none">{getUserInitials()}</span>
+                )}
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center mb-1">{getUserDisplayName()}</h2>
+              <span className="inline-block px-4 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-base font-semibold shadow mb-2">{userData.role}</span>
+              <span className="inline-block px-3 py-0.5 rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 text-xs font-semibold mb-2">Active</span>
+              <p className="text-gray-500 dark:text-gray-400 text-base text-center">Member since {new Date(userData.createdAt).toLocaleDateString('en-GB')}</p>
+            </div>
+            {/* Contact Info */}
+            <div className="py-6 px-2 border-b border-gray-100 dark:border-gray-800 flex-grow">
+              <div className="space-y-4">
+                <div className="flex items-center text-gray-700 dark:text-gray-200 gap-3">
+                  <Mail className="w-5 h-5 text-blue-500" />
+                  <span className="text-base">{user.emailAddresses[0]?.emailAddress || 'No email'}</span>
+                </div>
+                <div className="flex items-center text-gray-700 dark:text-gray-200 gap-3">
+                  <Phone className="w-5 h-5 text-blue-500" />
+                  <span className="text-base">{userData.phone || 'No phone'}</span>
+                </div>
+                <div className="flex items-center text-gray-700 dark:text-gray-200 gap-3">
+                  <Calendar className="w-5 h-5 text-blue-500" />
+                  <span className="text-base">Joined {new Date(userData.createdAt).toLocaleDateString('en-GB')}</span>
+                </div>
+              </div>
+              {/* QR Code for Owner ID */}
+              <div className="flex flex-col items-center justify-center mt-4 mb-1">
+                <div className="bg-white border border-gray-200 dark:border-gray-700 rounded p-2 shadow-sm">
+                  <QRCode value={userData.id} size={64} bgColor="#fff" fgColor="#222" />
+                </div>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Scan Owner ID</span>
+              </div>
+            </div>
+          </aside>
+          {/* Main Content */}
+          <section ref={rightRef} className="flex-1 min-w-0 flex flex-col h-full">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 pt-0 px-6 pb-10 flex-1 flex flex-col mb-6">
+                <div className="flex items-center justify-between mb-6 pb-2 border-b border-gray-100 dark:border-gray-800">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{getSectionTitle()}</h2>
+                  <button className="px-4 py-2 flex items-center bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg font-semibold shadow transition text-base" onClick={() => setEditOpen(true)}>
+                    <Edit3 className="w-5 h-5 mr-2" />
+                    Edit Profile
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{getIdLabel()}</div>
+                    <div className="font-mono text-base text-gray-800 dark:text-gray-200">{userData.id}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Department</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">Retail Operations</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Role</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{userData.role}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Email</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{user.emailAddresses[0]?.emailAddress || 'No email'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Phone</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{userData.phone || 'No phone'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Address</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{userData.address || 'No address provided'}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-100 dark:border-gray-800">Account Information</h2>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start pb-3 border-b border-gray-100 dark:border-gray-800">
+                    <div>
+                      <div className="font-medium text-gray-800 dark:text-gray-200">Account Created</div>
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{new Date(userData.createdAt).toLocaleDateString('en-GB')}</div>
+                  </div>
+                  <div className="flex justify-between items-start pb-3 border-b border-gray-100 dark:border-gray-800">
+                      <div>
+                      <div className="font-medium text-gray-800 dark:text-gray-200">Last Login</div>
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{new Date().toLocaleDateString('en-GB')}</div>
+                      </div>
+                  <div className="flex justify-between items-start pb-3 border-b border-gray-100 dark:border-gray-800">
+                    <div>
+                      <div className="font-medium text-gray-800 dark:text-gray-200">Account Status</div>
+                    </div>
+                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold">Active</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
       {editOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
-            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl" onClick={() => setEditOpen(false)}>&times;</button>
-            <h2 className="text-xl font-bold mb-6 text-gray-900">Edit Profile</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative border border-gray-200 dark:border-gray-700">
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl" onClick={() => setEditOpen(false)}>&times;</button>
+            <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-gray-100">Edit Profile</h2>
             <div className="flex flex-col items-center gap-4 mb-6">
               <div className="relative">
                 {editPhoto ? (
@@ -223,7 +326,7 @@ const ProfilePage = () => {
                       </DialogHeader>
                       <DialogFooter>
                         <button
-                          className="px-4 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          className="px-4 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
                           onClick={() => setShowRemovePhotoConfirm(false)}
                           type="button"
                         >
@@ -243,25 +346,25 @@ const ProfilePage = () => {
               )}
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Phone Number</label>
               <input
                 type="text"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-gray-900 dark:text-gray-100"
                 value={editPhone}
                 onChange={e => setEditPhone(e.target.value)}
               />
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Address</label>
               <textarea
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-gray-900 dark:text-gray-100"
                 value={editAddress}
                 onChange={e => setEditAddress(e.target.value)}
                 rows={2}
               />
             </div>
             <button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow transition disabled:opacity-60"
+              className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-semibold py-2 rounded-lg shadow transition disabled:opacity-60"
               onClick={handleSave}
               disabled={saving}
             >
@@ -270,118 +373,7 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
-      {/* Left Sidebar */}
-      <div className="lg:col-span-1 h-full flex flex-col">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 h-full flex flex-col">
-          {/* Profile Info */}
-          <div className="flex flex-col items-center p-8 border-b border-gray-100">
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg border-4 border-white mb-4 overflow-hidden">
-              {userData.photoUrl ? (
-                <img src={userData.photoUrl} alt="Profile" className="w-28 h-28 rounded-full object-cover" />
-              ) : (
-                <span className="text-white font-bold text-4xl select-none">{getUserInitials()}</span>
-              )}
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-1">{getUserDisplayName()}</h2>
-            <span className="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-800 text-base font-semibold shadow mb-2">{userData.role}</span>
-            <span className="inline-block px-3 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold mb-2">Active</span>
-            <p className="text-gray-500 text-base text-center">Member since {new Date(userData.createdAt).toLocaleDateString('en-GB')}</p>
-          </div>
-          
-          {/* Contact Info */}
-          <div className="p-8 border-b border-gray-100 flex-grow">
-            <div className="space-y-4">
-              <div className="flex items-center text-gray-700 gap-3">
-                <Mail className="w-5 h-5 text-blue-500" />
-                <span className="text-base">{user.emailAddresses[0]?.emailAddress || 'No email'}</span>
-              </div>
-              <div className="flex items-center text-gray-700 gap-3">
-                <Phone className="w-5 h-5 text-blue-500" />
-                <span className="text-base">{userData.phone || 'No phone'}</span>
-              </div>
-              <div className="flex items-center text-gray-700 gap-3">
-                <Calendar className="w-5 h-5 text-blue-500" />
-                <span className="text-base">Joined {new Date(userData.createdAt).toLocaleDateString('en-GB')}</span>
-              </div>
-            </div>
-            {/* QR Code for Owner ID */}
-            <div className="flex flex-col items-center justify-center mt-4 mb-1">
-              <div className="bg-white border border-gray-200 rounded p-2 shadow-sm">
-                <QRCode value={userData.id} size={64} bgColor="#fff" fgColor="#222" />
-              </div>
-              <span className="text-[10px] text-gray-400 mt-1">Scan Owner ID</span>
-            </div>
-          </div>
-          
-          {/* Edit Button */}
-          <div className="p-8 mt-auto">
-            <button className="w-full px-4 py-2 flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow transition text-base" onClick={() => setEditOpen(true)}>
-              <Edit3 className="w-5 h-5 mr-2" />
-              Edit Profile
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Right Content */}
-      <div className="lg:col-span-3 space-y-8 flex flex-col">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 flex-grow">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-100">{getSectionTitle()}</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
-            <div>
-              <div className="text-sm font-medium text-gray-500 mb-1">{getIdLabel()}</div>
-              <div className="font-mono text-base text-gray-800">{userData.id}</div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-500 mb-1">Department</div>
-              <div className="font-medium text-gray-900">Retail Operations</div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-500 mb-1">Role</div>
-              <div className="font-medium text-gray-900">{userData.role}</div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-500 mb-1">Email</div>
-              <div className="font-medium text-gray-900">{user.emailAddresses[0]?.emailAddress || 'No email'}</div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-500 mb-1">Phone</div>
-              <div className="font-medium text-gray-900">{userData.phone || 'No phone'}</div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-500 mb-1">Address</div>
-              <div className="font-medium text-gray-900">{userData.address || 'No address provided'}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-100">Account Information</h2>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
-              <div>
-                <div className="font-medium text-gray-800">Account Created</div>
-              </div>
-              <div className="text-sm text-gray-500">{new Date(userData.createdAt).toLocaleDateString('en-GB')}</div>
-            </div>
-            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
-                <div>
-                <div className="font-medium text-gray-800">Last Login</div>
-              </div>
-              <div className="text-sm text-gray-500">{new Date().toLocaleDateString('en-GB')}</div>
-                </div>
-            <div className="flex justify-between items-start pb-3 border-b border-gray-100">
-              <div>
-                <div className="font-medium text-gray-800">Account Status</div>
-              </div>
-              <div className="text-sm text-green-600 font-semibold">Active</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

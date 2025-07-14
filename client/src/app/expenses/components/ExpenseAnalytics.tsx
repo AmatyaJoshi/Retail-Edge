@@ -31,6 +31,7 @@ import { ChevronDown, Calendar as CalendarIcon, TrendingUp, PieChart as PieChart
 import { cn } from "@/lib/utils";
 import { useGetExpensesQuery } from "@/state/api";
 import { useGetAllExpenseCategoriesQuery } from "@/state/api";
+import { useTheme } from 'next-themes';
 
 // Define chart colors
 const COLORS = [
@@ -266,12 +267,15 @@ export function ExpenseAnalytics() {
     );
   }
   
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
+
   return (
-    <Card className="col-span-full bg-white rounded-xl shadow-sm border border-gray-200">
-      <CardHeader className="pb-2 border-b-0">
+    <Card className="col-span-full bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <CardHeader className="pb-2 border-b-0 dark:bg-gray-900">
         <div className="flex items-center gap-3">
           <PieChartIcon className="w-7 h-7 text-primary" />
-          <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Expense Analytics</CardTitle>
+          <CardTitle className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">Expense Analytics</CardTitle>
         </div>
         <div className="flex flex-wrap gap-2 mt-4">
           {/* Date Range Picker */}
@@ -299,39 +303,38 @@ export function ExpenseAnalytics() {
           {/* <Select ... /> */}
         </div>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className="pt-4 dark:bg-gray-900">
         {/* Professional KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
-            <div className="flex items-center gap-2 text-primary"><TrendingUp className="w-5 h-5" /> <span className="font-medium">Total Spent</span></div>
-            <div className="text-2xl font-bold animate-fade-in">{formatCurrency(totalSpent)}</div>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 text-primary dark:text-primary"><TrendingUp className="w-5 h-5" /> <span className="font-medium dark:text-gray-100">Total Spent</span></div>
+            <div className="text-2xl font-bold animate-fade-in dark:text-gray-100">{formatCurrency(totalSpent)}</div>
           </div>
-          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
-            <div className="flex items-center gap-2 text-blue-500"><Layers className="w-5 h-5" /> <span className="font-medium">Total Budget</span></div>
-            <div className="text-2xl font-bold animate-fade-in">{formatCurrency(totalBudget)}</div>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 text-blue-500 dark:text-blue-400"><Layers className="w-5 h-5" /> <span className="font-medium dark:text-gray-100">Total Budget</span></div>
+            <div className="text-2xl font-bold animate-fade-in dark:text-gray-100">{formatCurrency(totalBudget)}</div>
           </div>
-          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
-            <div className="flex items-center gap-2 text-green-600"><Award className="w-5 h-5" /> <span className="font-medium">Utilization</span></div>
-            <div className="text-2xl font-bold animate-fade-in">{percentageSpent.toFixed(1)}%</div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-              <div
-                className={cn(
-                  "h-2.5 rounded-full transition-all",
-                  percentageSpent > 90 ? 'bg-red-600' : percentageSpent > 70 ? 'bg-yellow-500' : 'bg-green-600'
-                )}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 text-green-600 dark:text-green-400"><Award className="w-5 h-5" /> <span className="font-medium dark:text-gray-100">Utilization</span></div>
+            <div className="text-2xl font-bold animate-fade-in dark:text-gray-100">{percentageSpent.toFixed(1)}%</div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-1">
+              <div className={cn(
+                "h-2.5 rounded-full transition-all",
+                percentageSpent > 90 ? 'bg-red-600' : percentageSpent > 70 ? 'bg-yellow-500' : 'bg-green-600'
+              ) + ' dark:bg-yellow-400'}
                 style={{ width: `${Math.min(percentageSpent, 100)}%` }}
               ></div>
             </div>
           </div>
-          <div className="bg-gray-50 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200">
-            <div className="flex items-center gap-2 text-fuchsia-600"><PieChartIcon className="w-5 h-5" /> <span className="font-medium">Top Category</span></div>
-            <div className="text-lg font-semibold animate-fade-in">{topCategory ? topCategory.name : '-'}</div>
-            <div className="text-xs text-muted-foreground">{topCategory ? formatCurrency(topCategory.value) : ''}</div>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm flex flex-col items-start p-4 gap-2 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 text-fuchsia-600 dark:text-fuchsia-400"><PieChartIcon className="w-5 h-5" /> <span className="font-medium dark:text-gray-100">Top Category</span></div>
+            <div className="text-lg font-semibold animate-fade-in dark:text-gray-100">{topCategory ? topCategory.name : '-'}</div>
+            <div className="text-xs text-muted-foreground dark:text-gray-300">{topCategory ? formatCurrency(topCategory.value) : ''}</div>
           </div>
         </div>
         {/* Main Visualizations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Category Distribution</h3>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -354,13 +357,13 @@ export function ExpenseAnalytics() {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><Layers className="w-4 h-4" /> Budget vs Actual</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={budgetVsActualData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `₹${value / 1000}k`} />
+                <XAxis dataKey="name" stroke="#e5e7eb" tick={{ fill: isDarkMode ? '#d1d5db' : '#374151' }} />
+                <YAxis tickFormatter={(value) => `₹${value / 1000}k`} stroke="#e5e7eb" tick={{ fill: isDarkMode ? '#d1d5db' : '#374151' }} />
                 <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                 <Legend />
                 <Bar dataKey="budget" fill="#06b6d4" name="Budget" radius={[4, 4, 0, 0]} />
@@ -370,13 +373,13 @@ export function ExpenseAnalytics() {
           </div>
         </div>
         {/* Top Pending Categories Visualization */}
-        <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col mt-8">
+        <div className="h-[340px] bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col mt-8">
           <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Top 5 Categories by Pending Amount</h3>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart layout="vertical" data={topPendingCategories}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" tickFormatter={(value) => formatCurrency(Number(value))} />
-              <YAxis dataKey="name" type="category" width={120} />
+              <XAxis type="number" tickFormatter={(value) => formatCurrency(Number(value))} stroke="#e5e7eb" tick={{ fill: isDarkMode ? '#d1d5db' : '#374151' }} />
+              <YAxis dataKey="name" type="category" width={120} stroke="#e5e7eb" tick={{ fill: isDarkMode ? '#d1d5db' : '#374151' }} />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
               <Bar dataKey="pending" fill="#f59e42" name="Pending Amount" radius={[0, 4, 4, 0]} />
             </BarChart>
@@ -385,13 +388,13 @@ export function ExpenseAnalytics() {
         {/* New Interactive Visualizations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           {/* Stacked Bar Chart: Paid vs Pending by Category */}
-          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><Layers className="w-4 h-4" /> Paid vs Pending by Category</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={paidPendingByCategory}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `₹${value / 1000}k`} />
+                <XAxis dataKey="name" stroke="#e5e7eb" tick={{ fill: isDarkMode ? '#d1d5db' : '#374151' }} />
+                <YAxis tickFormatter={(value) => `₹${value / 1000}k`} stroke="#e5e7eb" tick={{ fill: isDarkMode ? '#d1d5db' : '#374151' }} />
                 <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                 <Legend />
                 <Bar dataKey="paid" stackId="a" fill="#22c55e" name="Paid" />
@@ -400,7 +403,7 @@ export function ExpenseAnalytics() {
             </ResponsiveContainer>
           </div>
           {/* Donut Chart: Payment Status Breakdown */}
-          <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
+          <div className="h-[340px] bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
             <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Payment Status Breakdown</h3>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -426,7 +429,7 @@ export function ExpenseAnalytics() {
           </div>
         </div>
         {/* Treemap: Expense Distribution by Category */}
-        <div className="h-[340px] bg-gray-50 rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col mt-8">
+        <div className="h-[340px] bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col mt-8">
           <h3 className="text-base font-medium mb-2 flex items-center gap-2"><PieChartIcon className="w-4 h-4" /> Expense Distribution by Category</h3>
           <ResponsiveContainer width="100%" height="100%">
             <Treemap

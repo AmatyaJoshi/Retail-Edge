@@ -88,31 +88,50 @@ body,
   @apply transition-colors duration-200;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Light Mode (default) */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f3f4f6; /* gray-100 */
+  border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
-  border-radius: 3px;
+  background: #d1d5db; /* gray-300 */
+  border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #d1d5db;
+  background: #9ca3af; /* gray-400 */
 }
 
-/* Dark mode scrollbar */
+/* Dark Mode Scrollbar - for [data-theme="dark"] */
+:root[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-track {
+  background: #1f2937; /* gray-800 */
+}
+
 :root[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: #374151; /* gray-700 */
 }
 
 :root[data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+  background: #4b5563; /* gray-600 */
+}
+
+/* Dark Mode Scrollbar - for .dark class */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #1f2937; /* gray-800 */
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #374151; /* gray-700 */
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4b5563; /* gray-600 */
 }
 
 html,
@@ -217,4 +236,37 @@ body,
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Hide default calendar icon for custom date input */
+.custom-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+.custom-date-input::-ms-input-placeholder {
+  color: transparent;
+}
+.custom-date-input::-moz-placeholder {
+  color: transparent;
+}
+.custom-date-input:-ms-input-placeholder {
+  color: transparent;
+}
+.custom-date-input::placeholder {
+  color: transparent;
+}
+
+/* Firefox scrollbar support */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6; /* thumb track */
+}
+
+/* Firefox dark mode scrollbar */
+:root[data-theme="dark"] .custom-scrollbar {
+  scrollbar-color: #374151 #1f2937; /* thumb track */
+}
+
+.dark .custom-scrollbar {
+  scrollbar-color: #374151 #1f2937; /* thumb track */
 }

@@ -21,6 +21,13 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOption, setSortOption] = useState('name-asc');
 
+  // Close AddCustomerModal if parent modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setIsModalOpen(false);
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (customers) {
       let sorted = [...customers];
@@ -69,7 +76,7 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-md" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -83,34 +90,34 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="bg-white rounded-xl shadow-md border border-gray-100 p-10 w-full max-w-4xl mx-auto transform transition-all duration-300 ease-in-out">
-                <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Select Customer</h2>
+              <Dialog.Panel className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-600 p-8 w-full max-w-4xl mx-auto transform transition-all duration-300 ease-in-out">
+                <div className="flex justify-between items-center mb-8 border-b-2 border-gray-200 dark:border-gray-700 pb-6">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Select Customer</h2>
                   <button
                     type="button"
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                     onClick={onClose}
                   >
-                    <X className="h-6 w-6" aria-hidden="true" />
+                    <X className="h-7 w-7" aria-hidden="true" />
                   </button>
       </div>
       
-                <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Search customers..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-md bg-white"
+                      placeholder="Search customers by name, email, or phone..."
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-base transition-all duration-200"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="sort" className="text-gray-700 text-sm font-medium">Sort by:</label>
+                  <div className="flex items-center gap-3">
+                    <label htmlFor="sort" className="text-gray-700 dark:text-gray-300 text-sm font-semibold">Sort by:</label>
                     <select
                       id="sort"
-                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow bg-white"
+                      className="border-2 border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-all duration-200"
                       value={sortOption}
                       onChange={e => setSortOption(e.target.value)}
                     >
@@ -122,25 +129,25 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                   </div>
                 </div>
                 
-                <div className="max-h-80 overflow-y-auto border border-gray-100 rounded-xl shadow-inner bg-white">
+                <div className="max-h-96 overflow-y-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-inner bg-gray-50 dark:bg-gray-700 custom-scrollbar">
                   {
                     filteredCustomers.length > 0 ? (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-600">
             {filteredCustomers.map(customer => (
               <li 
                             key={customer.customerId}
-                            className="p-4 hover:bg-blue-50 cursor-pointer transition-colors flex items-center gap-4 rounded-xl bg-white shadow-md m-2 border border-gray-100"
+                            className="p-5 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer transition-all duration-200 flex items-center gap-4 rounded-xl bg-white dark:bg-gray-800 shadow-lg m-3 border-2 border-gray-100 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 hover:scale-105"
                             onClick={() => {
                               onCustomerSelect(customer);
                               onClose();
                             }}
               >
-                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl flex-shrink-0">
+                            <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-2xl flex-shrink-0 shadow-md">
                               {customer.name.charAt(0).toUpperCase()}
                             </div>
                   <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-gray-900 text-lg truncate">{customer.name}</p>
-                              <p className="text-base text-gray-600 truncate">
+                              <p className="font-bold text-gray-900 dark:text-gray-100 text-xl truncate">{customer.name}</p>
+                              <p className="text-base text-gray-600 dark:text-gray-400 truncate">
                                 {customer.email}
                                 {customer.email && customer.phone ? ' - ' : ''}
                                 {customer.phone}
@@ -150,18 +157,26 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
             ))}
           </ul>
         ) : (
-                      <p className="p-4 text-gray-500 text-center">No customers found. Try adding a new one!</p>
+                      <div className="flex flex-col items-center justify-center p-8 text-gray-500 dark:text-gray-400">
+                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4 dark:bg-gray-600">
+                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                        </div>
+                        <p className="font-medium text-lg">No customers found</p>
+                        <p className="text-sm">Try adding a new customer or adjusting your search</p>
+                      </div>
                     )
                   }
       </div>
       
-                <div className="mt-6 flex justify-end">
+                <div className="mt-8 flex justify-end">
         <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors"
+                    className="flex items-center space-x-3 px-6 py-4 bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 font-semibold"
         >
                     <Plus className="w-5 h-5" />
-                    <span>Add New</span>
+                    <span>Add New Customer</span>
         </button>
                 </div>
 

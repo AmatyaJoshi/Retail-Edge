@@ -1,14 +1,16 @@
 "use client";
 
 import { useCreateProductMutation, useGetProductsQuery, useUpdateProductMutation, useDeleteProductMutation } from "@/state/api";
-import type { Product } from "@/state/api";
-import { PlusCircleIcon, SearchIcon, ChevronLeft, ChevronRight, ArrowDownWideNarrow, ArrowUpWideNarrow } from "lucide-react";
+import type { Product, NewProduct } from "@/state/api";
+import { PlusCircleIcon, SearchIcon, ChevronLeft, ChevronRight, ArrowDownWideNarrow, ArrowUpWideNarrow, Printer } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/components/Header";
 import Rating from "@/app/components/Rating";
 import CreateProductModal from "./CreateProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
+import BarcodePrintingModal from "@/app/components/BarcodePrintingModal";
 import Image from "next/image";
+import { useProductsDataUpdater } from "@/app/hooks/use-page-data-updater";
 
 // Eyewear SVG icon from svgrepo.com
 const EyewearIcon = () => (
@@ -20,12 +22,7 @@ const EyewearIcon = () => (
   </svg>
 );
 
-type ProductFormData = {
-  name: string;
-  price: number;
-  stockQuantity: number;
-  rating: number;
-};
+type ProductFormData = NewProduct;
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +32,9 @@ const Products = () => {
   const itemsPerPage = 12;
   const [sortField, setSortField] = useState("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
 
   const {
     data: products,
@@ -47,9 +47,17 @@ const Products = () => {
   const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
+  // Update page data for AI Assistant
+  useProductsDataUpdater(products || [], 'Products');
+
   const handleCreateProduct = async (productData: ProductFormData) => {
-    await createProduct(productData);
-    refetch();
+    try {
+      await createProduct(productData);
+      refetch();
+    } catch (error) {
+      console.error("Failed to create product:", error);
+      alert("Failed to create product.");
+    }
   };
 
   const handleReduceStock = async (product: Product) => {
@@ -113,6 +121,40 @@ const Products = () => {
     }
   };
 
+  // Selection functions
+  const toggleProductSelection = (productId: string) => {
+    const newSelected = new Set(selectedProducts);
+    if (newSelected.has(productId)) {
+      newSelected.delete(productId);
+    } else {
+      newSelected.add(productId);
+    }
+    setSelectedProducts(newSelected);
+  };
+
+  const enterSelectionMode = () => {
+    setIsSelectionMode(true);
+  };
+
+  const exitSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedProducts(new Set());
+  };
+
+  const selectAllProducts = () => {
+    if (products) {
+      setSelectedProducts(new Set(products.map(p => p.productId)));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedProducts(new Set());
+  };
+
+  const getSelectedProducts = () => {
+    return products?.filter(p => selectedProducts.has(p.productId)) || [];
+  };
+
   // Calculate pagination
   const totalPages = products ? Math.ceil(products.length / itemsPerPage) : 0;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -136,150 +178,231 @@ const Products = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
-      {/* Professional Header Section */}
-      <div className="px-2 py-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Products</h1>
-        <p className="text-gray-500 text-base">Browse, search, and manage your store's product catalog. Add new products, update stock, and keep your inventory up to date for seamless sales and operations.</p>
-      </div>
+    <div className="flex flex-col h-full bg-gray-100 dark:bg-gray-950 overflow-x-hidden pt-20">
+      <div className="w-full px-4 md:px-8 flex flex-col h-full">
+        {/* Header Section */}
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Products</h1>
+        <p className="text-gray-600 dark:text-gray-300 text-base mb-4">Browse, search, and manage your store's product catalog. Add new products, update stock, and keep your inventory up to date for seamless sales and operations.</p>
 
-      {/* Controls Card */}
-      <div className="mb-4 mx-2 md:mx-0 bg-white shadow border border-gray-200 rounded-xl px-6 py-6 flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="relative flex-grow max-w-xl">
-            <input
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white shadow font-sans text-base transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          </div>
-          <div className="hidden md:block w-px h-10 bg-gray-100 mx-4" />
-          <div className="flex gap-2 items-center">
-            <select
-              className="py-2 px-4 border border-gray-200 rounded-xl bg-white text-gray-700 font-medium shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
-              value={sortField}
-              onChange={(e) => setSortField(e.target.value)}
-            >
-              <option value="name">Sort by Name</option>
-              <option value="rating">Sort by Rating</option>
-              <option value="stockQuantity">Sort by Stock</option>
-            </select>
-            <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="p-2 border border-gray-200 rounded-xl bg-white text-gray-700 hover:bg-gray-100 shadow focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
-            >
-              {sortOrder === "asc" ? <ArrowUpWideNarrow className="w-5 h-5" /> : <ArrowDownWideNarrow className="w-5 h-5" />}
-            </button>
-            <button
-              className="flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg ml-2 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <PlusCircleIcon className="w-5 h-5 mr-2 !text-white" /> Create Product
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="border-b border-gray-100 mb-8" />
-
-      {/* Main Content: Products Grid */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-0 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-10 gap-x-6 w-full">
-          {isLoading ? (
-            <div>Loading...</div>
-          ) : (
-            currentProducts?.map((product) => (
-              <div
-                key={product.productId}
-                className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-transform duration-200 cursor-pointer flex flex-col h-full group"
-                onClick={() => setSelectedProduct(product)}
+        {/* Controls Card */}
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 mb-4 shadow-sm flex flex-col gap-3">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="relative flex-grow max-w-xl">
+              <input
+                className="w-full pl-8 pr-2 py-1.5 border border-gray-200 dark:border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white dark:bg-gray-900 shadow-sm font-sans text-sm transition focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <SearchIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
+            </div>
+            <div className="hidden md:block w-px h-7 bg-gray-100 dark:bg-gray-700 mx-2" />
+            <div className="flex gap-1 items-center">
+              <select
+                className="py-1 px-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none text-sm"
+                value={sortField}
+                onChange={(e) => setSortField(e.target.value)}
               >
-                <div className="p-4 flex flex-col items-center flex-1">
-                  <div className="flex justify-center mb-2">
-                    <div className="w-[100px] h-[100px] bg-white rounded-lg flex items-center justify-center overflow-hidden border border-gray-200">
-                      {product.imageUrl ? (
-                        <Image
-                          src={product.imageUrl}
-                          alt={product.name}
-                          width={100}
-                          height={100}
-                          className="object-contain"
+                <option value="name">Sort by Name</option>
+                <option value="rating">Sort by Rating</option>
+                <option value="stockQuantity">Sort by Stock</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                className="p-1.5 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
+              >
+                {sortOrder === "asc" ? <ArrowUpWideNarrow className="w-4 h-4" /> : <ArrowDownWideNarrow className="w-4 h-4" />}
+              </button>
+              {!isSelectionMode ? (
+                <button
+                  onClick={enterSelectionMode}
+                  className="flex items-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-4 rounded-md shadow ml-1 transition focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
+                >
+                  Select
+                </button>
+              ) : (
+                <button
+                  onClick={exitSelectionMode}
+                  className="flex items-center bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-4 rounded-md shadow ml-1 transition focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                >
+                  Cancel
+                </button>
+              )}
+              <button
+                className="flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded-md shadow ml-1 transition focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <PlusCircleIcon className="w-4 h-4 mr-1 !text-white" /> Create Product
+              </button>
+            </div>
+          </div>
+          
+          {/* Bulk Actions */}
+          {isSelectionMode && (
+            <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedProducts.size} product{selectedProducts.size !== 1 ? 's' : ''} selected
+                </span>
+                {selectedProducts.size > 0 && (
+                  <button
+                    onClick={clearSelection}
+                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  >
+                    Clear selection
+                  </button>
+                )}
+                {selectedProducts.size === 0 && (
+                  <button
+                    onClick={selectAllProducts}
+                    className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    Select all
+                  </button>
+                )}
+              </div>
+              {selectedProducts.size > 0 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowPrintModal(true)}
+                    disabled={getSelectedProducts().filter(p => p.barcode).length === 0}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <Printer className="w-4 h-4" />
+                    Print Barcodes ({getSelectedProducts().filter(p => p.barcode).length})
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Main Content: Products Grid */}
+        <div className="flex-1 min-h-0">
+          <div className="border rounded-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 p-3 h-full overflow-y-auto custom-scrollbar">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-5 gap-x-3 w-full">
+              {isLoading ? (
+                <div>Loading...</div>
+              ) : (
+                currentProducts?.map((product) => (
+                  <div
+                    key={product.productId}
+                    className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hover:shadow-xl hover:border-blue-500 dark:hover:border-blue-400 hover:scale-[1.025] transition-all duration-200 flex flex-col h-full group ${
+                      selectedProducts.has(product.productId) ? 'ring-2 ring-blue-500 border-blue-500' : ''
+                    }`}
+                  >
+                    {/* Selection Checkbox */}
+                    {isSelectionMode && (
+                      <div className="p-2 flex justify-end">
+                        <input
+                          type="checkbox"
+                          checked={selectedProducts.has(product.productId)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            toggleProductSelection(product.productId);
+                          }}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                         />
-                      ) : (
-                        <EyewearIcon />
+                      </div>
+                    )}
+                    
+                    <div 
+                      className="p-3 flex flex-col items-center flex-1 cursor-pointer"
+                      onClick={() => {
+                        if (!isSelectionMode) {
+                          setSelectedProduct(product);
+                        }
+                      }}
+                    >
+                      <div className="flex justify-center mb-2">
+                        <div className="w-[64px] h-[64px] bg-white dark:bg-gray-900 rounded-md flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
+                          {product.imageUrl ? (
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.name}
+                              width={64}
+                              height={64}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <EyewearIcon />
+                          )}
+                        </div>
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 text-center truncate w-full" title={product.name}>
+                        {product.name}
+                      </h3>
+                      <p className="text-base font-medium text-blue-600 dark:text-blue-400 mt-1 truncate w-full text-center">
+                        ₹{product.price}
+                      </p>
+                      <div className="flex items-center justify-between w-full mt-2">
+                        <span className="text-xs text-gray-600 dark:text-gray-300 flex items-center truncate">
+                          Stock: {product.stockQuantity}
+                          {product.stockQuantity <= 10 && (
+                            <span className="ml-2 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-[11px] font-semibold shadow-sm border border-yellow-200 dark:border-yellow-800">Low</span>
+                          )}
+                        </span>
+                        {product.rating && (
+                          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5">
+                            <Rating rating={product.rating} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full border-t border-gray-200 dark:border-gray-700 my-3" />
+                      {!isSelectionMode && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReduceStock(product);
+                          }}
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+                        >
+                          Manage Stock
+                        </button>
                       )}
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 text-center truncate w-full">
-                    {product.name}
-                  </h3>
-                  <p className="text-lg font-medium text-blue-600 mt-1">
-                    ₹{product.price}
-                  </p>
-                  <div className="flex items-center justify-between w-full mt-2">
-                    <span className="text-sm text-gray-600 flex items-center">
-                      Stock: {product.stockQuantity}
-                      {product.stockQuantity <= 10 && (
-                        <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">Low</span>
-                      )}
-                    </span>
-                    {product.rating && (
-                      <div className="flex items-center">
-                        <Rating rating={product.rating} />
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleReduceStock(product);
-                    }}
-                    className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    Manage Stock
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Pagination Bar */}
-      {totalPages > 1 && (
-        <div className="py-3 flex justify-center items-center gap-2 border-t border-gray-200 bg-white">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-3 py-1 rounded-lg border border-gray-200 bg-white transition ${
-                  currentPage === page
-                    ? "bg-blue-500 text-white"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+                ))
+              )}
+            </div>
           </div>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-white transition"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
         </div>
-      )}
+
+        {/* Pagination Bar */}
+        {totalPages > 1 && (
+          <div className="py-3 flex justify-center items-center gap-2 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-xl mt-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-800 transition"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition ${
+                    currentPage === page
+                      ? "bg-blue-500 text-white"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-800 transition"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Create Product Modal */}
       <CreateProductModal
@@ -298,6 +421,14 @@ const Products = () => {
           onDelete={handleDeleteProduct}
         />
       )}
+
+      {/* Barcode Printing Modal */}
+      <BarcodePrintingModal
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        products={getSelectedProducts()}
+        title={`Print Barcodes - ${getSelectedProducts().length} products`}
+      />
     </div>
   );
 };

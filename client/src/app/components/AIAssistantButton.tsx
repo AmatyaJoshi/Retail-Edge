@@ -5,7 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import { usePathname } from 'next/navigation';
 
 export default function AIAssistantButton() {
-  const { openAssistant } = useAIAssistant();
+  const { openAssistant, isOpen } = useAIAssistant();
   const { isSignedIn, isLoaded } = useUser();
   const pathname = usePathname();
   const isAuthPage = Boolean(pathname?.startsWith('/auth'));
@@ -17,6 +17,8 @@ export default function AIAssistantButton() {
   if (!isLoaded || !isSignedIn || isAuthPage) {
     return null;
   }
+
+  if (isOpen) return null;
 
   return (
     <div className="relative group">
@@ -39,4 +41,4 @@ export default function AIAssistantButton() {
       </span>
     </div>
   );
-} 
+}

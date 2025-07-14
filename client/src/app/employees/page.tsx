@@ -121,8 +121,8 @@ const EmployeesPage = () => {
   const handleRoleChange = async (emp: Employee, newRole: string) => {
     setRoleLoadingId(emp.id);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/employees/${emp.id}/role`, {
-        method: 'PATCH',
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/employees/${emp.id}/assign-role`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: newRole })
       });
@@ -189,15 +189,15 @@ const EmployeesPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#10192A] dark:text-gray-100 overflow-x-hidden">
       {/* Professional Header Section */}
-      <div className="px-2 py-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Employees</h1>
-        <p className="text-gray-500 text-base">Browse, search, and manage your team members. Add new employees, update roles, and maintain your workforce database for seamless operations and communication.</p>
+      <div className="px-2 pt-24 pb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-2">Employees</h1>
+        <p className="text-gray-500 dark:text-gray-300 text-base">Browse, search, and manage your team members. Add new employees, update roles, and maintain your workforce database for seamless operations and communication.</p>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-0 pb-8">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-0 pb-8 custom-scrollbar">
         <div className="grid grid-cols-1 gap-8">
           {loading ? (
             <div className="col-span-full"><p className="text-gray-500">Loading employees...</p></div>
@@ -229,25 +229,25 @@ const EmployeesPage = () => {
                 return 0;
               });
               return (
-                <div key={group.role} className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                <div key={group.role} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                    <h2 className="text-lg font-semibold tracking-wide text-gray-800 flex items-center gap-2">
-                      <span className="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider">
+                    <h2 className="text-lg font-semibold tracking-wide text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                      <span className="inline-block px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 text-xs font-bold uppercase tracking-wider">
                         {ROLE_LABELS[group.role] || group.role}
                       </span>
-                      <span className="text-gray-400 font-normal text-xs">({filteredEmployees.length})</span>
+                      <span className="text-gray-400 dark:text-gray-300 font-normal text-xs">({filteredEmployees.length})</span>
                     </h2>
                     <div className="flex gap-2 items-center w-full md:w-auto">
                       <input
                         type="text"
                         placeholder="Search..."
-                        className="px-3 py-2 border border-gray-200 rounded-md text-sm w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md text-sm w-full md:w-56 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
                         value={sectionSearch[group.role] || ''}
                         onChange={e => setSectionSearch(s => ({ ...s, [group.role]: e.target.value }))}
                       />
                       {/* Sorting dropdown */}
                       <select
-                        className="px-2 py-2 border border-gray-200 rounded-md text-sm bg-white text-gray-700"
+                        className="px-2 py-2 border border-gray-200 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100"
                         value={sectionSort[group.role] || 'name'}
                         onChange={e => setSectionSort(s => ({ ...s, [group.role]: e.target.value }))}
                       >
@@ -258,28 +258,28 @@ const EmployeesPage = () => {
                       {/* Export button and dropdown */}
                       <div className="relative">
                         <button
-                          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
+                          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-md hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200"
                           onClick={() => setExportDropdown(exportDropdown === group.role ? null : group.role)}
                         >
                           <ArrowUpRightFromSquare className="w-4 h-4" />
                           Export
                         </button>
                         {exportDropdown === group.role && (
-                          <div className="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50" onClick={() => { exportData(filteredEmployees, 'excel', group.role); setExportDropdown(null); }}>Excel (.xlsx)</button>
-                            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50" onClick={() => { exportData(filteredEmployees, 'csv', group.role); setExportDropdown(null); }}>CSV (.csv)</button>
-                            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50" onClick={() => { exportData(filteredEmployees, 'json', group.role); setExportDropdown(null); }}>JSON (.json)</button>
+                          <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+                            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50 dark:hover:bg-gray-700" onClick={() => { exportData(filteredEmployees, 'excel', group.role); setExportDropdown(null); }}>Excel (.xlsx)</button>
+                            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50 dark:hover:bg-gray-700" onClick={() => { exportData(filteredEmployees, 'csv', group.role); setExportDropdown(null); }}>CSV (.csv)</button>
+                            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50 dark:hover:bg-gray-700" onClick={() => { exportData(filteredEmployees, 'json', group.role); setExportDropdown(null); }}>JSON (.json)</button>
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
                   {filteredEmployees.length > 0 ? (
-                    <div className="overflow-x-auto rounded-lg border border-gray-200">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-800">
                           <tr>
-                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-100 uppercase tracking-wider">
                               <div className="flex items-center justify-center">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -287,7 +287,7 @@ const EmployeesPage = () => {
                                 Name
                               </div>
                             </th>
-                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-100 uppercase tracking-wider">
                               <div className="flex items-center justify-center">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -295,7 +295,7 @@ const EmployeesPage = () => {
                                 Email
                               </div>
                             </th>
-                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-100 uppercase tracking-wider">
                               <div className="flex items-center justify-center">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -303,7 +303,7 @@ const EmployeesPage = () => {
                                 Phone
                               </div>
                             </th>
-                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-100 uppercase tracking-wider">
                               <div className="flex items-center justify-center">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -311,7 +311,7 @@ const EmployeesPage = () => {
                                 Role
                               </div>
                             </th>
-                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-100 uppercase tracking-wider">
                               <div className="flex items-center justify-center">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
@@ -321,9 +321,9 @@ const EmployeesPage = () => {
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                           {filteredEmployees.map((emp, index) => (
-                            <tr key={emp.id} className={`hover:bg-gray-50 transition-colors duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                            <tr key={emp.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 bg-white dark:bg-gray-800`}>
                               <td className="px-6 py-4 text-center">
                                 <div className="flex items-center justify-start">
                                   <div className="flex-shrink-0 h-10 w-10">
@@ -332,25 +332,25 @@ const EmployeesPage = () => {
                                     </div>
                                   </div>
                                   <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">{emp.firstName} {emp.lastName}</div>
+                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{emp.firstName} {emp.lastName}</div>
                                   </div>
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <div className="text-sm text-gray-900 font-medium">{emp.email}</div>
+                                <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">{emp.email}</div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <div className="text-sm text-gray-900 font-medium">{emp.phone}</div>
+                                <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">{emp.phone}</div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                                <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100 border border-gray-200 dark:border-gray-600">
                                   {ROLE_LABELS[emp.role] || emp.role}
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <div className="flex items-center justify-center gap-2">
                                   <button 
-                                    className="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-blue-700 border border-blue-700 rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
+                                    className="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-blue-700 border border-blue-600 rounded-md hover:bg-blue-800 dark:bg-blue-700 dark:border-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
                                     onClick={() => {
                                       setSelectedEmployee(emp);
                                       setShowEmployeeModal(true);
@@ -365,7 +365,7 @@ const EmployeesPage = () => {
                                   <div className="relative">
                                     <button
                                       ref={el => { roleBtnRefs.current[emp.id] = el; }}
-                                      className="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-blue-700 border border-blue-700 rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
+                                      className="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-blue-700 border border-blue-600 rounded-md hover:bg-blue-800 dark:bg-blue-700 dark:border-blue-600 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
                                       disabled={roleLoadingId === emp.id}
                                       onClick={() => setRoleDropdownId(emp.id === roleDropdownId ? null : emp.id)}
                                     >
@@ -379,7 +379,7 @@ const EmployeesPage = () => {
                                     </button>
                                   </div>
                                   <button 
-                                    className="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-red-700 border border-red-700 rounded-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-sm"
+                                    className="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-red-700 border border-red-700 rounded-md hover:bg-red-800 dark:bg-red-800 dark:border-red-700 dark:hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-sm"
                                     onClick={() => handleDelete(emp.id)}
                                   >
                                     <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -408,12 +408,12 @@ const EmployeesPage = () => {
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xs text-center">
-            <h2 className="text-lg font-semibold mb-4">Delete Employee</h2>
-            <p className="mb-6 text-gray-600">Are you sure you want to delete this employee?</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-xs text-center">
+            <h2 className="text-lg font-semibold mb-4 dark:text-gray-100">Delete Employee</h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete this employee?</p>
             <div className="flex justify-center gap-4">
-              <button className="px-4 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
-              <button className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700" onClick={confirmDelete}>Delete</button>
+              <button className="px-4 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-900" onClick={confirmDelete}>Delete</button>
             </div>
           </div>
         </div>
@@ -430,12 +430,12 @@ const EmployeesPage = () => {
       {/* Role Change Confirmation Modal */}
       {confirmRoleChange && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs text-center">
-            <h2 className="text-lg font-semibold mb-4">Change Role</h2>
-            <p className="mb-6 text-gray-600">Are you sure you want to change this employee's role to <span className="font-bold text-blue-700">{confirmRoleChange.newRole}</span>?</p>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-xs text-center">
+            <h2 className="text-lg font-semibold mb-4 dark:text-gray-100">Change Role</h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to change this employee's role to <span className="font-bold text-blue-700 dark:text-blue-300">{confirmRoleChange.newRole}</span>?</p>
             <div className="flex justify-center gap-4">
-              <button className="px-4 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200" onClick={() => setConfirmRoleChange(null)}>Cancel</button>
-              <button className="px-4 py-2 rounded bg-blue-700 text-white hover:bg-blue-800" onClick={() => { handleRoleChange(confirmRoleChange.emp, confirmRoleChange.newRole); setConfirmRoleChange(null); }}>Confirm</button>
+              <button className="px-4 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={() => setConfirmRoleChange(null)}>Cancel</button>
+              <button className="px-4 py-2 rounded bg-blue-700 text-white hover:bg-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800" onClick={() => { handleRoleChange(confirmRoleChange.emp, confirmRoleChange.newRole); setConfirmRoleChange(null); }}>Confirm</button>
             </div>
           </div>
         </div>
@@ -443,7 +443,7 @@ const EmployeesPage = () => {
       {/* Portal Dropdown */}
       {roleDropdownId && roleDropdownPos && ReactDOM.createPortal(
         <div
-          className="absolute z-50 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg"
+          className="absolute z-50 mt-2 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg"
           style={{
             position: 'absolute',
             top: roleDropdownPos.top,
@@ -457,7 +457,7 @@ const EmployeesPage = () => {
             return (
               <button
                 key={role}
-                className={`block w-full text-left px-4 py-2 text-sm hover:bg-blue-50 ${emp.role === role ? 'font-bold text-blue-700' : 'text-gray-700'}`}
+                className={`block w-full text-left px-4 py-2 text-sm hover:bg-blue-50 dark:hover:bg-gray-700 ${emp.role === role ? 'font-bold text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-100'}`}
                 onClick={() => {
                   setRoleDropdownId(null);
                   setConfirmRoleChange({ emp, newRole: role });

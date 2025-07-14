@@ -39,6 +39,8 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useAnalyticsDataUpdater } from "@/app/hooks/use-page-data-updater";
+import { useGetDashboardMetricsQuery } from "@/state/api";
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -51,6 +53,12 @@ export default function Dashboard() {
     status: "all",
     sortBy: "date",
   });
+
+  // Fetch dashboard metrics
+  const { data: dashboardData } = useGetDashboardMetricsQuery();
+
+  // Update page data for AI Assistant
+  useAnalyticsDataUpdater(dashboardData || {}, 'Dashboard');
 
   const formatDateRange = (range: DateRange) => {
     if (!range.from || !range.to) return "";
@@ -85,14 +93,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-6 pt-6 bg-white">
+    <div className="flex-1 space-y-6 p-6 pt-24 bg-white dark:bg-gray-900 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
       {/* Header Section */}
-      <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-2xl shadow-xl p-8 mb-8 bg-white/80 backdrop-blur border border-gray-200">
-        {/* Futuristic top accent line */}
-        <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 opacity-80 shadow-lg" />
+      <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-2xl shadow-xl p-8 mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-200 dark:border-gray-700">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Dashboard</h2>
-          <p className="text-gray-500 text-base">Monitor your business performance and analytics.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-2">Dashboard</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-base">Monitor your business performance and analytics.</p>
         </div>
         <div className="flex items-center gap-2">
           <DateRangePicker value={dateRange} onChange={setDateRange} />
@@ -218,22 +224,22 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="w-full justify-start p-1 bg-gray-50 rounded-xl mb-4">
+        <TabsList className="w-full justify-start p-1 bg-gray-50 dark:bg-gray-800 rounded-xl mb-4">
           <TabsTrigger 
             value="overview" 
-            className="flex-1 max-w-[200px] data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium"
+            className="flex-1 max-w-[200px] data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger 
             value="analytics" 
-            className="flex-1 max-w-[200px] data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium"
+            className="flex-1 max-w-[200px] data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200"
           >
             Analytics
           </TabsTrigger>
           <TabsTrigger 
             value="reports" 
-            className="flex-1 max-w-[200px] data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium"
+            className="flex-1 max-w-[200px] data-[state=active]:bg-white dark:data-[state=active]:bg-gray-900 data-[state=active]:shadow-sm transition-all duration-200 rounded-md px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200"
           >
             Reports
           </TabsTrigger>
@@ -273,22 +279,14 @@ export default function Dashboard() {
 
           {/* Second Row - Main Charts */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
-            <CardContent className="col-span-1 flex flex-col overflow-hidden min-h-[350px] flex-grow min-h-0 h-full p-6 bg-background border rounded-xl shadow-md">
-              <CardSalesSummary />
-            </CardContent>
-            <CardContent className="col-span-1 flex flex-col overflow-hidden min-h-[350px] flex-grow min-h-0 h-full p-6 bg-background border rounded-xl shadow-md">
-      <CardPopularProducts />
-            </CardContent>
+            <CardSalesSummary />
+            <CardPopularProducts />
           </div>
 
           {/* Third Row - Trend Analysis */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
-            <CardContent className="col-span-1 flex flex-col overflow-hidden min-h-[350px] flex-grow min-h-0 h-full p-6 bg-background border rounded-xl shadow-md">
-              <CardTrendAnalysis />
-            </CardContent>
-            <CardContent className="col-span-1 flex flex-col overflow-hidden min-h-[350px] flex-grow min-h-0 h-full p-6 bg-background border rounded-xl shadow-md">
-              <CardCategoryAnalysis />
-            </CardContent>
+            <CardTrendAnalysis />
+            <CardCategoryAnalysis />
           </div>
 
           {/* Fourth Row - Additional Metrics */}

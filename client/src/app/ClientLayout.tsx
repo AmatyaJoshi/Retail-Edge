@@ -7,6 +7,7 @@ import DashboardWrapper from './dashboardWrapper';
 import ReduxProvider from '@/providers/ReduxProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SignedIn, useUser } from '@clerk/nextjs';
+import { useAppSelector } from './hooks/useAppSelector';
 
 export default function ClientLayout({
   children,
@@ -17,6 +18,7 @@ export default function ClientLayout({
   const router = useRouter();
   const { isSignedIn, isLoaded } = useUser();
   const isAuthPage = Boolean(pathname?.startsWith('/auth'));
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   // Debug authentication state
   useEffect(() => {

@@ -6,9 +6,12 @@ import ReactQueryProvider from "./providers/ReactQueryProvider";
 import { Toaster } from "./components/ui/toaster";
 import ConditionalAIAssistant from "./components/ConditionalAIAssistant";
 import { AIAssistantProvider } from "./contexts/AIAssistantContext";
+import { PageDataProvider } from "./contexts/PageDataContext";
 import { ClerkProvider } from '@clerk/nextjs';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale } from 'next-intl/server';
+import ReduxProvider from './providers/ReduxProvider';
+import DarkModeSync from './components/DarkModeSync';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,17 +41,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <ClerkProvider>
       <html lang={locale}>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-          <ReactQueryProvider>
-            <AIAssistantProvider>
-              <ClientLayout>
-                {children}
-              </ClientLayout>
-              <ConditionalAIAssistant />
-            </AIAssistantProvider>
-            <Toaster />
-          </ReactQueryProvider>
-          </NextIntlClientProvider>
+          <ReduxProvider>
+            <DarkModeSync />
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <ReactQueryProvider>
+                <PageDataProvider>
+                  <AIAssistantProvider>
+                    <ClientLayout>
+                      {children}
+                    </ClientLayout>
+                    <ConditionalAIAssistant />
+                  </AIAssistantProvider>
+                </PageDataProvider>
+                <Toaster />
+              </ReactQueryProvider>
+            </NextIntlClientProvider>
+          </ReduxProvider>
         </body>
       </html>
     </ClerkProvider>

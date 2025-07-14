@@ -7,8 +7,9 @@ import CustomerSelection from './CustomerSelection';
 import PrescriptionForm from './PrescriptionForm';
 import type { Customer } from '@/types';
 import type { Prescription } from '@/types/prescriptions';
-import { useUpdatePrescriptionMutation } from '@/state/api';
+import { useUpdatePrescriptionMutation, useGetProductsQuery } from '@/state/api';
 import { useUser } from '@clerk/nextjs';
+import { useProductsDataUpdater } from '@/app/hooks/use-page-data-updater';
 
 export default function Home() {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -16,6 +17,12 @@ export default function Home() {
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [updatePrescription] = useUpdatePrescriptionMutation();
+  
+  // Fetch products for AI Assistant
+  const { data: products } = useGetProductsQuery();
+  
+  // Update page data for AI Assistant
+  useProductsDataUpdater(products || [], 'POS');
   
   // Debug authentication state
   useEffect(() => {
@@ -116,7 +123,7 @@ export default function Home() {
   };
   
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white dark:bg-gray-900">
       <Toaster position="top-right" />
       
       {/* POS System */}

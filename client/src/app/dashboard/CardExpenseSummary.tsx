@@ -23,7 +23,7 @@ const CardExpenseSummary = () => {
   const formattedTotalExpenses = totalExpenses.toFixed(2);
 
   return (
-    <div className="row-span-3 bg-white dark:bg-gray-800 shadow-md rounded-2xl flex flex-col justify-between">
+    <div className="row-span-3 bg-gray-50 dark:bg-[#232e41] border border-gray-200 dark:border-gray-700 shadow-md rounded-2xl flex flex-col justify-between text-gray-900 dark:text-gray-100">
       {isLoading ? (
         <div className="m-5 text-gray-700 dark:text-gray-300">Loading...</div>
       ) : (

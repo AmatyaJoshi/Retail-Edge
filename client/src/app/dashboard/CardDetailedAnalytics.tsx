@@ -44,7 +44,6 @@ const salesData = [
 
 const categoryData = [
   { name: 'Sunglasses', value: 450000 },
-  { name: 'Prescription', value: 680000 },
   { name: 'Contact Lenses', value: 320000 },
   { name: 'Frames', value: 280000 },
   { name: 'Accessories', value: 150000 },
@@ -197,11 +196,11 @@ export default function CardDetailedAnalytics() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Monthly Sales Performance</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-gray-50 dark:bg-[#232e41]">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={areaData}>
@@ -217,7 +216,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Product Category Distribution</CardTitle>
           </CardHeader>
@@ -246,7 +245,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Order Value Distribution</CardTitle>
           </CardHeader>
@@ -265,7 +264,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Product Performance Analysis</CardTitle>
           </CardHeader>
@@ -274,19 +273,23 @@ export default function CardDetailedAnalytics() {
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" dataKey="x" name="Price" />
-                  <YAxis type="number" dataKey="y" name="Quantity" />
-                  <ZAxis type="number" dataKey="z" range={[50, 400]} name="Revenue" />
+                  <XAxis type="number" dataKey="x" name="Price" label={{ value: 'Price (₹)', position: 'insideBottomRight', offset: 0 }} />
+                  <YAxis type="number" dataKey="y" name="Quantity" label={{ value: 'Quantity', angle: -90, position: 'insideLeft' }} />
+                  <ZAxis type="number" dataKey="z" range={[100, 600]} name="Revenue" />
                   <Tooltip formatter={(value) => formatIndianNumber(value as number)} />
                   <Legend />
-                  <Scatter name="Products" data={scatterData} fill="#8884d8" />
+                  <Scatter name="Sunglasses" data={scatterData.filter(d => d.category === 'Sunglasses')} fill="#8884d8" />
+                  <Scatter name="Prescription" data={scatterData.filter(d => d.category === 'Prescription')} fill="#00C49F" />
+                  <Scatter name="Contact Lenses" data={scatterData.filter(d => d.category === 'Contact Lenses')} fill="#FFBB28" />
+                  <Scatter name="Frames" data={scatterData.filter(d => d.category === 'Frames')} fill="#FF8042" />
+                  <Scatter name="Accessories" data={scatterData.filter(d => d.category === 'Accessories')} fill="#a4de6c" />
                 </ScatterChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Category-wise Revenue</CardTitle>
           </CardHeader>
@@ -305,7 +308,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Daily Sales & Orders</CardTitle>
           </CardHeader>
@@ -325,7 +328,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Category Performance Metrics</CardTitle>
           </CardHeader>
@@ -345,7 +348,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Sales by Product Type Over Time</CardTitle>
           </CardHeader>
@@ -368,7 +371,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-4 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Monthly Business Overview</CardTitle>
           </CardHeader>
@@ -390,40 +393,26 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Top Selling Products</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <RadialBarChart
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="20%"
-                  outerRadius="80%"
-                  barSize={10}
-                  data={topProductsData}
-                >
-                  <RadialBar
-                    label={{ position: 'insideStart', fill: '#fff' }}
-                    background
-                    dataKey="sales"
-                  />
-                  <Legend
-                    iconSize={10}
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                  />
+                <BarChart data={topProductsData} layout="vertical" margin={{ left: 30, right: 20, top: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={100} />
                   <Tooltip />
-                </RadialBarChart>
+                  <Bar dataKey="sales" fill="#8884d8" barSize={18} radius={[8, 8, 8, 8]} label={{ position: 'right', fill: '#fff' }} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Sales by Region</CardTitle>
           </CardHeader>
@@ -443,7 +432,7 @@ export default function CardDetailedAnalytics() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-4 bg-white dark:bg-[#232e41]">
           <CardHeader>
             <CardTitle>Customer Age Distribution</CardTitle>
           </CardHeader>

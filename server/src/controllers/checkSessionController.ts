@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { verifyAppwriteJWT } from '../lib/appwriteAuth';
+import { getAuth } from '@clerk/nextjs/server';
 
 const prisma = new PrismaClient();
 
 /**
- * Checks if the user has a valid Appwrite session and returns the associated user data
+ * Checks if the user has a valid Clerk session and returns the associated user data
  */
 export const checkSession = async (req: Request, res: Response) => {
   try {
@@ -24,66 +24,59 @@ export const checkSession = async (req: Request, res: Response) => {
       });
     }
     
-    // Check for Appwrite session cookie
-    const appwriteSessionCookie = req.cookies['__session'];
+    // Check for Clerk session cookie
+    const clerkSessionCookie = req.cookies['__session'];
     
-    if (appwriteSessionCookie) {
-      // Validate the JWT token
-      const validation = verifyAppwriteJWT(appwriteSessionCookie);
-      
-      if (!validation.isValid) {
-        console.log(`Invalid JWT: ${validation.reason}`);
+    if (clerkSessionCookie) {
+      try {
+        // Get user data from Clerk session
+        const { userId } = await getAuth(req);
         
-        // If the token is expired, tell the client to reauthenticate
-        if (validation.reason?.includes('Token expired')) {
+        if (!userId) {
+          console.log('No valid Clerk user ID found');
           return res.status(401).json({ 
             success: false, 
-            message: 'Session expired',
-            error: validation.reason,
-            requiresReauthentication: true,
-            sessionExpired: true
+            message: 'Invalid session token',
+            requiresReauthentication: true
           });
         }
         
+        // Try to get user from database using the Clerk user ID
+        const user = await prisma.users.findFirst({
+          where: { clerkId: userId }
+        });
+        
+        if (user) {
+          // Return success with user data from our database
+          return res.status(200).json({
+            success: true,
+            message: 'Session valid',
+            user: user
+          });
+        } else {
+          // If no user in our database but valid Clerk session, it means the user 
+          // is in process of registering and hasn't completed yet
+          console.log('Valid Clerk session but user not yet in database - still in registration flow');
+          return res.status(200).json({ 
+            success: true, 
+            message: 'Valid Clerk session, but user registration incomplete',
+            registrationIncomplete: true,
+            clerkUserId: userId
+          });
+        }
+      } catch (clerkError) {
+        console.error('Clerk session validation error:', clerkError);
         return res.status(401).json({ 
           success: false, 
-          message: 'Invalid session token',
-          error: validation.reason,
-          requiresReauthentication: true
-        });
-      }
-      
-      // Token is valid, get the user from database
-      const userData = validation.parsedToken;
-      
-      // Try to get user from database using the Appwrite user ID
-      const user = await prisma.users.findFirst({
-        where: { clerkId: userData.userId } // Fixed: use correct field name from Prisma schema
-      });
-      
-      if (user) {
-        // Return success with user data from our database
-        return res.status(200).json({
-          success: true,
-          message: 'Session valid',
-          user: user,
-          tokenExpiry: userData.exp
-        });
-      } else {
-        // If no user in our database but valid Appwrite session, it means the user 
-        // is in process of registering and hasn't completed yet
-        console.log('Valid Appwrite session but user not yet in database - still in registration flow');
-        return res.status(200).json({ 
-          success: true, 
-          message: 'Valid Appwrite session, but user registration incomplete',
-          registrationIncomplete: true,
-          appwriteUserId: userData.userId,
-          tokenExpiry: userData.exp
+          message: 'Session expired or invalid',
+          error: 'Session validation failed',
+          requiresReauthentication: true,
+          sessionExpired: true
         });
       }
     }
 
-    // No valid Appwrite session found
+    // No valid Clerk session found
     console.log('No valid session found');
     return res.status(401).json({ success: false, message: 'No active session' });
     

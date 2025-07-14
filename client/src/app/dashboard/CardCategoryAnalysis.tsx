@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAppSelector } from "@/state/hooks";
 
 const formatIndianNumber = (num: number) => {
   if (num >= 10000000) {
@@ -31,10 +32,11 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 const CardCategoryAnalysis = () => {
   const { data, isLoading, error } = useGetDashboardMetricsQuery();
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className={isDarkMode ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
         <CardContent>
           <div className="flex items-center justify-center h-[300px]">Loading...</div>
         </CardContent>
@@ -44,7 +46,7 @@ const CardCategoryAnalysis = () => {
 
   if (error) {
     return (
-      <Card>
+      <Card className={isDarkMode ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
         <CardContent>
           <div className="flex items-center justify-center h-[300px] text-red-500">Error loading data</div>
         </CardContent>
@@ -65,13 +67,13 @@ const CardCategoryAnalysis = () => {
   }));
 
   return (
-    <Card>
-      <CardContent className="flex flex-col h-full">
-        <CardTitle className="mb-4">Category Analysis</CardTitle>
+    <Card className={isDarkMode ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white border-gray-200 text-gray-900"}>
+      <CardContent className="flex flex-col h-full bg-gray-50 dark:bg-[#232e41] pt-4">
+        <CardTitle className="mb-4 text-lg md:text-xl font-semibold">Category Analysis</CardTitle>
         <Tabs defaultValue="distribution" className="w-full flex-grow flex flex-col">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="distribution">Distribution</TabsTrigger>
-            <TabsTrigger value="revenue">Revenue</TabsTrigger>
+            <TabsTrigger value="distribution" className="text-base md:text-lg font-medium">Distribution</TabsTrigger>
+            <TabsTrigger value="revenue" className="text-base md:text-lg font-medium">Revenue</TabsTrigger>
           </TabsList>
           <TabsContent value="distribution" className="flex-grow">
             <div>

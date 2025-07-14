@@ -243,12 +243,19 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="flex justify-center pt-24 pb-10 px-2 min-h-screen bg-white">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col rounded-2xl shadow-md mr-8 sticky top-24 self-start h-fit max-h-[calc(100vh-6rem)]">
+    <div className="min-h-screen w-full flex bg-gray-50 dark:bg-gray-900 dark:text-gray-100">
+      <aside className="w-64 min-h-screen h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-6 flex flex-col pt-8">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-2 px-3 py-2 mb-6 rounded-lg bg-[#1e293b] hover:bg-[#334155] text-white border border-transparent transition-colors"
+        >
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="font-medium text-white">Back</span>
+        </button>
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">{t('settings')}</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('settings')}</h2>
             <img 
               src="/zayra-logo.svg" 
               alt="Retail Edge Logo" 
@@ -261,11 +268,7 @@ const Settings = () => {
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    activeCategory === category.id
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg mb-2 text-left font-semibold transition-colors duration-150 ${activeCategory === category.id ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-100'}`}
                 >
                   {category.icon}
                   <span className="font-medium">{category.label}</span>
@@ -284,14 +287,14 @@ const Settings = () => {
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 max-w-5xl w-full bg-white rounded-2xl shadow-md p-10 min-h-[70vh]">
+      {/* Main Content */}
+      <main className="flex-1 min-h-screen h-full p-8 pt-24 overflow-y-auto custom-scrollbar bg-white dark:bg-gray-900">
             <div className="flex justify-between items-start mb-8">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {categories.find((c) => c.id === activeCategory)?.label}
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                   Manage your {categories.find((c) => c.id === activeCategory)?.label.toLowerCase()} settings
                 </p>
               </div>
@@ -325,13 +328,13 @@ const Settings = () => {
 
             {/* Search Bar */}
             <div className="mb-6">
-              <div className="relative">
+              <div className="relative bg-white dark:bg-gray-900 rounded-lg">
                 <input
                   type="text"
                   placeholder="Search settings..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 />
                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
               </div>
@@ -342,15 +345,15 @@ const Settings = () => {
               {filteredSettings.map((setting: typeof storeFields[number]) => (
                 <div
                   key={setting.id}
-                  className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200 flex flex-col h-full group"
+                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200 flex flex-col h-full group"
                 >
                   <div className="p-6 flex flex-col h-full">
                     <div className="flex items-start gap-4 mb-4">
-                      <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl text-blue-600 group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-200">
+                      <div className="p-3 bg-blue-50 dark:bg-gray-700 rounded-xl text-blue-600 dark:text-blue-300 transition-all duration-200">
                         {setting.icon}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-lg mb-1">
                           {setting.label}
                         </h3>
                       </div>
@@ -360,7 +363,7 @@ const Settings = () => {
                       {setting.type === "logo" ? (
                         <div className="flex flex-col items-center gap-4">
                           {storeLogoPreview && (
-                            <div className="w-20 h-20 bg-white rounded-xl border-2 border-gray-200 flex items-center justify-center overflow-hidden shadow-sm">
+                            <div className="w-20 h-20 bg-white dark:bg-gray-900 rounded-xl border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden shadow-sm">
                               <img
                                 src={storeLogoPreview}
                                 alt="Store Logo Preview"
@@ -385,7 +388,7 @@ const Settings = () => {
                         </div>
                       ) : setting.type === "toggle" ? (
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Enable/Disable</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-100">Enable/Disable</span>
                           <label className="inline-flex relative items-center cursor-pointer">
                             <input
                               type="checkbox"
@@ -398,9 +401,9 @@ const Settings = () => {
                         </div>
                       ) : setting.type === "select" ? (
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Select Option</label>
+                          <label className="text-sm font-medium text-gray-700 dark:text-gray-100">Select Option</label>
                           <select
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 focus:border-blue-500"
                             value={store[setting.id]}
                             onChange={(e) => handleStoreChange(setting.id, e.target.value)}
                           >
@@ -413,10 +416,10 @@ const Settings = () => {
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-gray-700">Enter Value</label>
+                          <label className="text-sm font-medium text-gray-700 dark:text-gray-100">Enter Value</label>
                           <input
                             type={setting.type}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200"
+                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 focus:border-blue-500"
                             value={store[setting.id]}
                             onChange={(e) => handleStoreChange(setting.id, e.target.value)}
                             placeholder={`Enter ${setting.label.toLowerCase()}`}
@@ -431,19 +434,25 @@ const Settings = () => {
 
             {/* Help Modal */}
             {showHelp && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
+              <div
+                className="fixed inset-0 flex items-center justify-center z-50"
+                onClick={() => setShowHelp(false)}
+              >
+                <div
+                  className="bg-white dark:bg-gray-900 dark:text-gray-100 rounded-xl p-6 max-w-lg w-full mx-4 border border-gray-200 dark:border-gray-700"
+                  onClick={e => e.stopPropagation()}
+                >
                   <h3 className="text-xl font-semibold mb-4">Store Settings Help</h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
                     Configure your store settings to optimize your eyewear retail operations. Use the sidebar to navigate between different categories, and the search bar to quickly find specific settings.
                   </p>
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-500">• Store: Basic store information and contact details</p>
-                    <p className="text-sm text-gray-500">• POS: Receipt and transaction settings</p>
-                    <p className="text-sm text-gray-500">• Inventory: Stock management and alerts</p>
-                    <p className="text-sm text-gray-500">• Prescription: Eye prescription management</p>
-                    <p className="text-sm text-gray-500">• Billing: Payment methods and invoice settings</p>
-                    <p className="text-sm text-gray-500">• Security: User access and system security</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">• Store: Basic store information and contact details</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">• POS: Receipt and transaction settings</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">• Inventory: Stock management and alerts</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">• Prescription: Eye prescription management</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">• Billing: Payment methods and invoice settings</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">• Security: User access and system security</p>
                   </div>
                   <button
                     onClick={() => setShowHelp(false)}
@@ -455,7 +464,6 @@ const Settings = () => {
               </div>
             )}
         </main>
-      </div>
     </div>
   );
 };

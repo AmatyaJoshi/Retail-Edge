@@ -22,7 +22,7 @@ interface AssociatesState {
 
 export const associatesApi = createApi({
   reducerPath: 'associatesApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_SERVER_URL + '/api' }),
   tagTypes: ['Associate'],
   endpoints: (builder) => ({
     getAssociates: builder.query<Associate[], GetAssociatesParams>({

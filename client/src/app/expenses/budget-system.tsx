@@ -139,16 +139,16 @@ export default function BudgetSystem() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4">
+    <div className="max-w-7xl mx-auto pt-0 pb-6 px-4 dark:bg-gray-900 dark:text-gray-100">
       {/* Income Management */}
-      <Card className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold text-gray-900">Income Management</CardTitle>
+      <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
+        <CardHeader className="pb-4 bg-gray-50 dark:bg-gray-800">
+          <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">Income Management</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 mb-4">
+        <CardContent className="pt-0 bg-gray-50 dark:bg-gray-800">
+          <div className="flex flex-col md:flex-row md:items-end gap-4 mb-4 bg-gray-50 dark:bg-gray-800">
             <div className="flex flex-col gap-2 md:w-1/3">
-              <label className="text-sm font-medium text-gray-700">Source Name</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-white">Source Name</label>
               <Input 
                 value={newIncome.name} 
                 onChange={e => setNewIncome({ ...newIncome, name: e.target.value })} 
@@ -157,7 +157,7 @@ export default function BudgetSystem() {
               />
             </div>
             <div className="flex flex-col gap-2 md:w-1/3">
-              <label className="text-sm font-medium text-gray-700">Amount</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-white">Amount</label>
               <Input 
                 type="number" 
                 value={newIncome.amount} 
@@ -167,16 +167,16 @@ export default function BudgetSystem() {
               />
             </div>
             <Button 
-              className="md:w-auto bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" 
+              className="md:w-auto bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-white" 
               onClick={handleAddIncome}
             >
               Add Income
             </Button>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left border-separate border-spacing-y-2 bg-white rounded-lg border border-gray-200">
+            <table className="min-w-full text-left border-separate border-spacing-y-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <thead>
-                <tr className="bg-gray-50 text-gray-700 text-sm font-medium">
+                <tr className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-100 text-sm font-medium">
                   <th className="py-3 px-4 border-b border-gray-200">Source</th>
                   <th className="py-3 px-4 border-b border-gray-200">Amount</th>
                   <th className="py-3 px-4 border-b border-gray-200">Actions</th>
@@ -185,8 +185,8 @@ export default function BudgetSystem() {
               <tbody>
                 {incomeSources.map(src => (
                   <tr key={src.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4 font-medium text-gray-900">{src.name}</td>
-                    <td className="py-3 px-4 text-gray-700">{formatCurrency(Number(src.amount))}</td>
+                    <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{src.name}</td>
+                    <td className="py-3 px-4 text-gray-700 dark:text-gray-100">{formatCurrency(Number(src.amount))}</td>
                     <td className="py-3 px-4">
                       <Button 
                         size="sm" 
@@ -207,44 +207,44 @@ export default function BudgetSystem() {
 
       {/* Budget Dashboard KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Income</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg px-6 py-7 flex flex-col items-center justify-center">
+          <CardHeader className="pb-1 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-100 mb-2 tracking-tight">Total Income</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalIncome)}</div>
+          <CardContent className="p-0 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <div className="text-xl font-extrabold text-gray-900 dark:text-gray-100 text-center">{formatCurrency(totalIncome)}</div>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Budgeted</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg px-6 py-7 flex flex-col items-center justify-center">
+          <CardHeader className="pb-1 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-100 mb-2 tracking-tight">Total Budgeted</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalBudget)}</div>
+          <CardContent className="p-0 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <div className="text-xl font-extrabold text-gray-900 dark:text-gray-100 text-center">{formatCurrency(totalBudget)}</div>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Spent</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg px-6 py-7 flex flex-col items-center justify-center">
+          <CardHeader className="pb-1 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-100 mb-2 tracking-tight">Total Spent</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalSpent)}</div>
+          <CardContent className="p-0 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <div className="text-xl font-extrabold text-gray-900 dark:text-gray-100 text-center">{formatCurrency(totalSpent)}</div>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Remaining</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg px-6 py-7 flex flex-col items-center justify-center">
+          <CardHeader className="pb-1 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-100 mb-2 tracking-tight">Remaining</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalRemaining)}</div>
+          <CardContent className="p-0 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <div className="text-xl font-extrabold text-gray-900 dark:text-gray-100 text-center">{formatCurrency(totalRemaining)}</div>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Net Cash Flow</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg px-6 py-7 flex flex-col items-center justify-center">
+          <CardHeader className="pb-1 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <CardTitle className="text-base font-semibold text-gray-700 dark:text-gray-100 mb-2 tracking-tight">Net Cash Flow</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className={`text-2xl font-bold ${netCashFlow < 0 ? 'text-red-600' : 'text-green-600'}`}>
+          <CardContent className="p-0 bg-gray-50 dark:bg-gray-800 w-full flex flex-col items-center justify-center">
+            <div className={`text-xl font-extrabold ${netCashFlow < 0 ? 'text-red-600' : 'text-green-600'}`}>
               {formatCurrency(netCashFlow)}
             </div>
           </CardContent>
@@ -253,11 +253,11 @@ export default function BudgetSystem() {
 
       {/* Visualizations */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold text-gray-900">Income Sources</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <CardHeader className="pb-2 bg-gray-50 dark:bg-gray-800">
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-100">Income Sources</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 h-[340px]">
+          <CardContent className="pt-0 h-[340px] bg-gray-50 dark:bg-gray-800">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -281,11 +281,11 @@ export default function BudgetSystem() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold text-gray-900">Budget vs Spent by Category</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <CardHeader className="pb-2 bg-gray-50 dark:bg-gray-800">
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-100">Budget vs Spent by Category</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 h-[340px]">
+          <CardContent className="pt-0 h-[340px] bg-gray-50 dark:bg-gray-800">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -299,11 +299,11 @@ export default function BudgetSystem() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold text-gray-900">Income vs Expenses (Monthly)</CardTitle>
+        <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <CardHeader className="pb-2 bg-gray-50 dark:bg-gray-800">
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-100">Income vs Expenses (Monthly)</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 h-[340px]">
+          <CardContent className="pt-0 h-[340px] bg-gray-50 dark:bg-gray-800">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={lineChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -320,88 +320,83 @@ export default function BudgetSystem() {
       </div>
 
       {/* Budget Table */}
-      <Card className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold text-gray-900">Category Budgets</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left border-separate border-spacing-y-2 bg-white rounded-lg border border-gray-200">
-              <thead>
-                <tr className="bg-gray-50 text-gray-700 text-sm font-medium">
-                  <th className="py-3 px-4 border-b border-gray-200">Category</th>
-                  <th className="py-3 px-4 border-b border-gray-200">Allocated</th>
-                  <th className="py-3 px-4 border-b border-gray-200">Spent</th>
-                  <th className="py-3 px-4 border-b border-gray-200">Remaining</th>
-                  <th className="py-3 px-4 border-b border-gray-200">Utilization</th>
-                  <th className="py-3 px-4 border-b border-gray-200">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {budgetTable.map(row => (
-                  <tr key={row.categoryId ?? ''} className={`hover:bg-gray-50 transition-colors ${row.overBudget ? "bg-red-50" : ""}`}>
-                    <td className="py-3 px-4 font-medium text-gray-900">{row.name}</td>
-                    <td className="py-3 px-4">
-                      {editBudget[row.categoryId ?? ''] ? (
-                        <div className="flex gap-2 items-center">
-                          <Input
-                            type="number"
-                            min={row.spent}
-                            value={budgetInputs[row.categoryId ?? ''] ?? ''}
-                            onChange={e => setBudgetInputs(prev => ({ ...prev, [row.categoryId ?? '']: e.target.value }))}
-                            className="w-24 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={() => handleCancel(row.categoryId ?? '')}
-                            className="border-gray-300 hover:bg-gray-50"
-                          >
-                            Cancel
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            onClick={() => handleSave(row.categoryId ?? '', row.expenseId ?? '', row.spent)} 
-                            disabled={parseFloat(budgetInputs[row.categoryId ?? ''] ?? '') < row.spent}
-                            className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                          >
-                            Save
-                          </Button>
-                        </div>
-                      ) : (
-                        <span>{formatCurrency(row.allocated)}</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">{formatCurrency(row.spent)}</td>
-                    <td className="py-3 px-4 text-gray-700">{formatCurrency(row.remaining)}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <span>{row.utilization.toFixed(1)}%</span>
-                        <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                          <div className={`h-2.5 rounded-full ${row.utilization > 100 ? 'bg-red-600' : 'bg-blue-600'}`} style={{ width: `${Math.min(row.utilization, 100)}%` }}></div>
-                        </div>
-                      </div>
-                      {row.overBudget && <div className="text-xs text-red-600 font-semibold mt-1">Over Budget!</div>}
-                    </td>
-                    <td className="py-3 px-4">
-                      {!editBudget[row.categoryId ?? ''] && (
+      <div className="mb-8">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left border-separate border-spacing-y-2 bg-white dark:bg-gray-800 rounded-lg">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-100 text-sm font-medium">
+                <th className="py-3 px-4 border-b border-gray-200">Category</th>
+                <th className="py-3 px-4 border-b border-gray-200">Allocated</th>
+                <th className="py-3 px-4 border-b border-gray-200">Spent</th>
+                <th className="py-3 px-4 border-b border-gray-200">Remaining</th>
+                <th className="py-3 px-4 border-b border-gray-200">Utilization</th>
+                <th className="py-3 px-4 border-b border-gray-200">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {budgetTable.map(row => (
+                <tr key={row.categoryId ?? ''} className={`hover:bg-gray-50 transition-colors ${row.overBudget ? "bg-red-50" : ""}`}>
+                  <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{row.name}</td>
+                  <td className="py-3 px-4 dark:bg-gray-800">
+                    {editBudget[row.categoryId ?? ''] ? (
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          type="number"
+                          min={row.spent}
+                          value={budgetInputs[row.categoryId ?? ''] ?? ''}
+                          onChange={e => setBudgetInputs(prev => ({ ...prev, [row.categoryId ?? '']: e.target.value }))}
+                          className="w-24 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          onClick={() => handleEdit(row.categoryId ?? '', row.allocated)}
-                          className="border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                          onClick={() => handleCancel(row.categoryId ?? '')}
+                          className="border-gray-300 hover:bg-gray-50"
                         >
-                          Edit
+                          Cancel
                         </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleSave(row.categoryId ?? '', row.expenseId ?? '', row.spent)} 
+                          disabled={parseFloat(budgetInputs[row.categoryId ?? ''] ?? '') < row.spent}
+                          className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <span>{formatCurrency(row.allocated)}</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-gray-700 dark:text-gray-100">{formatCurrency(row.spent)}</td>
+                  <td className="py-3 px-4 text-gray-700 dark:text-gray-100">{formatCurrency(row.remaining)}</td>
+                  <td className="py-3 px-4 dark:bg-gray-800">
+                    <div className="flex items-center gap-2">
+                      <span>{row.utilization.toFixed(1)}%</span>
+                      <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                        <div className={`h-2.5 rounded-full ${row.utilization > 100 ? 'bg-red-600' : 'bg-blue-600'}`} style={{ width: `${Math.min(row.utilization, 100)}%` }}></div>
+                      </div>
+                    </div>
+                    {row.overBudget && <div className="text-xs text-red-600 font-semibold mt-1">Over Budget!</div>}
+                  </td>
+                  <td className="py-3 px-4 dark:bg-gray-800">
+                    {!editBudget[row.categoryId ?? ''] && (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleEdit(row.categoryId ?? '', row.allocated)}
+                        className="border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 } 

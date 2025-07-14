@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useGetProductsQuery, useGetPurchaseOrdersQuery, useCreatePurchaseOrderMutation, useUpdatePurchaseOrderStatusMutation, useUpdateProductStockMutation } from "@/state/api";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef, GridRenderCellParams, GridColumnVisibilityModel } from "@mui/x-data-grid";
@@ -9,6 +9,8 @@ import { toast } from "react-hot-toast";
 import { ArrowDownToLine, CheckCircle2, Clock, PenBox, ShoppingCart, XCircle, Search, Columns } from "lucide-react";
 import { useTheme } from 'next-themes';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { useGetAssociatesQuery } from "@/app/state/associates";
 
 // Eyewear SVG icon from svgrepo.com
 const EyewearIcon = () => (
@@ -66,6 +68,65 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
   const [name, setName] = useState(product.name);
   const [category, setCategory] = useState(product.category);
   const [notes, setNotes] = useState("");
+  const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
+  const buyerInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showSupplierDropdown, setShowSupplierDropdown] = useState(false);
+  const supplierInputRef = useRef<HTMLInputElement>(null);
+  const dropdownSupplierRef = useRef<HTMLDivElement>(null);
+  const { data: associates = [], isLoading: associatesLoading } = useGetAssociatesQuery({});
+  const buyers = associates.filter(a => a.type === 'BUYER' || a.type === 'BOTH');
+  const suppliers = associates.filter(a => a.type === 'SUPPLIER' || a.type === 'BOTH');
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
+  // Debug: Log associates data
+  useEffect(() => {
+    console.log('Associates data:', associates);
+  }, [associates]);
+
+  // Click outside handler for dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buyerInputRef.current &&
+        !buyerInputRef.current.contains(event.target as Node)
+      ) {
+        setShowBuyerDropdown(false);
+      }
+    }
+    if (showBuyerDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showBuyerDropdown]);
+
+  // Click outside handler for supplier dropdown
+  useEffect(() => {
+    function handleClickOutsideSupplier(event: MouseEvent) {
+      if (
+        dropdownSupplierRef.current &&
+        !dropdownSupplierRef.current.contains(event.target as Node) &&
+        supplierInputRef.current &&
+        !supplierInputRef.current.contains(event.target as Node)
+      ) {
+        setShowSupplierDropdown(false);
+      }
+    }
+    if (showSupplierDropdown) {
+      document.addEventListener('mousedown', handleClickOutsideSupplier);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutsideSupplier);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideSupplier);
+    };
+  }, [showSupplierDropdown]);
 
   const categories = [
     { value: "frames", label: "Frames" },
@@ -149,28 +210,26 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl w-full max-w-2xl">
+      <div className="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-2xl w-full max-w-lg flex flex-col justify-center mx-2">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-1">
-              {getModalTitle()}
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Product: {product.name}
-            </p>
+        <div className="flex flex-col gap-1 mb-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">{getModalTitle()}</h2>
+              <p className="text-sm text-gray-400 dark:text-gray-300 mt-1">Product: <span className="font-medium text-gray-900 dark:text-white">{product.name}</span></p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <XCircle className="w-6 h-6" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          >
-            <XCircle className="w-6 h-6" />
-          </button>
         </div>
 
-        <div className="grid grid-cols-5 gap-6">
-          {/* Main Form */}
-          <div className="col-span-3 space-y-4">
+        <div className="flex flex-col gap-2">
+          {/* Main Form and Transaction Summary only */}
+          <div className="space-y-2">
             {type === 'update' ? (
               <>
                 <div>
@@ -226,7 +285,7 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
                       type="text"
                       value={product.stockQuantity}
                       disabled
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
                     />
                   </div>
                   <div className="flex-1">
@@ -237,7 +296,7 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
                       type="text"
                       value={`₹${product.price.toLocaleString()}`}
                       disabled
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
                     />
                   </div>
                 </div>
@@ -258,13 +317,56 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Supplier
                     </label>
-                    <input
-                      type="text"
-                      value={supplier}
-                      onChange={(e) => setSupplier(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter supplier name"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={supplier}
+                        onChange={e => {
+                          setSupplier(e.target.value);
+                          setShowSupplierDropdown(true);
+                        }}
+                        ref={supplierInputRef}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Type or select supplier..."
+                        autoComplete="off"
+                        onFocus={() => setShowSupplierDropdown(true)}
+                      />
+                      {showSupplierDropdown && (
+                        <div ref={dropdownSupplierRef} className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg custom-scrollbar">
+                          {associatesLoading ? (
+                            <div className="px-4 py-2 text-gray-400 text-sm">Loading suppliers...</div>
+                          ) : suppliers.length === 0 ? (
+                            <div className="px-4 py-2 text-gray-400 text-sm">No suppliers available</div>
+                          ) : (
+                            <>
+                              {suppliers
+                                .filter(a => !supplier || a.name.toLowerCase().includes(supplier.toLowerCase()) || (a.email && a.email.toLowerCase().includes(supplier.toLowerCase())))
+                                .slice(0, 20)
+                                .map(a => (
+                                  <div
+                                    key={a.associateId}
+                                    className="px-4 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900 text-gray-900 dark:text-white text-sm flex flex-col gap-1"
+                                    onClick={() => {
+                                      setSupplier(a.name);
+                                      setShowSupplierDropdown(false);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium">{a.name}</span>
+                                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600`}>{a.type}</span>
+                                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${a.status === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} border border-gray-300 dark:border-gray-600`}>{a.status}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">{a.email || 'No email'}</span>
+                                  </div>
+                                ))}
+                              {suppliers.filter(a => !supplier || a.name.toLowerCase().includes(supplier.toLowerCase()) || (a.email && a.email.toLowerCase().includes(supplier.toLowerCase()))).length === 0 && (
+                                <div className="px-4 py-2 text-gray-400 text-sm">No suppliers found</div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
                 {type === 'sell' && (
@@ -272,13 +374,56 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Buyer
                     </label>
-                    <input
-                      type="text"
-                      value={buyer}
-                      onChange={(e) => setBuyer(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter buyer name"
-                    />
+                    <div className="relative">
+                      <input
+                        ref={buyerInputRef}
+                        type="text"
+                        value={buyer}
+                        onChange={e => {
+                          setBuyer(e.target.value);
+                          setShowBuyerDropdown(true);
+                        }}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Type or select associate..."
+                        autoComplete="off"
+                        onFocus={() => setShowBuyerDropdown(true)}
+                      />
+                      {showBuyerDropdown && (
+                        <div ref={dropdownRef} className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg custom-scrollbar">
+                          {associatesLoading ? (
+                            <div className="px-4 py-2 text-gray-400 text-sm">Loading associates...</div>
+                          ) : buyers.length === 0 ? (
+                            <div className="px-4 py-2 text-gray-400 text-sm">No buyers available</div>
+                          ) : (
+                            <>
+                              {buyers
+                                .filter(a => !buyer || a.name.toLowerCase().includes(buyer.toLowerCase()) || (a.email && a.email.toLowerCase().includes(buyer.toLowerCase())))
+                                .slice(0, 20)
+                                .map(a => (
+                                  <div
+                                    key={a.associateId}
+                                    className="px-4 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900 text-gray-900 dark:text-white text-sm flex flex-col gap-1"
+                                    onClick={() => {
+                                      setBuyer(a.name);
+                                      setShowBuyerDropdown(false);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium">{a.name}</span>
+                                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600`}>{a.type}</span>
+                                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${a.status === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'} border border-gray-300 dark:border-gray-600`}>{a.status}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">{a.email || 'No email'}</span>
+                                  </div>
+                                ))}
+                              {buyers.filter(a => !buyer || a.name.toLowerCase().includes(buyer.toLowerCase()) || (a.email && a.email.toLowerCase().includes(buyer.toLowerCase()))).length === 0 && (
+                                <div className="px-4 py-2 text-gray-400 text-sm">No buyers found</div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
                 <div>
@@ -293,48 +438,34 @@ const StockModal = ({ isOpen, onClose, product, type, onSubmit }: StockModalProp
                     rows={3}
                   />
                 </div>
-                {type === 'sell' && (
-                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Transaction Summary</h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500 dark:text-gray-400">Quantity:</span>
-                        <span className="text-gray-900 dark:text-white font-medium">{quantity} units</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500 dark:text-gray-400">Unit Price:</span>
-                        <span className="text-gray-900 dark:text-white font-medium">₹{product.price.toLocaleString()}</span>
-                      </div>
-                      <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
-                        <div className="flex justify-between text-sm font-medium">
-                          <span className="text-gray-900 dark:text-white">Total Amount:</span>
-                          <span className="text-blue-600 dark:text-blue-400">₹{(quantity * product.price).toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </>
             )}
           </div>
-
-          {/* Process Info */}
-          <div className="col-span-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Process Information</h3>
-            <div className="space-y-4">
-              {getStepInfo()?.map((step, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{index + 1}</span>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">{step}</p>
+          {/* Section: Transaction Summary */}
+          <div className="mt-2">
+            <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Transaction Summary</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Quantity:</span>
+                  <span className="text-gray-900 dark:text-white font-medium">{quantity} units</span>
                 </div>
-              ))}
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Unit Price:</span>
+                  <span className="text-gray-900 dark:text-white font-medium">₹{product.price.toLocaleString()}</span>
+                </div>
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-600">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span className="text-gray-900 dark:text-white">Total Amount:</span>
+                    <span className="text-blue-600 dark:text-blue-400">₹{(quantity * product.price).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+        <div className="mt-4 pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 transition-colors"
@@ -402,7 +533,7 @@ const Inventory = () => {
     isError: ordersError, 
     isLoading: ordersLoading,
     refetch: refetchOrders
-  } = useGetPurchaseOrdersQuery();
+  } = useGetPurchaseOrdersQuery(undefined, { skip: activeTab !== 'orders' });
 
   const [createPurchaseOrder] = useCreatePurchaseOrderMutation();
   const [updatePurchaseOrderStatus] = useUpdatePurchaseOrderStatusMutation();
@@ -411,12 +542,13 @@ const Inventory = () => {
 
   // Poll for updates every 5 seconds
   useEffect(() => {
+    if (activeTab !== 'orders') return;
     const pollInterval = setInterval(() => {
       refetchOrders();
     }, 5000);
 
     return () => clearInterval(pollInterval);
-  }, [refetchOrders]);
+  }, [refetchOrders, activeTab]);
 
   // Log any fetch errors
   useEffect(() => {
@@ -1130,6 +1262,19 @@ const columns: GridColDef[] = [
     );
   };
 
+  const theme = useMemo(() => createTheme({
+    palette: {
+      mode: isDarkMode ? 'dark' : 'light',
+      background: {
+        default: isDarkMode ? '#232e41' : '#fff',
+        paper: isDarkMode ? '#232e41' : '#fff',
+      },
+    },
+    typography: {
+      fontFamily: 'inherit',
+    },
+  }), [isDarkMode]);
+
   if (productsLoading || ordersLoading) {
     return <div className="py-4 text-gray-700 dark:text-gray-300">Loading...</div>;
   }
@@ -1143,34 +1288,34 @@ const columns: GridColDef[] = [
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
-      {/* Professional Header Section */}
-      <div className="px-2 py-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Inventory</h1>
-        <p className="text-gray-500 text-base">Manage your inventory, track stock levels, and handle purchase orders efficiently. Keep your products up to date for smooth operations.</p>
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 pt-20">
+      {/* Professional Header Section - now more compact */}
+      <div className="px-2 pt-4 pb-3">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">Inventory</h1>
+        <p className="text-gray-500 dark:text-gray-300 text-base mb-2">Manage your inventory, track stock levels, and handle purchase orders efficiently. Keep your products up to date for smooth operations.</p>
       </div>
 
-      {/* Summary Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-2 pb-2">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-          <span className="text-sm text-gray-500 mb-2">Total Products</span>
-          <span className="text-xl font-semibold text-gray-800 dark:text-gray-200">{products?.length ?? 0}</span>
+      {/* Summary Cards Row - more compact */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2 pb-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+          <span className="text-xs text-gray-500 mb-1">Total Products</span>
+          <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">{products?.length ?? 0}</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-          <span className="text-sm text-gray-500 mb-2">Total Stock</span>
-          <span className="text-xl font-semibold text-gray-800 dark:text-gray-200">{products ? products.reduce((sum, p) => sum + (p.stockQuantity || 0), 0).toLocaleString() : 0}</span>
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+          <span className="text-xs text-gray-500 mb-1">Total Stock</span>
+          <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">{products ? products.reduce((sum, p) => sum + (p.stockQuantity || 0), 0).toLocaleString() : 0}</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-          <span className="text-sm text-gray-500 mb-2">Inventory Value</span>
-          <span className="text-xl font-semibold text-gray-800 dark:text-gray-200">₹{products ? products.reduce((sum, p) => sum + (p.price * (p.stockQuantity || 0)), 0).toLocaleString() : 0}</span>
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
+          <span className="text-xs text-gray-500 mb-1">Inventory Value</span>
+          <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">₹{products ? products.reduce((sum, p) => sum + (p.price * (p.stockQuantity || 0)), 0).toLocaleString() : 0}</span>
         </div>
       </div>
 
-      <div className="border-b border-gray-200 dark:border-gray-700 my-4 mx-2" />
+      {/* Removed partition line for a cleaner look */}
 
-      <div className="px-2 py-8 flex-1">
+      <div className="px-2 pt-4 pb-8 flex-1">
         {/* Search Bar, Column Management, and Tabs */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('inventory')}
@@ -1215,199 +1360,280 @@ const columns: GridColDef[] = [
         </div>
 
         {/* Content */}
-        <div className="w-full max-w-[1100px] mx-auto px-2">
-          {activeTab === 'inventory' ? (
-            <DataGrid
-              rows={filteredProducts}
-              columns={columns}
-              getRowId={(row) => row.productId}
-              className="font-sans text-base !text-gray-800 dark:!text-gray-200"
-              slots={{
-                toolbar: () => (
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                        Products
+        <ThemeProvider theme={theme}>
+          <div className="w-full px-2 md:px-4">
+            {activeTab === 'inventory' ? (
+              <DataGrid
+                rows={filteredProducts}
+                columns={columns}
+                getRowId={(row) => row.productId}
+                className="font-sans text-base !text-gray-800 dark:!text-gray-200"
+                style={{ height: 320 }}
+                slots={{
+                  toolbar: () => (
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex justify-between items-center">
+                        <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                          Products
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ),
-                pagination: (props) => (
-                  <ModernPagination
-                    page={paginationModel.page}
-                    pageCount={Math.ceil(filteredProducts.length / paginationModel.pageSize)}
-                    onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
-                    pageSize={paginationModel.pageSize}
-                    onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
-                  />
-                ),
-              }}
-              columnVisibilityModel={columnVisibilityModel}
-              onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-              sx={{
-                fontFamily: 'inherit',
-                fontSize: '1rem',
-                color: isDarkMode ? '#e0e1dd' : '#22223b',
-                '& .MuiDataGrid-row': {
-                  minHeight: '48px !important',
-                  maxHeight: '48px !important',
-                  backgroundColor: isDarkMode ? '#1f2937' : '#fff',
-                  borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                  '&:hover': {
-                    backgroundColor: isDarkMode ? '#2d3340' : '#f8fafc',
-                  },
-                },
-                '& .MuiDataGrid-cell': {
-                  padding: '8px 8px',
+                  ),
+                  pagination: (props) => (
+                    <ModernPagination
+                      page={paginationModel.page}
+                      pageCount={Math.ceil(filteredProducts.length / paginationModel.pageSize)}
+                      onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
+                      pageSize={paginationModel.pageSize}
+                      onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
+                    />
+                  ),
+                }}
+                columnVisibilityModel={columnVisibilityModel}
+                onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+                sx={{
+                  fontFamily: 'inherit',
                   fontSize: '1rem',
                   color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  fontWeight: 500,
-                },
-                '& .MuiDataGrid-columnHeaders': {
-                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                  borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                  minHeight: '48px !important',
-                  maxHeight: '72px !important',
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  whiteSpace: 'pre-line',
-                  textAlign: 'center',
-                },
-                '& .MuiDataGrid-footerContainer': {
-                  display: 'flex',
-                  alignItems: 'center',
-                  minHeight: '40px',
-                  height: '40px',
-                  overflow: 'hidden',
-                  borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                  padding: '8px 12px',
-                  '& .MuiTablePagination-root': {
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: '40px',
-                    height: '40px',
-                  },
-                  '& .MuiTablePagination-toolbar': {
-                    minHeight: '40px',
-                    height: '40px',
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                  },
-                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                    fontSize: '0.95rem',
-                    lineHeight: 1.2,
-                    margin: 0,
-                    padding: 0,
-                  },
-                  '& .MuiInputBase-root, & .MuiTablePagination-select': {
-                    minHeight: '32px',
-                    height: '32px',
-                    fontSize: '0.95rem',
-                    margin: 0,
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                  },
-                },
-                '& .MuiDataGrid-columnSeparator': {
-                  display: 'none',
-                },
-                '& .MuiDataGrid-virtualScroller': {
-                  overflowY: 'hidden !important',
-                },
-              }}
-              rowHeight={48}
-              pageSizeOptions={[5, 10, 25, 50]}
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-              autoHeight
-              disableRowSelectionOnClick
-            />
-          ) : (
-            <DataGrid
-              rows={padRows(normalizedPurchaseOrders, 5)}
-              columns={purchaseOrderColumns}
-              getRowId={(row) => row.id}
-              className="font-sans text-base !text-gray-800 dark:!text-gray-200"
-              rowHeight={56}
-              slots={{
-                toolbar: () => (
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                        Purchase Orders
-                      </div>
-                    </div>
-                  </div>
-                ),
-                pagination: (props) => (
-                  <ModernPagination
-                    page={paginationModel.page}
-                    pageCount={Math.ceil(normalizedPurchaseOrders.length / paginationModel.pageSize)}
-                    onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
-                    pageSize={paginationModel.pageSize}
-                    onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
-                  />
-                ),
-              }}
-              columnVisibilityModel={columnVisibilityModel}
-              onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-              sx={{
-                fontFamily: 'inherit',
-                fontSize: '1rem',
-                color: isDarkMode ? '#e0e1dd' : '#22223b',
-                '& .MuiDataGrid-row': {
-                  minHeight: '56px !important',
-                  maxHeight: '56px !important',
-                  backgroundColor: isDarkMode
-                    ? '#1f2937'
-                    : 'inherit',
-                  borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                  '&:nth-of-type(even)': {
-                    backgroundColor: isDarkMode ? '#23293a' : '#f9fafb',
-                  },
-                  '&:nth-of-type(odd)': {
+                  '& .MuiDataGrid-row': {
+                    minHeight: '48px !important',
+                    maxHeight: '48px !important',
                     backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                    borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                    '&:hover': {
+                      backgroundColor: isDarkMode ? '#2d3340' : '#f8fafc',
+                    },
                   },
-                  '&:hover': {
-                    backgroundColor: isDarkMode ? '#2d3340' : '#f3f4f6',
-                    boxShadow: isDarkMode
-                      ? '0 2px 8px 0 rgba(31,41,55,0.15)'
-                      : '0 2px 8px 0 rgba(0,0,0,0.06)',
+                  '& .MuiDataGrid-cell': {
+                    padding: '8px 8px',
+                    fontSize: '1rem',
+                    color: isDarkMode ? '#e0e1dd' : '#22223b',
+                    fontWeight: 500,
                   },
-                },
-                '& .MuiDataGrid-cell': {
-                  padding: '8px 8px',
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: isDarkMode ? '#232e41' : '#f8fafc',
+                    borderBottom: `1.5px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                    minHeight: '36px !important',
+                    maxHeight: '40px !important',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    color: isDarkMode ? '#bfc9db' : '#22223b',
+                    whiteSpace: 'pre-line',
+                    textAlign: 'center',
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                  },
+                  '& .MuiDataGrid-columnHeaderTitle': {
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    color: isDarkMode ? '#bfc9db' : '#22223b',
+                    padding: 0,
+                  },
+                  '& .MuiDataGrid-virtualScroller': {
+                    overflowY: 'auto !important',
+                    // Add custom-scrollbar class for consistent styling
+                    '&::-webkit-scrollbar': {
+                      width: '8px',
+                      background: '#232e41',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      background: '#64748b',
+                      borderRadius: '8px',
+                    },
+                    '&::-webkit-scrollbar-thumb:hover': {
+                      background: '#475569',
+                    },
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: '40px',
+                    height: '40px',
+                    overflow: 'hidden',
+                    borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                    backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                    padding: '8px 12px',
+                    '& .MuiTablePagination-root': {
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      minHeight: '40px',
+                      height: '40px',
+                    },
+                    '& .MuiTablePagination-toolbar': {
+                      minHeight: '40px',
+                      height: '40px',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                      fontSize: '0.95rem',
+                      lineHeight: 1.2,
+                      margin: 0,
+                      padding: 0,
+                    },
+                    '& .MuiInputBase-root, & .MuiTablePagination-select': {
+                      minHeight: '32px',
+                      height: '32px',
+                      fontSize: '0.95rem',
+                      margin: 0,
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                  },
+                  '& .MuiDataGrid-columnSeparator': {
+                    display: 'none',
+                  },
+                }}
+                rowHeight={48}
+                pageSizeOptions={[5, 10, 25, 50]}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                autoHeight
+                disableRowSelectionOnClick
+              />
+            ) : (
+              <DataGrid
+                rows={padRows(normalizedPurchaseOrders, 5)}
+                columns={purchaseOrderColumns}
+                getRowId={(row) => row.id}
+                className="font-sans text-base !text-gray-800 dark:!text-gray-200"
+                rowHeight={56}
+                slots={{
+                  toolbar: () => (
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex justify-between items-center">
+                        <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                          Purchase Orders
+                        </div>
+                      </div>
+                    </div>
+                  ),
+                  pagination: (props) => (
+                    <ModernPagination
+                      page={paginationModel.page}
+                      pageCount={Math.ceil(normalizedPurchaseOrders.length / paginationModel.pageSize)}
+                      onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
+                      pageSize={paginationModel.pageSize}
+                      onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
+                    />
+                  ),
+                }}
+                columnVisibilityModel={columnVisibilityModel}
+                onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+                sx={{
+                  fontFamily: 'inherit',
                   fontSize: '1rem',
                   color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  fontWeight: 500,
-                },
-                '& .MuiDataGrid-columnHeaders': {
-                  backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                  borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                  minHeight: '48px !important',
-                  maxHeight: '72px !important',
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  whiteSpace: 'pre-line',
-                  textAlign: 'center',
-                },
-              }}
-              pageSizeOptions={[5, 10, 25, 50]}
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-              autoHeight
-              disableRowSelectionOnClick
-            />
-          )}
-        </div>
+                  '& .MuiDataGrid-row': {
+                    minHeight: '56px !important',
+                    maxHeight: '56px !important',
+                    backgroundColor: isDarkMode
+                      ? '#1f2937'
+                      : 'inherit',
+                    borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                    '&:nth-of-type(even)': {
+                      backgroundColor: isDarkMode ? '#23293a' : '#f9fafb',
+                    },
+                    '&:nth-of-type(odd)': {
+                      backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                    },
+                    '&:hover': {
+                      backgroundColor: isDarkMode ? '#2d3340' : '#f3f4f6',
+                      boxShadow: isDarkMode
+                        ? '0 2px 8px 0 rgba(31,41,55,0.15)'
+                        : '0 2px 8px 0 rgba(0,0,0,0.06)',
+                    },
+                  },
+                  '& .MuiDataGrid-cell': {
+                    padding: '8px 8px',
+                    fontSize: '1rem',
+                    color: isDarkMode ? '#e0e1dd' : '#22223b',
+                    fontWeight: 500,
+                  },
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                    borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                    minHeight: '48px !important',
+                    maxHeight: '72px !important',
+                    fontSize: '1.125rem',
+                    fontWeight: 600,
+                    color: isDarkMode ? '#e0e1dd' : '#22223b',
+                    whiteSpace: 'pre-line',
+                    textAlign: 'center',
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    display: 'flex',
+                    minHeight: '40px',
+                    height: '40px',
+                    overflow: 'hidden',
+                    borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                    backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                    padding: '8px 12px',
+                    '& .MuiTablePagination-root': {
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      minHeight: '40px',
+                      height: '40px',
+                    },
+                    '& .MuiTablePagination-toolbar': {
+                      minHeight: '40px',
+                      height: '40px',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                      fontSize: '0.95rem',
+                      lineHeight: 1.2,
+                      margin: 0,
+                      padding: 0,
+                    },
+                    '& .MuiInputBase-root, & .MuiTablePagination-select': {
+                      minHeight: '32px',
+                      height: '32px',
+                      fontSize: '0.95rem',
+                      margin: 0,
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                  },
+                  '& .MuiDataGrid-columnSeparator': {
+                    display: 'none',
+                  },
+                }}
+                pageSizeOptions={[5, 10, 25, 50]}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                autoHeight
+                disableRowSelectionOnClick
+              />
+            )}
+          </div>
+        </ThemeProvider>
         {/* Column Management Modal */}
         <ColumnManagementModal />
+        {/* Stock Modal for Sell, Order, Update */}
+        {selectedProduct && modalType && (
+          <StockModal
+            isOpen={!!selectedProduct && !!modalType}
+            onClose={() => {
+              setSelectedProduct(null);
+              setModalType(null);
+            }}
+            product={selectedProduct}
+            type={modalType}
+            onSubmit={modalType === 'sell'
+              ? handleSellStock
+              : modalType === 'order'
+              ? handleCreateOrder
+              : handleUpdateProduct}
+          />
+        )}
       </div>
     </div>
   );

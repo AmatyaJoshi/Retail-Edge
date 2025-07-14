@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { generateSKU, generateUniqueBarcode, isSKUUnique, isBarcodeUnique } from "../lib/productUtils";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,7 @@ export const getProducts = async (
         { category: { contains: searchString, mode: 'insensitive' } },
         { brand: { contains: searchString, mode: 'insensitive' } },
         { sku: { contains: searchString, mode: 'insensitive' } },
+        { barcode: { contains: searchString, mode: 'insensitive' } },
         { description: { contains: searchString, mode: 'insensitive' } },
       ];
     }
@@ -42,16 +44,39 @@ export const getProducts = async (
   }
 };
 
+export const getProduct = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { productId } = req.params;
+
+    const product = await prisma.products.findUnique({
+      where: { productId },
+    });
+
+    if (!product) {
+      res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ message: "Error retrieving product", error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+};
+
 export const createProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { productId, name, price, rating, stockQuantity, category, brand, sku, description, imageUrl } = req.body;
+    const { productId, name, price, rating, stockQuantity, category, brand, sku, description, imageUrl, barcode } = req.body;
 
     // Check if a product with the same name already exists
     let product = await prisma.products.findUnique({
-      where: { name: name }, // Assuming name is unique or used for identification
+      where: { name: name },
     });
 
     if (product) {
@@ -59,33 +84,72 @@ export const createProduct = async (
       product = await prisma.products.update({
         where: { name: name },
         data: {
-          stockQuantity: product.stockQuantity + stockQuantity, // Increment existing stock
+          stockQuantity: product.stockQuantity + stockQuantity,
           price,
           rating,
           category,
           brand,
-          sku,
+          sku: sku || product.sku,
           description,
-          imageUrl
+          imageUrl,
+          barcode: barcode || product.barcode
         },
       });
       res.status(200).json({ message: "Product stock updated successfully", product });
     } else {
+      // Generate SKU and barcode if not provided
+      let generatedSKU = sku;
+      let generatedBarcode = barcode;
+
+      if (!generatedSKU) {
+        generatedSKU = await generateSKU(category, brand);
+        // Ensure SKU is unique
+        let counter = 1;
+        while (!(await isSKUUnique(generatedSKU))) {
+          generatedSKU = await generateSKU(category, brand);
+          counter++;
+          if (counter > 100) break; // Prevent infinite loop
+        }
+      } else {
+        // Check if provided SKU is unique
+        if (!(await isSKUUnique(generatedSKU))) {
+          res.status(400).json({ 
+            message: "SKU already exists",
+            error: "SKU_DUPLICATE"
+          });
+          return;
+        }
+      }
+
+      if (!generatedBarcode) {
+        generatedBarcode = await generateUniqueBarcode();
+      } else {
+        // Check if provided barcode is unique
+        if (!(await isBarcodeUnique(generatedBarcode))) {
+          res.status(400).json({ 
+            message: "Barcode already exists",
+            error: "BARCODE_DUPLICATE"
+          });
+          return;
+        }
+      }
+
       // If product does not exist, create a new one
       product = await prisma.products.create({
-      data: {
-        productId,
-        name,
-        price,
-        rating,
-        stockQuantity,
+        data: {
+          productId,
+          name,
+          price,
+          rating,
+          stockQuantity,
           category: category || 'uncategorized',
           brand,
-          sku,
+          sku: generatedSKU,
           description,
-          imageUrl
-      },
-    });
+          imageUrl,
+          barcode: generatedBarcode
+        },
+      });
       res.status(201).json({ message: "Product created successfully", product });
     }
   } catch (error) {
@@ -123,7 +187,40 @@ export const updateProduct = async (
 ): Promise<void> => {
   try {
     const { productId } = req.params;
-    const { name, price, rating, stockQuantity, category, brand, sku, description, imageUrl } = req.body;
+    const { name, price, rating, stockQuantity, category, brand, sku, description, imageUrl, barcode } = req.body;
+
+    // Check if SKU or barcode already exists for another product
+    if (sku) {
+      const existingProductWithSKU = await prisma.products.findFirst({
+        where: {
+          sku: sku,
+          productId: { not: productId }
+        }
+      });
+      if (existingProductWithSKU) {
+        res.status(400).json({ 
+          message: "SKU already exists for another product",
+          error: "SKU_DUPLICATE"
+        });
+        return;
+      }
+    }
+
+    if (barcode) {
+      const existingProductWithBarcode = await prisma.products.findFirst({
+        where: {
+          barcode: barcode,
+          productId: { not: productId }
+        }
+      });
+      if (existingProductWithBarcode) {
+        res.status(400).json({ 
+          message: "Barcode already exists for another product",
+          error: "BARCODE_DUPLICATE"
+        });
+        return;
+      }
+    }
 
     const updatedProduct = await prisma.products.update({
       where: { productId },
@@ -136,7 +233,8 @@ export const updateProduct = async (
         brand,
         sku,
         description,
-        imageUrl
+        imageUrl,
+        barcode
       },
     });
 

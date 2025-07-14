@@ -41,6 +41,7 @@ import { ExpenseList } from "./components/ExpenseList";
 import { ExpenseAnalyticsSidebar } from "./components/ExpenseAnalyticsSidebar";
 import PayExpenseModal from "./components/PayExpenseModal";
 import BudgetSystem from "./budget-system";
+import { useExpensesDataUpdater } from "@/app/hooks/use-page-data-updater";
 
 type ExpenseStatus = "pending" | "approved" | "rejected";
 
@@ -101,11 +102,15 @@ export function ExpenseModalWrapper({
 export default function ExpensesPage() {
   const { categoryIdToName, isLoading: isLoadingCategories } = useExpenseCategories();
   const { data: categorySummaries, isLoading: isLoadingSummaries } = useGetExpensesByCategoryQuery({});
+  const { data: expenses } = useGetExpensesQuery({});
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'budget'>('overview');
   const router = useRouter();
+
+  // Update page data for AI Assistant
+  useExpensesDataUpdater(expenses || [], 'Expenses');
 
   const isLoading = isLoadingCategories || isLoadingSummaries;
 
@@ -123,23 +128,24 @@ export default function ExpensesPage() {
   const handleTabClick = (tab: 'overview' | 'analytics' | 'budget') => setActiveTab(tab);
 
   return (
-    <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8">
-      <header className="max-w-7xl mx-auto mb-8">
+    <div className="h-screen overflow-y-auto bg-white dark:bg-[#10192A] p-4 sm:p-6 lg:p-8 custom-scrollbar">
+      <div className="h-24" />
+      <header className="max-w-7xl mx-auto mb-8 p-0">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-2">Expenses</h1>
-            <p className="text-gray-500 text-base">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Expenses</h1>
+            <p className="text-gray-500 dark:text-gray-300 text-base">
               Browse, search, and manage your business expenditures. Track expenses by category, analyze spending patterns, and maintain your budget for optimal financial control.
             </p>
           </div>
           <div className="w-full flex flex-col md:flex-row items-center justify-center gap-4">
             {/* Centered Tab Navigation Buttons */}
-            <div className="flex bg-gray-100 rounded-full shadow-sm p-1 gap-1 max-w-xl mx-auto">
+            <div className="flex bg-gray-100 dark:bg-gray-800 rounded-full shadow-sm p-1 gap-1 max-w-xl mx-auto">
               <button
                 className={`px-7 py-2.5 rounded-full font-semibold transition-all text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
                   activeTab === 'overview'
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-transparent text-black hover:bg-blue-50 hover:text-blue-700'
+                    : 'bg-transparent text-black dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-700 dark:hover:text-blue-300'
                 }`}
                 onClick={() => handleTabClick('overview')}
               >
@@ -149,7 +155,7 @@ export default function ExpensesPage() {
                 className={`px-7 py-2.5 rounded-full font-semibold transition-all text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
                   activeTab === 'analytics'
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-transparent text-black hover:bg-blue-50 hover:text-blue-700'
+                    : 'bg-transparent text-black dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-700 dark:hover:text-blue-300'
                 }`}
                 onClick={() => handleTabClick('analytics')}
               >
@@ -159,7 +165,7 @@ export default function ExpensesPage() {
                 className={`px-7 py-2.5 rounded-full font-semibold transition-all text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${
                   activeTab === 'budget'
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-transparent text-black hover:bg-blue-50 hover:text-blue-700'
+                    : 'bg-transparent text-black dark:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-700 dark:hover:text-blue-300'
                 }`}
                 onClick={() => handleTabClick('budget')}
               >
@@ -170,7 +176,7 @@ export default function ExpensesPage() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="ml-0 md:ml-8 px-6 py-2.5 rounded-full border border-blue-600 bg-blue-600 text-white font-semibold flex items-center gap-2 text-base transition-all hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
+                  className="ml-0 md:ml-8 px-6 py-2.5 rounded-full border border-blue-600 bg-blue-600 text-white font-semibold flex items-center gap-2 text-base transition-all hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm dark:border-blue-400 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
                   <PlusCircleIcon className="h-5 w-5 text-white" />
                   Add
@@ -184,8 +190,7 @@ export default function ExpensesPage() {
           </div>
         </div>
       </header>
-
-      <main className="max-w-7xl mx-auto">
+      <main className="max-w-7xl mx-auto dark:text-gray-100">
         <Tabs value={activeTab} onValueChange={val => setActiveTab(val as 'overview' | 'analytics' | 'budget')} className="space-y-4">
           <TabsList className="w-full justify-start p-1 bg-muted/50 rounded-lg mb-8 hidden" />
           <TabsContent value="overview" className="space-y-4">
@@ -207,12 +212,12 @@ export default function ExpensesPage() {
                           key={summary.category}
                           value={summary.category}
                           className={cn(
-                            "bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-4 transition-all duration-200 hover:shadow-md hover:border-gray-300"
+                            "bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-4 transition-all duration-200 hover:shadow-md hover:border-gray-300 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
                           )}
                         >
-                          <AccordionTrigger className="flex items-center justify-center w-full h-16 p-0 rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 hover:bg-gray-100 hover:shadow-sm hover:no-underline">
+                          <AccordionTrigger className="flex items-center justify-center w-full h-16 p-0 rounded-lg border border-gray-200 bg-gray-50 transition-all duration-200 hover:bg-gray-100 hover:shadow-sm hover:no-underline dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 dark:hover:shadow-none">
                             <div className="w-full flex items-center justify-center">
-                              <h3 className="text-lg font-semibold tracking-tight text-gray-900 text-center w-full font-sans">
+                              <h3 className="text-lg font-semibold tracking-tight text-gray-900 text-center w-full font-sans dark:text-white">
                                 {categoryIdToName[summary.category] || summary.category}
                               </h3>
                             </div>
@@ -250,7 +255,6 @@ export default function ExpensesPage() {
           </TabsContent>
         </Tabs>
       </main>
-
       {selectedExpense && (
         <PayExpenseModal
           open={isPayModalOpen}
@@ -325,7 +329,7 @@ function ExpenseTransactionHistory() {
     {
       accessorKey: 'amount',
       header: 'Amount',
-      cell: (info: any) => <span className="font-semibold text-gray-900">₹{Number(info.getValue()).toLocaleString()}</span>,
+      cell: (info: any) => <span className="font-semibold text-gray-900 dark:text-gray-100">₹{Number(info.getValue()).toLocaleString('en-IN')}</span>,
     },
     {
       accessorKey: 'paymentMethod',
@@ -367,7 +371,7 @@ function ExpenseTransactionHistory() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
       <DataTable columns={columns} data={tableData} searchKey="expenseName" onRowClick={handleRowClick} />
       <TransactionDetailModal open={!!selectedTxn} onOpenChange={() => setSelectedTxn(null)} txn={selectedTxn} />
     </div>
@@ -388,7 +392,7 @@ function TransactionDetailModal({ open, onOpenChange, txn }: { open: boolean, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl w-full p-0 bg-white rounded-xl overflow-hidden shadow-xl font-sans border border-gray-200">
+      <DialogContent className="max-w-6xl w-full p-0 bg-white rounded-xl overflow-hidden shadow-xl font-sans border border-gray-200 dark:border-gray-700">
         <DialogTitle className="sr-only">Expense Transaction Details</DialogTitle>
         <div className="flex flex-col md:flex-row">
           {/* Left: Summary Card */}
@@ -411,8 +415,8 @@ function TransactionDetailModal({ open, onOpenChange, txn }: { open: boolean, on
             )}
           </div>
           {/* Right: Details */}
-          <div className="md:w-2/3 p-8 flex flex-col gap-8 bg-white">
-            <div className="bg-gray-50 rounded-lg shadow-sm p-6 mt-0">
+          <div className="md:w-2/3 p-8 flex flex-col gap-8 bg-white dark:bg-gray-900">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-0">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight">Transaction Details</h2>
               {raw && expense ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">

@@ -56,7 +56,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <NotificationProvider>
       <NotificationInitializer />
       <div
-        className={`flex w-full min-h-screen ${
+        className={`flex w-full h-screen overflow-hidden ${
           isDarkMode 
             ? 'bg-gray-900 text-gray-50' 
             : 'bg-white text-gray-900'
@@ -64,13 +64,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       >
         {pathname !== "/settings" && <Sidebar />}
         <main
-          className={`flex flex-col w-full h-full ${
-            pathname !== "/settings" ? "py-7 px-9 pt-20" : "pt-6"
-          } ${
-            isDarkMode ? 'bg-gray-900' : 'bg-white'
-          } ${
-            pathname !== "/settings" ? (isSidebarCollapsed ? "md:pl-24" : "md:pl-72") : ""
-          }`}
+          className={`flex flex-col w-full h-full min-h-0 flex-1 overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'} ${pathname === "/pos" || pathname === "/profile" ? (isSidebarCollapsed ? "md:pl-24" : "md:pl-64") : ""} ${pathname === "/products" ? (isSidebarCollapsed ? "md:pl-16" : "md:pl-64") : pathname !== "/settings" && pathname !== "/pos" && pathname !== "/profile" ? (isSidebarCollapsed ? "md:pl-24" : "md:pl-72") : ""} p-0 m-0`}
         >
           <Navbar showBackButton={pathname === "/settings"} />
           {children}

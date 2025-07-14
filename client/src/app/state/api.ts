@@ -18,6 +18,10 @@ export const api = createApi({
       }),
       providesTags: ["Products"],
     }),
+    getProduct: build.query<Product, string>({
+      query: (productId) => `/products/${productId}`,
+      providesTags: (_result, _error, productId) => [{ type: 'Products', id: productId }],
+    }),
     createProduct: build.mutation<Product, NewProduct>({
       query: (newProduct) => ({
         url: "/products",
@@ -93,7 +97,7 @@ export const api = createApi({
     updateProductStock: build.mutation<Product, { productId: string; stockQuantity: number }>({
       query: ({ productId, stockQuantity }) => ({
         url: `/products/${productId}/stock`,
-        method: "PATCH",
+        method: "PUT",
         body: { stockQuantity },
       }),
       invalidatesTags: ["Products", "DashboardMetrics"],
@@ -166,7 +170,7 @@ export const api = createApi({
     updateProduct: build.mutation<Product, { productId: string; updates: Partial<Product> }>({
       query: ({ productId, updates }) => ({
         url: `/products/${productId}`,
-        method: "PATCH",
+        method: "PUT",
         body: updates,
       }),
       invalidatesTags: ["Products", "DashboardMetrics"],
@@ -237,10 +241,17 @@ export interface Product {
 }
 
 export interface NewProduct {
+  productId: string;
   name: string;
+  description: string;
   price: number;
-  rating?: number;
   stockQuantity: number;
+  category: string;
+  brand: string;
+  rating: number;
+  sku: string;
+  barcode?: string;
+  imageUrl?: string;
 }
 
 export interface SalesSummary {
@@ -450,6 +461,7 @@ export interface ExpenseSummaryResponse {
 export const {
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
+  useGetProductQuery,
   useCreateProductMutation,
   useGetCustomersQuery,
   useCreateCustomerMutation,

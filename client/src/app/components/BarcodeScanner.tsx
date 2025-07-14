@@ -30,157 +30,82 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, onClose }) 
   const handleRescan = () => setScanning(true);
 
   return (
-    <div style={{
-      position: "fixed",
-      inset: 0,
-      inlineSize: "100vw",
-      blockSize: "100vh",
-      background: "rgba(0,0,0,0.7)",
-      zIndex: 1000,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center"
-    }}>
-      <div style={{
-        background: "#fff",
-        borderRadius: 18,
-        boxShadow: "0 6px 32px rgba(0,0,0,0.18)",
-        padding: 36,
-        inlineSize: 600,
-        maxInlineSize: "98vw",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        animation: "fadeIn 0.3s"
-      }}>
+    <div className="fixed inset-0 w-screen h-screen bg-black/80 backdrop-blur-md flex items-center justify-center z-[1000]">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 w-[650px] max-w-[98vw] relative flex flex-col items-center animate-fadeIn border-2 border-gray-200 dark:border-gray-600">
         <button
           onClick={onClose}
-          style={{
-            position: "absolute",
-            insetBlockStart: 14,
-            insetInlineEnd: 14,
-            background: "#f5f5f5",
-            border: "none",
-            borderRadius: "50%",
-            inlineSize: 36,
-            blockSize: 36,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 22,
-            cursor: "pointer",
-            color: "#888",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
-            transition: "background 0.2s"
-          }}
+          className="absolute top-6 right-6 bg-gray-100 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-full w-10 h-10 flex items-center justify-center text-lg cursor-pointer text-gray-500 dark:text-gray-400 shadow-lg hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-110 transition-all duration-200"
           aria-label="Close"
         >
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M6 14L14 6" stroke="#888" strokeWidth="2" strokeLinecap="round"/></svg>
-        </button>
-        <div style={{ margin: "0 0 12px 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" style={{ marginBlockEnd: 4 }}>
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="#1976d2" strokeWidth="2" fill="#e3f0fc" />
-            <path d="M7 12h10M12 7v10" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" />
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M6 6l8 8M6 14L14 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
-          <h2 style={{ margin: 0, fontWeight: 700, fontSize: 22, color: "#222" }}>Scan a Barcode</h2>
+        </button>
+        
+        <div className="mb-4 flex flex-col items-center">
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-3">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-blue-600 dark:text-blue-400">
+              <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none" />
+              <path d="M7 12h10M12 7v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <h2 className="m-0 font-bold text-2xl text-gray-900 dark:text-gray-100">Scan a Barcode</h2>
         </div>
-        <p style={{ margin: "0 0 18px 0", color: "#555", fontSize: 15, textAlign: "center" }}>
+        
+        <p className="m-0 mb-6 text-gray-600 dark:text-gray-300 text-base text-center max-w-md">
           Align the barcode within the frame below. Scanning will happen automatically.
         </p>
-        <div style={{
-          inlineSize: "100%",
-          maxInlineSize: 520,
-          aspectRatio: "16/9",
-          borderRadius: 16,
-          overflow: "hidden",
-          border: scanning ? "2.5px solid #1976d2" : "2.5px solid #43a047",
-          marginBlockEnd: 28,
-          boxShadow: scanning ? "0 2px 8px rgba(25,118,210,0.10)" : "0 2px 8px rgba(67,160,71,0.10)",
-          position: "relative",
-          background: "#222"
-        }}>
+        
+        <div className={`w-full max-w-[540px] aspect-video rounded-2xl overflow-hidden border-4 mb-8 shadow-2xl relative bg-gray-900 ${
+          scanning ? 'border-blue-500 shadow-blue-500/20' : 'border-green-500 shadow-green-500/20'
+        }`}>
           <video
             ref={videoRef}
-            style={{ inlineSize: "100%", blockSize: "100%", objectFit: "cover", background: "#222" }}
+            className="w-full h-full object-cover bg-gray-900"
             autoPlay
             muted
             playsInline
           />
           {!scanning && (
-            <div style={{
-              position: "absolute",
-              inset: 0,
-              background: "rgba(67,160,71,0.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#43a047",
-              fontWeight: 600,
-              fontSize: 20
-            }}>
-              ✓ Barcode Detected
+            <div className="absolute inset-0 bg-green-500/20 backdrop-blur-sm flex items-center justify-center text-green-600 dark:text-green-400 font-bold text-2xl">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border-2 border-green-200 dark:border-green-700">
+                ✓ Barcode Detected
+              </div>
             </div>
           )}
         </div>
-        <div style={{ inlineSize: "100%", display: "flex", flexDirection: "column", gap: 10, marginBlockStart: 8 }}>
+        
+        <div className="w-full flex flex-col gap-3 mt-2">
           <button
             onClick={onClose}
-            style={{
-              inlineSize: "100%",
-              background: "#1976d2",
-              color: "#fff",
-              border: "none",
-              borderRadius: 8,
-              padding: "12px 0",
-              fontSize: 17,
-              fontWeight: 700,
-              cursor: "pointer",
-              boxShadow: "0 1px 4px rgba(25,118,210,0.10)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              transition: "background 0.2s"
-            }}
-            onMouseOver={e => (e.currentTarget.style.background = '#1456a0')}
-            onMouseOut={e => (e.currentTarget.style.background = '#1976d2')}
+            className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white border-none rounded-xl py-4 text-lg font-bold cursor-pointer shadow-lg flex items-center justify-center gap-3 transition-all duration-200 transform hover:scale-105"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 10h8M10 6l-4 4 4 4" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M6 10h8M10 6l-4 4 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             Cancel
           </button>
+          
           {!scanning && (
             <button
               onClick={handleRescan}
-              style={{
-                inlineSize: "100%",
-                background: "#fff",
-                color: "#1976d2",
-                border: "2px solid #1976d2",
-                borderRadius: 8,
-                padding: "12px 0",
-                fontSize: 17,
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow: "0 1px 4px rgba(25,118,210,0.07)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                transition: "background 0.2s, color 0.2s, border 0.2s"
-              }}
-              onMouseOver={e => (e.currentTarget.style.background = '#e3f0fc')}
-              onMouseOut={e => (e.currentTarget.style.background = '#fff')}
+              className="w-full bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-500 rounded-xl py-4 text-lg font-bold cursor-pointer shadow-lg flex items-center justify-center gap-3 transition-all duration-200 transform hover:scale-105 hover:bg-blue-50 dark:hover:bg-gray-600"
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="#1976d2" strokeWidth="2" strokeLinecap="round"/></svg>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
               Rescan
             </button>
           )}
         </div>
-        <style>{`
+        
+        <style jsx>{`
           @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
           }
         `}</style>
       </div>
