@@ -5,6 +5,7 @@ import styles from './auth.module.css';
 import { useSignUp, useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getCurrentYear } from '@/app/lib/utils';
 
 export default function SignupPage() {
   const { signUp, isLoaded } = useSignUp();
@@ -20,35 +21,35 @@ export default function SignupPage() {
   }, [isLoaded, isSignedIn, router]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
-      <div className="flex-1 flex items-center justify-center p-12">
-        <div className="w-full max-w-6xl flex gap-16">
+    <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center px-2 md:px-8 py-4">
+        <div className="w-full max-w-6xl flex gap-8 xl:gap-16 overflow-hidden">
           {/* Left side - Branding */}
-          <div className="hidden lg:flex flex-col justify-center text-white space-y-10 flex-1">
-            <div className="space-y-6">
-              <div className="relative group">
-                <h1 className="text-6xl font-bold tracking-tight transform transition-transform duration-300 group-hover:scale-105">
-                  <span className={`bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-white to-blue-200 ${styles.animateGradientX}`}>
-                    Retail Edge
-                  </span>
-                </h1>
-                <div className="absolute -bottom-2 left-0 w-32 h-1 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transform transition-all duration-300 group-hover:w-40 group-hover:from-blue-300 group-hover:to-blue-500"></div>
+          <div className="hidden lg:flex flex-col justify-center items-start text-white space-y-10 flex-1">
+            <div className="space-y-6 flex flex-col items-start">
+              <div className="relative group flex flex-col items-start mb-2">
+                <img
+                  src="/retail-edge-logo-dark.svg"
+                  alt="Retail Edge Logo"
+                  className="w-64 h-auto object-contain"
+                  style={{ padding: 0, margin: 0 }}
+                />
               </div>
-              <p className="text-2xl text-blue-100 font-light tracking-wide transform transition-all duration-300 group-hover:text-blue-50">
-                Enterprise POS System for Modern Retail
+              <p className="text-base font-medium text-slate-100 tracking-normal leading-snug mt-2 mb-0">
+                A cutting-edge platform for retail point-of-sale and business management, designed to streamline operations and accelerate growth.
               </p>
             </div>
-            <div className="space-y-4">
-              <div className="relative group">
-                <h2 className="text-4xl font-semibold tracking-tight transform transition-transform duration-300 group-hover:scale-105">
-                  <span className={`bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-blue-300 ${styles.animateGradientX}`}>
-                    Vision Loop
-                  </span>
-                </h2>
-                <div className="absolute -bottom-1 left-0 w-24 h-0.5 bg-gradient-to-r from-blue-300 to-blue-400 rounded-full transform transition-all duration-300 group-hover:w-32 group-hover:from-blue-200 group-hover:to-blue-300"></div>
+            <div className="space-y-4 flex flex-col items-start">
+              <div className="relative group flex flex-col items-start">
+                <img
+                  src="/vision-loop-logo-dark.svg"
+                  alt="Vision Loop Logo"
+                  className="w-40 h-auto object-contain"
+                  style={{ padding: 0, margin: 0 }}
+                />
               </div>
-              <p className="text-xl text-blue-100/90 font-light tracking-wide transform transition-all duration-300 group-hover:text-blue-50">
-                Empowering eyewear retail excellence
+              <p className="text-base font-normal text-slate-100/80 tracking-normal leading-tight mt-1 mb-0">
+                A premier destination for high-quality, diverse eyewear—crafted to suit every style and vision need.
               </p>
             </div>
           </div>
@@ -59,8 +60,8 @@ export default function SignupPage() {
       </div>
       
       {/* Footer */}
-      <footer className="w-full py-6 text-center text-blue-100 border-t border-blue-800">
-        <p className="text-base">© 2025 Retail Edge - Enterprise POS System | Vision Loop - Eyewear Retail</p>
+      <footer className="w-full py-4 text-center text-blue-100 border-t border-blue-800">
+        <p className="text-base">© {getCurrentYear()} Retail Edge - Enterprise POS System | Vision Loop - Eyewear Retail</p>
       </footer>
     </div>
   );

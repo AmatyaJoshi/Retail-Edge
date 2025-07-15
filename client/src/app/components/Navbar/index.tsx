@@ -132,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
 
   return (
     <div
-      className={`flex justify-between items-center mb-7 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-b dark:border-gray-900 fixed top-0 z-30 shadow-sm h-20 px-8 transition-all duration-300 ${leftOffset} ${widthClass}`}
+      className={`flex justify-between items-center mb-7 bg-white border-b-2 border-gray-400 dark:bg-gray-800 dark:border-b-2 dark:border-gray-700 fixed top-0 z-30 shadow-md h-20 px-8 transition-all duration-300 ${leftOffset} ${widthClass}`}
       style={{ minHeight: '5rem' }}
     >
       {/* LEFT SIDE */}
@@ -150,7 +150,7 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
             </div>
           ) : (
         <button
-          className={`px-3 py-3 rounded-full border ${isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'} hover:bg-blue-100 cursor-pointer`}
+          className={`px-3 py-3 rounded-full border-2 ${isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'} hover:bg-blue-100 cursor-pointer`}
           onClick={toggleSidebar}
         >
           <Menu className={`w-4 h-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`} />
@@ -161,12 +161,37 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
 
       {/* CENTER */}
       <div className="flex items-center">
-        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-          <EyewearIcon />
-        </div>
-        <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-gray-100">
-          {pathname === "/settings" ? "Retail Edge" : <span className="text-gray-900 dark:text-white">Vision Loop</span>}
-        </span>
+        {pathname === "/settings" ? (
+          <div className="flex items-center justify-center w-44 max-h-16">
+            {/* Light mode logo */}
+            <img
+              src="/retail-edge-logo-light.svg"
+              alt="Retail Edge Logo"
+              className="block dark:hidden w-44 max-h-16 object-contain"
+            />
+            {/* Dark mode logo */}
+            <img
+              src="/retail-edge-logo-dark.svg"
+              alt="Retail Edge Logo"
+              className="hidden dark:block w-44 max-h-16 object-contain"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center w-44 max-h-16">
+            {/* Light mode logo */}
+            <img
+              src="/vision-loop-logo-light.svg"
+              alt="Vision Loop Logo"
+              className="block dark:hidden w-44 max-h-16 object-contain"
+            />
+            {/* Dark mode logo */}
+            <img
+              src="/vision-loop-logo-dark.svg"
+              alt="Vision Loop Logo"
+              className="hidden dark:block w-44 max-h-16 object-contain"
+            />
+          </div>
+        )}
       </div>
 
       {/* RIGHT SIDE */}

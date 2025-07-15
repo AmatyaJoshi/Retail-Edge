@@ -335,6 +335,12 @@ export default function AIAssistantWidget() {
     }
   };
 
+  // Add this near the top, with other refs and state
+  const positionRef = useRef(position);
+  useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
+
   // Snap widget to nearest corner when chat is closed
   const snapToNearestCorner = () => {
     // Check if we're on the client side
@@ -343,8 +349,8 @@ export default function AIAssistantWidget() {
     }
     
     const { innerWidth, innerHeight } = window;
-    const currentX = position.x;
-    const currentY = position.y;
+    const currentX = positionRef.current.x;
+    const currentY = positionRef.current.y;
     
     // Calculate distances to each corner
     const corners = [
@@ -368,12 +374,14 @@ export default function AIAssistantWidget() {
     });
     
     if (nearestCorner) {
+      // Add smooth animation by using CSS transition
       setPosition(nearestCorner);
     }
   };
 
-  // Drag handlers
-  const onMouseDown = (e: React.MouseEvent) => {
+  // --- DRAG HANDLERS ---
+  // For both widget and chat box, always use the widget's position for drag offset
+  const onWidgetMouseDown = (e: React.MouseEvent) => {
     setDragging(true);
     dragOffset.current = {
       x: e.clientX - position.x,
@@ -382,7 +390,6 @@ export default function AIAssistantWidget() {
     dragStartPos.current = { x: e.clientX, y: e.clientY };
     setJustDragged(false);
     document.body.style.userSelect = 'none';
-    
     // Reset states when user interacts with widget
     lastActivityRef.current = Date.now();
     if (isHidden) {
@@ -395,40 +402,32 @@ export default function AIAssistantWidget() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!dragging) return;
-    
+
     const onMouseMove = (e: MouseEvent) => {
-      if (!widgetRef.current) return;
-      
       const { innerWidth, innerHeight } = window;
-      const rect = widgetRef.current.getBoundingClientRect();
-      
       // Clamp position so widget stays in viewport
       const minX = MARGIN;
       const minY = MARGIN;
       const maxX = innerWidth - WIDGET_SIZE - MARGIN;
       const maxY = innerHeight - WIDGET_SIZE - MARGIN;
-      
       let newX = e.clientX - dragOffset.current.x;
       let newY = e.clientY - dragOffset.current.y;
-      
       newX = Math.max(minX, Math.min(newX, maxX));
       newY = Math.max(minY, Math.min(newY, maxY));
-      
       setPosition({ x: newX, y: newY });
-      
       if (Math.abs(e.clientX - dragStartPos.current.x) > 5 || Math.abs(e.clientY - dragStartPos.current.y) > 5) {
         setJustDragged(true);
       }
     };
-    
     const onMouseUp = () => {
       setDragging(false);
       document.body.style.userSelect = '';
+      setTimeout(() => {
+        snapToNearestCorner();
+      }, 100);
     };
-    
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
-    
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
@@ -511,14 +510,10 @@ export default function AIAssistantWidget() {
     
     const handleResize = () => {
       const { innerWidth, innerHeight } = window;
-      
-      // Ensure widget stays in viewport after resize
-      const newX = Math.min(position.x, innerWidth - WIDGET_SIZE - MARGIN);
-      const newY = Math.min(position.y, innerHeight - WIDGET_SIZE - MARGIN);
-      
+      // Always snap to bottom right after resize
       setPosition({
-        x: Math.max(MARGIN, newX),
-        y: Math.max(MARGIN, newY),
+        x: innerWidth - WIDGET_SIZE - MARGIN,
+        y: innerHeight - WIDGET_SIZE - MARGIN,
       });
     };
 
@@ -534,17 +529,22 @@ export default function AIAssistantWidget() {
   // Don't render if hidden and not showing indicator
   if (isHidden && !showIndicator && !open) {
   return (
-    <div
-      ref={widgetRef}
-      className="fixed z-50 font-sans"
-      style={{ left: position.x, top: position.y, position: 'fixed' }}
-    >
+            <div
+          ref={widgetRef}
+          className="fixed z-50 font-sans"
+          style={{ 
+            left: position.x, 
+            top: position.y, 
+            position: 'fixed',
+            transition: dragging ? 'none' : 'left 0.3s cubic-bezier(0.4,0,0.2,1), top 0.3s cubic-bezier(0.4,0,0.2,1)'
+          }}
+        >
         <div style={{ position: 'relative' }}>
           <button
             className="bg-white/15 backdrop-blur-md rounded-full p-0 flex items-center justify-center border-4 border-[#a259ff] w-12 h-12 group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#6c38ff] hover:border-[#2e3cff] hover:bg-white hover:opacity-100 opacity-50"
             onClick={handleOpen}
             title="Open Zayra Assistant"
-            onMouseDown={onMouseDown}
+            onMouseDown={onWidgetMouseDown}
             onMouseEnter={() => {
               // Show widget fully immediately when hovering
               if (hoverTimeoutRef.current) {
@@ -617,35 +617,24 @@ export default function AIAssistantWidget() {
             height: chatBoxPosition.height,
             position: 'fixed',
             cursor: dragging ? 'grabbing' : undefined,
+            transition: dragging ? 'none' : 'left 0.3s cubic-bezier(0.4,0,0.2,1), top 0.3s cubic-bezier(0.4,0,0.2,1)'
           }}
         >
-          <div className="w-full h-full bg-gradient-to-br from-white via-[#f3f4fa] to-[#e9eafd] border border-[#d1d5fa] rounded-2xl flex flex-col shadow-2xl dark:bg-gradient-to-br dark:from-[#232b3e] dark:via-[#334155] dark:to-[#1a223a] dark:border-blue-500 dark:ring-2 dark:ring-blue-700">
+          <div className="w-full h-full bg-gradient-to-br from-[#2e3cff] via-[#6c38ff] to-[#a259ff] border-2 border-[#6c38ff] rounded-3xl flex flex-col shadow-2xl dark:bg-gradient-to-br dark:from-[#232b3e] dark:via-[#334155] dark:to-[#1a223a] dark:border-blue-500 dark:ring-2 dark:ring-blue-700">
             {/* Header */}
             <div
-              className="flex items-center justify-between px-5 py-4 border-b border-[#d1d5fa] bg-gradient-to-r from-[#2e3cff] via-[#6c38ff] to-[#a259ff] rounded-t-2xl cursor-move select-none dark:border-blue-500 dark:bg-gradient-to-r dark:from-blue-700 dark:via-indigo-600 dark:to-indigo-400"
-              onMouseDown={e => {
-                setDragging(true);
-                dragOffset.current = {
-                  x: e.clientX - chatBoxPosition.x,
-                  y: e.clientY - chatBoxPosition.y,
-                };
-                dragStartPos.current = { x: e.clientX, y: e.clientY };
-                setJustDragged(false);
-                document.body.style.userSelect = 'none';
+              className="relative flex items-center justify-center h-32 w-full border-b border-[#d1d5fa] rounded-t-2xl cursor-move select-none bg-no-repeat dark:border-blue-500"
+              style={{
+                backgroundImage: 'url(/zayra-branding.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                cursor: dragging ? 'grabbing' : 'grab'
               }}
-              style={{ cursor: dragging ? 'grabbing' : 'grab' }}
+              onMouseDown={onWidgetMouseDown}
             >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md border-2 border-[#6c38ff] overflow-hidden">
-                  <img src="/zayra-logo.svg" alt="Zayra Logo" className="w-full h-full object-contain" />
-              </div>
-              <div>
-                <div className="font-bold text-white text-lg leading-tight tracking-wide drop-shadow-glow">Zayra</div>
-                <div className="text-xs text-[#e0e0ff]">Retail Edge AI Assistant</div>
-              </div>
+              <button onClick={handleClose} className="text-[#e0e0ff] hover:text-white text-2xl font-bold transition-colors absolute right-4 top-1/2 -translate-y-1/2">×</button>
             </div>
-              <button onClick={handleClose} className="text-[#e0e0ff] hover:text-white text-2xl font-bold transition-colors">×</button>
-          </div>
             
           {/* Chat Body */}
             <div className="flex-1 p-5 overflow-y-auto bg-gradient-to-br from-white via-[#f3f4fa] to-[#e9eafd] dark:bg-gradient-to-br dark:from-[#181f2a] dark:via-[#232b3e] dark:to-[#1a223a] custom-scrollbar">
@@ -710,7 +699,12 @@ export default function AIAssistantWidget() {
         <div
           ref={widgetRef}
           className="fixed z-50 font-sans"
-          style={{ left: position.x, top: position.y, position: 'fixed' }}
+          style={{ 
+            left: position.x, 
+            top: position.y, 
+            position: 'fixed',
+            transition: dragging ? 'none' : 'left 0.3s cubic-bezier(0.4,0,0.2,1), top 0.3s cubic-bezier(0.4,0,0.2,1)'
+          }}
         >
           <div style={{ position: 'relative' }}>
             {showIntro && !open && (() => {
@@ -746,7 +740,7 @@ export default function AIAssistantWidget() {
               }`}
               onClick={handleOpen}
               title="Open Zayra Assistant"
-              onMouseDown={onMouseDown}
+              onMouseDown={onWidgetMouseDown}
               onMouseEnter={() => {
                 // Clear any pending timeouts
                 if (hoverTimeoutRef.current) {

@@ -89,6 +89,10 @@ body,
 }
 
 /* Custom Scrollbar - Light Mode (default) */
+.custom-scrollbar {
+  scrollbar-color: #d1d5db #f3f4f6; /* thumb color, track color */
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
@@ -235,6 +239,13 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+    background-color: #f6f8fc;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #181f2a;
   }
 }
 

@@ -254,13 +254,8 @@ const Settings = () => {
           </svg>
           <span className="font-medium text-white">Back</span>
         </button>
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="p-4 border-b border-gray-200 flex items-center">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('settings')}</h2>
-            <img 
-              src="/zayra-logo.svg" 
-              alt="Retail Edge Logo" 
-              className="w-8 h-8"
-            />
           </div>
           <div className="flex-1 overflow-y-auto">
             <nav className="p-4 space-y-1">

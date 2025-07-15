@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { useGetExpensesByCategoryQuery, useGetAllExpenseCategoriesQuery, useUpdateExpenseMutation, useGetExpensesQuery } from "@/state/api";
 import type { Expense, ExpenseByCategorySummary } from "@/state/api";
+import { useAppSelector } from "@/app/redux";
 
 const COLORS = [
   '#6366f1', '#06b6d4', '#f59e42', '#ef4444', '#a64d79', '#674ea7', '#3c78d8', '#6aa84f', '#f1c232', '#cc0000'
@@ -134,12 +135,21 @@ export default function BudgetSystem() {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
 
+  const isSidebarCollapsed = useAppSelector((state) => state.global.isSidebarCollapsed);
+
   if (isLoadingCategories || isLoadingExpenses) {
     return <Skeleton className="h-[600px] w-full rounded-xl" />;
   }
 
   return (
-    <div className="max-w-7xl mx-auto pt-0 pb-6 px-4 dark:bg-gray-900 dark:text-gray-100">
+    <div
+      className={
+        `pt-0 pb-6 transition-all duration-300 dark:bg-gray-900 dark:text-gray-100 ` +
+        (isSidebarCollapsed
+          ? 'max-w-[98vw] md:max-w-[1800px]'
+          : 'max-w-7xl')
+      }
+    >
       {/* Income Management */}
       <Card className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
         <CardHeader className="pb-4 bg-gray-50 dark:bg-gray-800">
@@ -184,7 +194,7 @@ export default function BudgetSystem() {
               </thead>
               <tbody>
                 {incomeSources.map(src => (
-                  <tr key={src.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={src.id} className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">{src.name}</td>
                     <td className="py-3 px-4 text-gray-700 dark:text-gray-100">{formatCurrency(Number(src.amount))}</td>
                     <td className="py-3 px-4">

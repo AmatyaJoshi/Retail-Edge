@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, Upload, FileSpreadsheet, FileText } from "lucide-react";
+import { Plus, ArrowDownCircle, ArrowUpCircle, FileSpreadsheet, FileText } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import React from "react";
 import { toast } from "sonner";
@@ -44,8 +44,8 @@ export function PageHeader({
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Download className="mr-2 h-4 w-4" />
+              <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 border-blue-600">
+                <ArrowUpCircle className="mr-2 h-5 w-5 text-white" />
                 Export
               </Button>
             </DropdownMenuTrigger>
@@ -67,13 +67,13 @@ export function PageHeader({
 
           <div className="relative">
             <Button
-              variant="outline"
               size="sm"
+              className="bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
               onClick={handleImportClick}
             >
-            <Upload className="mr-2 h-4 w-4" />
-            Import
-          </Button>
+              <ArrowDownCircle className="mr-2 h-5 w-5 text-white" />
+              Import
+            </Button>
             <input
               ref={fileInputRef}
               type="file"

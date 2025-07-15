@@ -87,3 +87,11 @@ export const validateBarcode = (barcode: string): boolean => {
   // Barcode should be exactly 12 or 13 digits
   return /^[0-9]{12,13}$/.test(barcode);
 };
+
+/**
+ * Get the current year as a number
+ * @returns The current year (e.g., 2025)
+ */
+export function getCurrentYear(): number {
+  return new Date().getFullYear();
+}

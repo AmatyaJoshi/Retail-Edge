@@ -25,6 +25,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useUser } from '@clerk/nextjs';
+import { getCurrentYear } from '@/app/lib/utils';
 
 interface SidebarLinkProps {
   href: string;
@@ -97,27 +98,48 @@ const Sidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
 
-  const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"} bg-white dark:bg-gray-800 border-r-2 border-gray-300 dark:border-gray-700 transition-all duration-300 overflow-hidden h-screen z-40 custom-scrollbar`;
+  const sidebarClassNames = `fixed flex flex-col ${isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"} bg-white dark:bg-gray-800 border-r-2 border-gray-400 dark:border-gray-700 transition-all duration-300 overflow-hidden h-screen z-40`;
 
   return (
     <div className={sidebarClassNames}>
       {/* TOP LOGO */}
       <div
-        className={`flex gap-3 justify-between md:justify-normal items-center pt-6 ${isSidebarCollapsed ? "px-5" : "px-8"
+        className={`flex gap-3 justify-between md:justify-normal items-center pt-4 ${isSidebarCollapsed ? "" : ""
           }`}
       >
-        <div className="flex items-center">
-          {/* Temporarily commented out due to Next.js image configuration
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            width={40}
-            height={40}
-            className="rounded-lg"
-          />
-          */}
-          <EyewearIcon />
-          <span className="ml-2 text-xl font-semibold">Retail Edge</span>
+        <div className="flex items-center justify-center w-full">
+          {/* Collapsed state: show collapse logo */}
+          {isSidebarCollapsed ? (
+            <>
+              {/* Light mode collapsed logo */}
+              <img
+                src="/retail-edge-collapse-logo-light.svg"
+                alt="Retail Edge Collapsed Logo"
+                className="block dark:hidden w-14 h-14 object-contain"
+              />
+              {/* Dark mode collapsed logo */}
+              <img
+                src="/retail-edge-collapse-logo-dark.svg"
+                alt="Retail Edge Collapsed Logo"
+                className="hidden dark:block w-14 h-14 object-contain"
+              />
+            </>
+          ) : (
+            <>
+              {/* Light mode logo */}
+              <img
+                src="/retail-edge-logo-light.svg"
+                alt="Retail Edge Logo"
+                className="block dark:hidden w-44 max-h-20 object-contain"
+              />
+              {/* Dark mode logo */}
+              <img
+                src="/retail-edge-logo-dark.svg"
+                alt="Retail Edge Logo"
+                className="hidden dark:block w-44 max-h-20 object-contain"
+              />
+            </>
+          )}
         </div>
 
         <button
@@ -129,7 +151,7 @@ const Sidebar = () => {
       </div>
 
       {/* LINKS */}
-      <div className="flex flex-col mt-6 flex-1 overflow-y-auto">
+      <div className="flex flex-col mt-2 flex-1">
         <SidebarLink
           href="/pos"
           icon={Monitor}
@@ -199,7 +221,7 @@ const Sidebar = () => {
       <div className={`${isSidebarCollapsed ? "hidden" : "block"} mt-auto py-4`}>
         <div className="text-center">
           <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-            &copy; 2025 RetailEdge
+            &copy; {getCurrentYear()} RetailEdge
           </p>
           <p className={`text-xs mt-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
             All rights reserved

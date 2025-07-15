@@ -128,9 +128,9 @@ export default function ExpensesPage() {
   const handleTabClick = (tab: 'overview' | 'analytics' | 'budget') => setActiveTab(tab);
 
   return (
-    <div className="h-screen overflow-y-auto bg-white dark:bg-[#10192A] p-4 sm:p-6 lg:p-8 custom-scrollbar">
-      <div className="h-24" />
-      <header className="max-w-7xl mx-auto mb-8 p-0">
+    <div className="h-screen overflow-y-auto bg-white dark:bg-[#10192A] p-2 sm:p-3 lg:p-4 custom-scrollbar mt-12">
+      <div className="h-8" />
+      <header className="max-w-full mx-0 mb-4 p-0">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Expenses</h1>
@@ -190,7 +190,7 @@ export default function ExpensesPage() {
           </div>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto dark:text-gray-100">
+      <main className="max-w-full mx-0 dark:text-gray-100">
         <Tabs value={activeTab} onValueChange={val => setActiveTab(val as 'overview' | 'analytics' | 'budget')} className="space-y-4">
           <TabsList className="w-full justify-start p-1 bg-muted/50 rounded-lg mb-8 hidden" />
           <TabsContent value="overview" className="space-y-4">
@@ -238,7 +238,7 @@ export default function ExpensesPage() {
             </div>
             {/* Expense Transaction History Section */}
             <section className="max-w-7xl mx-auto mt-12">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Expense Transaction History</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100">Expense Transaction History</h2>
               <ExpenseTransactionHistory />
             </section>
           </TabsContent>

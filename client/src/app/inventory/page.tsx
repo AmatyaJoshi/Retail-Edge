@@ -1296,7 +1296,7 @@ const columns: GridColDef[] = [
       </div>
 
       {/* Summary Cards Row - more compact */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-2 pb-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-2 pb-1 w-full max-w-full">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center">
           <span className="text-xs text-gray-500 mb-1">Total Products</span>
           <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">{products?.length ?? 0}</span>
@@ -1313,10 +1313,10 @@ const columns: GridColDef[] = [
 
       {/* Removed partition line for a cleaner look */}
 
-      <div className="px-2 pt-4 pb-8 flex-1">
+      <div className="px-2 pt-4 pb-8 flex flex-col flex-1 min-h-0">
         {/* Search Bar, Column Management, and Tabs */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex gap-4">
+        <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 w-full">
+          <div className="flex gap-2 md:gap-4 w-full md:w-auto">
             <button
               onClick={() => setActiveTab('inventory')}
               className={`px-4 py-2 rounded-xl font-medium transition-colors font-sans text-base cursor-pointer ${
@@ -1338,8 +1338,8 @@ const columns: GridColDef[] = [
               Purchase Orders
             </button>
           </div>
-          <div className="flex items-center gap-4 flex-1 ml-8">
-            <div className="relative flex-1 min-w-[400px]">
+          <div className="flex flex-col sm:flex-row items-stretch gap-2 md:gap-4 flex-1 md:ml-8 w-full">
+            <div className="relative flex-1 min-w-0">
               <input
                 type="text"
                 placeholder="Search products..."
@@ -1361,257 +1361,245 @@ const columns: GridColDef[] = [
 
         {/* Content */}
         <ThemeProvider theme={theme}>
-          <div className="w-full px-2 md:px-4">
+          <div className="w-full px-2 md:px-4 flex-1 min-h-0 flex flex-col">
             {activeTab === 'inventory' ? (
-              <DataGrid
-                rows={filteredProducts}
-                columns={columns}
-                getRowId={(row) => row.productId}
-                className="font-sans text-base !text-gray-800 dark:!text-gray-200"
-                style={{ height: 320 }}
-                slots={{
-                  toolbar: () => (
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex justify-between items-center">
-                        <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                          Products
+              <div className="w-full overflow-x-auto flex-1 min-h-0 flex flex-col">
+                <DataGrid
+                  rows={filteredProducts}
+                  columns={columns}
+                  getRowId={(row) => row.productId}
+                  className="font-sans text-base !text-gray-800 dark:!text-gray-200 min-w-[600px] flex-1 custom-scrollbar"
+                  style={{ height: '100%' }}
+                  slots={{
+                    toolbar: () => (
+                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-between items-center">
+                          <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                            Products
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ),
-                  pagination: (props) => (
-                    <ModernPagination
-                      page={paginationModel.page}
-                      pageCount={Math.ceil(filteredProducts.length / paginationModel.pageSize)}
-                      onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
-                      pageSize={paginationModel.pageSize}
-                      onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
-                    />
-                  ),
-                }}
-                columnVisibilityModel={columnVisibilityModel}
-                onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-                sx={{
-                  fontFamily: 'inherit',
-                  fontSize: '1rem',
-                  color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  '& .MuiDataGrid-row': {
-                    minHeight: '48px !important',
-                    maxHeight: '48px !important',
-                    backgroundColor: isDarkMode ? '#1f2937' : '#fff',
-                    borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                    '&:hover': {
-                      backgroundColor: isDarkMode ? '#2d3340' : '#f8fafc',
-                    },
-                  },
-                  '& .MuiDataGrid-cell': {
-                    padding: '8px 8px',
+                    ),
+                    pagination: (props) => (
+                      <ModernPagination
+                        page={paginationModel.page}
+                        pageCount={Math.ceil(filteredProducts.length / paginationModel.pageSize)}
+                        onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
+                        pageSize={paginationModel.pageSize}
+                        onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
+                      />
+                    ),
+                  }}
+                  columnVisibilityModel={columnVisibilityModel}
+                  onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+                  sx={{
+                    fontFamily: 'inherit',
                     fontSize: '1rem',
                     color: isDarkMode ? '#e0e1dd' : '#22223b',
-                    fontWeight: 500,
-                  },
-                  '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: isDarkMode ? '#232e41' : '#f8fafc',
-                    borderBottom: `1.5px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                    minHeight: '36px !important',
-                    maxHeight: '40px !important',
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    color: isDarkMode ? '#bfc9db' : '#22223b',
-                    whiteSpace: 'pre-line',
-                    textAlign: 'center',
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                  },
-                  '& .MuiDataGrid-columnHeaderTitle': {
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    color: isDarkMode ? '#bfc9db' : '#22223b',
-                    padding: 0,
-                  },
-                  '& .MuiDataGrid-virtualScroller': {
-                    overflowY: 'auto !important',
-                    // Add custom-scrollbar class for consistent styling
-                    '&::-webkit-scrollbar': {
-                      width: '8px',
-                      background: '#232e41',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      background: '#64748b',
-                      borderRadius: '8px',
-                    },
-                    '&::-webkit-scrollbar-thumb:hover': {
-                      background: '#475569',
-                    },
-                  },
-                  '& .MuiDataGrid-footerContainer': {
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: '40px',
-                    height: '40px',
-                    overflow: 'hidden',
-                    borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                    backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                    padding: '8px 12px',
-                    '& .MuiTablePagination-root': {
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      minHeight: '40px',
-                      height: '40px',
-                    },
-                    '& .MuiTablePagination-toolbar': {
-                      minHeight: '40px',
-                      height: '40px',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                    },
-                    '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                      fontSize: '0.95rem',
-                      lineHeight: 1.2,
-                      margin: 0,
-                      padding: 0,
-                    },
-                    '& .MuiInputBase-root, & .MuiTablePagination-select': {
-                      minHeight: '32px',
-                      height: '32px',
-                      fontSize: '0.95rem',
-                      margin: 0,
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                    },
-                  },
-                  '& .MuiDataGrid-columnSeparator': {
-                    display: 'none',
-                  },
-                }}
-                rowHeight={48}
-                pageSizeOptions={[5, 10, 25, 50]}
-                paginationModel={paginationModel}
-                onPaginationModelChange={setPaginationModel}
-                autoHeight
-                disableRowSelectionOnClick
-              />
-            ) : (
-              <DataGrid
-                rows={padRows(normalizedPurchaseOrders, 5)}
-                columns={purchaseOrderColumns}
-                getRowId={(row) => row.id}
-                className="font-sans text-base !text-gray-800 dark:!text-gray-200"
-                rowHeight={56}
-                slots={{
-                  toolbar: () => (
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex justify-between items-center">
-                        <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                          Purchase Orders
-                        </div>
-                      </div>
-                    </div>
-                  ),
-                  pagination: (props) => (
-                    <ModernPagination
-                      page={paginationModel.page}
-                      pageCount={Math.ceil(normalizedPurchaseOrders.length / paginationModel.pageSize)}
-                      onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
-                      pageSize={paginationModel.pageSize}
-                      onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
-                    />
-                  ),
-                }}
-                columnVisibilityModel={columnVisibilityModel}
-                onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-                sx={{
-                  fontFamily: 'inherit',
-                  fontSize: '1rem',
-                  color: isDarkMode ? '#e0e1dd' : '#22223b',
-                  '& .MuiDataGrid-row': {
-                    minHeight: '56px !important',
-                    maxHeight: '56px !important',
-                    backgroundColor: isDarkMode
-                      ? '#1f2937'
-                      : 'inherit',
-                    borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-                    '&:nth-of-type(even)': {
-                      backgroundColor: isDarkMode ? '#23293a' : '#f9fafb',
-                    },
-                    '&:nth-of-type(odd)': {
+                    '& .MuiDataGrid-row': {
+                      minHeight: '48px !important',
+                      maxHeight: '48px !important',
                       backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                      borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                      '&:hover': {
+                        backgroundColor: isDarkMode ? '#2d3340' : '#f8fafc',
+                      },
                     },
-                    '&:hover': {
-                      backgroundColor: isDarkMode ? '#2d3340' : '#f3f4f6',
-                      boxShadow: isDarkMode
-                        ? '0 2px 8px 0 rgba(31,41,55,0.15)'
-                        : '0 2px 8px 0 rgba(0,0,0,0.06)',
+                    '& .MuiDataGrid-cell': {
+                      padding: '8px 8px',
+                      fontSize: '1rem',
+                      color: isDarkMode ? '#e0e1dd' : '#22223b',
+                      fontWeight: 500,
                     },
-                  },
-                  '& .MuiDataGrid-cell': {
-                    padding: '8px 8px',
+                    '& .MuiDataGrid-columnHeaders': {
+                      backgroundColor: isDarkMode ? '#232e41' : '#f8fafc',
+                      borderBottom: `1.5px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                      minHeight: '36px !important',
+                      maxHeight: '40px !important',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      color: isDarkMode ? '#bfc9db' : '#22223b',
+                      whiteSpace: 'pre-line',
+                      textAlign: 'center',
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                    },
+                    '& .MuiDataGrid-columnHeaderTitle': {
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      color: isDarkMode ? '#bfc9db' : '#22223b',
+                      padding: 0,
+                    },
+                    // Removed custom scrollbar styles from .MuiDataGrid-virtualScroller
+                    '& .MuiDataGrid-footerContainer': {
+                      display: 'flex',
+                      alignItems: 'center',
+                      minHeight: '40px',
+                      height: '40px',
+                      overflow: 'hidden',
+                      borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                      backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                      padding: '8px 12px',
+                      '& .MuiTablePagination-root': {
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        minHeight: '40px',
+                        height: '40px',
+                      },
+                      '& .MuiTablePagination-toolbar': {
+                        minHeight: '40px',
+                        height: '40px',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                      },
+                      '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                        fontSize: '0.95rem',
+                        lineHeight: 1.2,
+                        margin: 0,
+                        padding: 0,
+                      },
+                      '& .MuiInputBase-root, & .MuiTablePagination-select': {
+                        minHeight: '32px',
+                        height: '32px',
+                        fontSize: '0.95rem',
+                        margin: 0,
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                      },
+                    },
+                    '& .MuiDataGrid-columnSeparator': {
+                      display: 'none',
+                    },
+                  }}
+                  rowHeight={48}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  disableRowSelectionOnClick
+                />
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto flex-1 min-h-0 flex flex-col">
+                <DataGrid
+                  rows={padRows(normalizedPurchaseOrders, 5)}
+                  columns={purchaseOrderColumns}
+                  getRowId={(row) => row.id}
+                  className="font-sans text-base !text-gray-800 dark:!text-gray-200 min-w-[600px] flex-1"
+                  style={{ height: '100%' }}
+                  slots={{
+                    toolbar: () => (
+                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-between items-center">
+                          <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                            Purchase Orders
+                          </div>
+                        </div>
+                      </div>
+                    ),
+                    pagination: (props) => (
+                      <ModernPagination
+                        page={paginationModel.page}
+                        pageCount={Math.ceil(normalizedPurchaseOrders.length / paginationModel.pageSize)}
+                        onPageChange={(page: number) => setPaginationModel({ ...paginationModel, page })}
+                        pageSize={paginationModel.pageSize}
+                        onPageSizeChange={(pageSize: number) => setPaginationModel({ ...paginationModel, pageSize, page: 0 })}
+                      />
+                    ),
+                  }}
+                  columnVisibilityModel={columnVisibilityModel}
+                  onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+                  sx={{
+                    fontFamily: 'inherit',
                     fontSize: '1rem',
                     color: isDarkMode ? '#e0e1dd' : '#22223b',
-                    fontWeight: 500,
-                  },
-                  '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                    borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                    minHeight: '48px !important',
-                    maxHeight: '72px !important',
-                    fontSize: '1.125rem',
-                    fontWeight: 600,
-                    color: isDarkMode ? '#e0e1dd' : '#22223b',
-                    whiteSpace: 'pre-line',
-                    textAlign: 'center',
-                  },
-                  '& .MuiDataGrid-footerContainer': {
-                    display: 'flex',
-                    minHeight: '40px',
-                    height: '40px',
-                    overflow: 'hidden',
-                    borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-                    backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
-                    padding: '8px 12px',
-                    '& .MuiTablePagination-root': {
-                      width: '100%',
+                    '& .MuiDataGrid-row': {
+                      minHeight: '56px !important',
+                      maxHeight: '56px !important',
+                      backgroundColor: isDarkMode
+                        ? '#1f2937'
+                        : 'inherit',
+                      borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+                      '&:nth-of-type(even)': {
+                        backgroundColor: isDarkMode ? '#23293a' : '#f9fafb',
+                      },
+                      '&:nth-of-type(odd)': {
+                        backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+                      },
+                      '&:hover': {
+                        backgroundColor: isDarkMode ? '#2d3340' : '#f3f4f6',
+                        boxShadow: isDarkMode
+                          ? '0 2px 8px 0 rgba(31,41,55,0.15)'
+                          : '0 2px 8px 0 rgba(0,0,0,0.06)',
+                      },
+                    },
+                    '& .MuiDataGrid-cell': {
+                      padding: '8px 8px',
+                      fontSize: '1rem',
+                      color: isDarkMode ? '#e0e1dd' : '#22223b',
+                      fontWeight: 500,
+                    },
+                    '& .MuiDataGrid-columnHeaders': {
+                      backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                      borderBottom: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                      minHeight: '48px !important',
+                      maxHeight: '72px !important',
+                      fontSize: '1.125rem',
+                      fontWeight: 600,
+                      color: isDarkMode ? '#e0e1dd' : '#22223b',
+                      whiteSpace: 'pre-line',
+                      textAlign: 'center',
+                    },
+                    '& .MuiDataGrid-footerContainer': {
                       display: 'flex',
-                      alignItems: 'center',
                       minHeight: '40px',
                       height: '40px',
+                      overflow: 'hidden',
+                      borderTop: `2px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+                      backgroundColor: isDarkMode ? '#1f2937' : '#f8fafc',
+                      padding: '8px 12px',
+                      '& .MuiTablePagination-root': {
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        minHeight: '40px',
+                        height: '40px',
+                      },
+                      '& .MuiTablePagination-toolbar': {
+                        minHeight: '40px',
+                        height: '40px',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                      },
+                      '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                        fontSize: '0.95rem',
+                        lineHeight: 1.2,
+                        margin: 0,
+                        padding: 0,
+                      },
+                      '& .MuiInputBase-root, & .MuiTablePagination-select': {
+                        minHeight: '32px',
+                        height: '32px',
+                        fontSize: '0.95rem',
+                        margin: 0,
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                      },
                     },
-                    '& .MuiTablePagination-toolbar': {
-                      minHeight: '40px',
-                      height: '40px',
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
+                    '& .MuiDataGrid-columnSeparator': {
+                      display: 'none',
                     },
-                    '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                      fontSize: '0.95rem',
-                      lineHeight: 1.2,
-                      margin: 0,
-                      padding: 0,
-                    },
-                    '& .MuiInputBase-root, & .MuiTablePagination-select': {
-                      minHeight: '32px',
-                      height: '32px',
-                      fontSize: '0.95rem',
-                      margin: 0,
-                      padding: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                    },
-                  },
-                  '& .MuiDataGrid-columnSeparator': {
-                    display: 'none',
-                  },
-                }}
-                pageSizeOptions={[5, 10, 25, 50]}
-                paginationModel={paginationModel}
-                onPaginationModelChange={setPaginationModel}
-                autoHeight
-                disableRowSelectionOnClick
-              />
+                  }}
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  disableRowSelectionOnClick
+                />
+              </div>
             )}
           </div>
         </ThemeProvider>
