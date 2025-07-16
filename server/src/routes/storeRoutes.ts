@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 import { UploadedFile } from 'express-fileupload';
+import { uploadToAzure } from '../lib/azureBlob';
 
 const prisma = new PrismaClient();
 const router = express.Router();
@@ -36,11 +37,10 @@ router.patch('/', async (req, res) => {
       // Generate unique filename
       const ext = path.extname(file.name);
       const fileName = `store-logo-${store.id}-${Date.now()}${ext}`;
-      const uploadPath = path.join(__dirname, '../../../client/public/', fileName);
-      // Move file to public directory
-      await file.mv(uploadPath);
-      // Set logo URL (relative to public)
-      updateData.logo = `/${fileName}`;
+      // Upload to Azure Blob Storage - use tempFilePath since express-fileupload is configured with useTempFiles: true
+      const url = await uploadToAzure('product-images', file.tempFilePath, fileName, file.mimetype);
+      // Set logo URL to Azure Blob URL
+      updateData.logo = url;
     }
 
     const updated = await prisma.stores.update({

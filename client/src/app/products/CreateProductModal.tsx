@@ -59,7 +59,7 @@ const CreateProductModal = ({
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isGeneratingSKU, setIsGeneratingSKU] = useState(false);
   const [isGeneratingBarcode, setIsGeneratingBarcode] = useState(false);
@@ -84,11 +84,8 @@ const CreateProductModal = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPendingImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setSelectedFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -97,17 +94,16 @@ const CreateProductModal = ({
   };
 
   const handleSaveImage = () => {
-    if (pendingImage) {
-      setImagePreview(pendingImage);
-      setFormData(prev => ({ ...prev, imageUrl: pendingImage }));
-      setPendingImage(null);
+    if (selectedFile) {
+      setImagePreview(URL.createObjectURL(selectedFile));
+      setFormData(prev => ({ ...prev, imageUrl: URL.createObjectURL(selectedFile) }));
+      setSelectedFile(null);
     }
   };
 
   const handleRemoveImage = () => {
     setImagePreview(null);
-    setPendingImage(null);
-    setFormData(prev => ({ ...prev, imageUrl: "" }));
+    setSelectedFile(null);
   };
 
   // Auto-generation functions
@@ -275,11 +271,27 @@ const CreateProductModal = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (validateForm()) {
-      onCreate(formData);
+      if (selectedFile) {
+        const form = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+          if (key !== 'imageUrl') form.append(key, value as any);
+        });
+        form.append('image', selectedFile);
+        await fetch('/api/products', {
+          method: 'POST',
+          body: form,
+        });
+      } else {
+        await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+      }
       onClose();
       // Reset form
       setFormData({
@@ -296,7 +308,7 @@ const CreateProductModal = ({
         imageUrl: "",
       });
       setImagePreview(null);
-      setPendingImage(null);
+      setSelectedFile(null);
       setErrors({});
     }
   };
@@ -553,11 +565,9 @@ const CreateProductModal = ({
                   <ImageIcon className="w-5 h-5" />
                   Product Image
                 </label>
-                <div className={`w-full h-48 rounded-xl flex items-center justify-center overflow-hidden shadow-md relative ${imagePreview || pendingImage ? `${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'} border` : `${isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'} border-2 border-dashed`}`}>
-                  {pendingImage ? (
-                    <img src={pendingImage} alt="Product preview" className="object-contain w-full h-full" />
-                  ) : imagePreview ? (
-                    <img src={imagePreview} alt="Product" className="object-contain w-full h-full" />
+                <div className={`w-full h-48 rounded-xl flex items-center justify-center overflow-hidden shadow-md relative ${imagePreview ? `${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'} border` : `${isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'} border-2 border-dashed`}`}>
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Product preview" className="object-contain w-full h-full" />
                   ) : (
                     <div className="text-center">
                       <ImageIcon className={`w-12 h-12 mx-auto mb-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
@@ -576,28 +586,24 @@ const CreateProductModal = ({
                     onClick={handleImageUploadClick}
                     className={`absolute bottom-4 right-4 ${isDarkMode ? 'bg-gray-600/80 border-gray-500 text-gray-200 hover:bg-gray-500' : 'bg-white/80 border-gray-300 text-blue-700 hover:bg-blue-50'} border rounded-full px-4 py-2 text-sm font-semibold shadow`}
                   >
-                    {imagePreview || pendingImage ? 'Change Image' : 'Upload Image'}
+                    {imagePreview ? 'Change Image' : 'Upload Image'}
                   </button>
-                  {(pendingImage || imagePreview) && (
+                  {imagePreview && (
                     <div className="absolute bottom-4 left-4 flex gap-2">
-                      {pendingImage && (
-                        <button
-                          type="button"
-                          onClick={handleSaveImage}
-                          className="bg-green-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-green-600"
-                        >
-                          Save
-                        </button>
-                      )}
-                      {(pendingImage || imagePreview) && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveImage}
-                          className="bg-red-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-red-600"
-                        >
-                          Remove
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={handleSaveImage}
+                        className="bg-green-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-green-600"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="bg-red-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-red-600"
+                      >
+                        Remove
+                      </button>
                     </div>
                   )}
                 </div>

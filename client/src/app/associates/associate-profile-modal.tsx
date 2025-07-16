@@ -387,12 +387,12 @@ export function AssociateProfileModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-gray-100">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-2xl">Associate Profile</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-2xl text-gray-900 dark:text-gray-100">Associate Profile</DialogTitle>
+              <DialogDescription className="text-gray-600 dark:text-gray-300">
                 View and manage associate details and analytics
               </DialogDescription>
             </div>
@@ -455,8 +455,8 @@ export function AssociateProfileModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl p-6 flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
               <CreditCard className="h-4 w-4 text-muted-foreground" />
@@ -476,8 +476,8 @@ export function AssociateProfileModal({
                 />
               </div>
             </CardContent>
-          </Card>
-          <Card>
+          </div>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl p-6 flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
               <History className="h-4 w-4 text-muted-foreground" />
@@ -488,8 +488,8 @@ export function AssociateProfileModal({
                 Last 30 days
               </p>
             </CardContent>
-          </Card>
-          <Card>
+          </div>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl p-6 flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Status</CardTitle>
               <Badge variant={associate.status === 'ACTIVE' ? 'default' : 'destructive'}>
@@ -501,8 +501,8 @@ export function AssociateProfileModal({
                 Joined {format(new Date(associate.joinedDate), 'MMM d, yyyy')}
               </div>
             </CardContent>
-          </Card>
-          <Card>
+          </div>
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl p-6 flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Payment Terms</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -529,20 +529,20 @@ export function AssociateProfileModal({
                 </p>
               </div>
             </CardContent>
-          </Card>
+          </div>
         </div>
 
         <Tabs defaultValue="overview" className="mt-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-            <TabsTrigger value="contacts">Contacts</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
+            <TabsTrigger value="overview" className="text-gray-900 dark:text-gray-100 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-colors">Overview</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-gray-900 dark:text-gray-100 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-colors">Analytics</TabsTrigger>
+            <TabsTrigger value="history" className="text-gray-900 dark:text-gray-100 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-colors">History</TabsTrigger>
+            <TabsTrigger value="contacts" className="text-gray-900 dark:text-gray-100 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md rounded-lg transition-colors">Contacts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl p-6">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Basic Information</CardTitle>
                   {!isEditingBasic ? (
@@ -664,9 +664,8 @@ export function AssociateProfileModal({
                     </form>
                   )}
                 </CardContent>
-              </Card>
-
-              <Card>
+              </div>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl p-6">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Contact Information</CardTitle>
                   {!isEditingContactInfo ? (
@@ -742,7 +741,7 @@ export function AssociateProfileModal({
                     </form>
                   )}
                 </CardContent>
-              </Card>
+              </div>
             </div>
           </TabsContent>
 
@@ -756,7 +755,7 @@ export function AssociateProfileModal({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Credit Utilization */}
-                <Card className="col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2">
                     <CardTitle className="text-sm font-medium">Credit Utilization</CardTitle>
                     <CreditCard className="h-4 w-4 text-muted-foreground" />
@@ -769,7 +768,7 @@ export function AssociateProfileModal({
                   </Card>
 
                 {/* Order Frequency */}
-                <Card className="col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2">
                     <CardTitle className="text-sm font-medium">Order Frequency</CardTitle>
                     <Package className="h-4 w-4 text-muted-foreground" />
@@ -781,7 +780,7 @@ export function AssociateProfileModal({
                 </Card>
 
                 {/* Average Transaction Value */}
-                <Card className="col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2">
                     <CardTitle className="text-sm font-medium">Avg. Transaction Value</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -793,7 +792,7 @@ export function AssociateProfileModal({
                 </Card>
 
                 {/* Total Sales Metric */}
-                <Card className="col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-1 md:col-span-2 lg:col-span-1 h-[140px]">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2">
                     <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
                     <Banknote className="h-4 w-4 text-muted-foreground" />
@@ -805,7 +804,7 @@ export function AssociateProfileModal({
                 </Card>
 
                 {/* YoY Growth Chart */}
-                <Card className="col-span-full md:col-span-2 lg:col-span-2 h-[280px] flex flex-col overflow-hidden">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-full md:col-span-2 lg:col-span-2 h-[280px] flex flex-col overflow-hidden">
                   <CardHeader className="py-2 px-4">
                     <CardTitle className="text-lg font-semibold">Year-over-Year Growth</CardTitle>
                   </CardHeader>
@@ -848,7 +847,7 @@ export function AssociateProfileModal({
                 </Card>
 
                 {/* Payment Patterns Over Time */}
-                <Card className="col-span-full md:col-span-2 lg:col-span-2 h-[280px] flex flex-col overflow-hidden">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-full md:col-span-2 lg:col-span-2 h-[280px] flex flex-col overflow-hidden">
                   <CardHeader className="py-2 px-4">
                     <CardTitle className="text-lg font-semibold">Payment Patterns Over Time</CardTitle>
                   </CardHeader>
@@ -880,7 +879,7 @@ export function AssociateProfileModal({
                 </Card>
 
                 {/* Customer Acquisition Trend */}
-                <Card className="col-span-full md:col-span-2 lg:col-span-2 h-[280px] flex flex-col overflow-hidden">
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl col-span-full md:col-span-2 lg:col-span-2 h-[280px] flex flex-col overflow-hidden">
                   <CardHeader className="py-2 px-4">
                     <CardTitle className="text-lg font-semibold">Customer Acquisition Trend</CardTitle>
                   </CardHeader>
@@ -920,7 +919,7 @@ export function AssociateProfileModal({
                 {/* Right Column Metrics (Return Rate & Avg. Order Value) */}
                 <div className="col-span-full md:col-span-2 lg:col-span-2 grid grid-cols-1 gap-4">
                   {/* Return Rate Metric */}
-                  <Card className="h-[140px]">
+                  <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl h-[140px]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2">
                       <CardTitle className="text-sm font-medium">Return Rate</CardTitle>
                       <RotateCw className="h-4 w-4 text-muted-foreground" />
@@ -932,7 +931,7 @@ export function AssociateProfileModal({
                   </Card>
 
                   {/* Average Order Value Metric */}
-                  <Card className="h-[140px]">
+                  <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl h-[140px]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 py-2">
                       <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
                       <ShoppingCart className="h-4 w-4 text-muted-foreground" />
@@ -949,7 +948,7 @@ export function AssociateProfileModal({
 
           <TabsContent value="history" className="mt-4">
             {/* Associate Transaction History */}
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
               <CardHeader>
                 <CardTitle>Associate Transaction History</CardTitle>
                 <CardDescription>All transactions associated with this profile.</CardDescription>
@@ -1017,7 +1016,7 @@ export function AssociateProfileModal({
             {associate.contacts && associate.contacts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {associate.contacts.map((contact) => (
-                <Card key={contact.id}>
+                <Card key={contact.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-base font-medium">{contact.name}</CardTitle>
                       <div className="flex space-x-2">
@@ -1127,4 +1126,3 @@ export function AssociateProfileModal({
     </Dialog>
   );
 }
-

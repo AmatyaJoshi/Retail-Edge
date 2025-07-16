@@ -115,14 +115,14 @@ export function AssociateForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">
+          <DialogTitle className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {associate ? "Edit Associate" : "Add New Associate"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 text-gray-900 dark:text-gray-100">
             <div className="grid grid-cols-2 gap-6">
               <FormField
                 control={form.control}

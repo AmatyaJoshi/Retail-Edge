@@ -24,6 +24,9 @@ import expenseTransactionsRoutes from './routes/expenseTransactionsRoutes';
 import barcodeRoutes from './routes/barcode';
 import employeesRoutes from './routes/employees';
 import storeRoutes from './routes/storeRoutes';
+import aiAssistantRoutes from './routes/aiAssistant';
+import productImageRoutes from './routes/productImage';
+import userAvatarRoutes from './routes/userAvatar';
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -102,6 +105,9 @@ app.use("/api/expenses/transactions", expenseTransactionsRoutes);
 app.use('/api/barcode', barcodeRoutes);
 app.use('/api/employees', employeesRoutes);
 app.use('/api/store', storeRoutes);
+app.use('/api/ai-assistant', aiAssistantRoutes);
+app.use('/api/product-image', productImageRoutes);
+app.use('/api/user-avatar', userAvatarRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

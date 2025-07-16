@@ -191,7 +191,8 @@ export default function AIAssistantWidget() {
     const fetchUserData = async () => {
       if (user?.id) {
         try {
-          const profileResponse = await fetch(`/api/user-profile?clerkId=${user.id}`);
+          const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+          const profileResponse = await fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`);
           if (profileResponse.ok) {
             const profileData = await profileResponse.json();
             setUserPhotoUrl(profileData.photoUrl || null);
@@ -456,7 +457,8 @@ export default function AIAssistantWidget() {
         setMessages([...newMessages, { role: 'assistant', content: dataAnswer }]);
       } else {
         // Fallback to LLM for general questions
-        const res = await fetch('/api/ai-assistant', {
+        const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+        const res = await fetch(`${backendUrl}/api/ai-assistant`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ messages: newMessages.slice(-5) })
@@ -641,8 +643,8 @@ export default function AIAssistantWidget() {
             {messages.map((m, i) => (
               <div key={i} className={`mb-4 flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {m.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2e3cff] to-[#a259ff] flex items-center justify-center mr-2 shadow-md">
-                    <span className="text-white font-bold">Z</span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2e3cff] to-[#a259ff] flex items-center justify-center mr-2 shadow-md overflow-hidden">
+                    <img src="/zayra-icon.png" alt="Zayra" className="w-18 h-18 object-cover" />
                   </div>
                 )}
                   <span className={`inline-block px-4 py-2 rounded-2xl shadow text-base max-w-[75%] break-words whitespace-pre-wrap ${
@@ -655,7 +657,7 @@ export default function AIAssistantWidget() {
                 {m.role === 'user' && (
                   <div className="w-8 h-8 rounded-full bg-[#e9eafd] flex items-center justify-center ml-2 shadow-md overflow-hidden">
                     {userPhotoUrl ? (
-                      <img src={userPhotoUrl} alt="User Avatar" className="w-full h-full object-cover" />
+                      <img src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${userPhotoUrl.startsWith('http') ? userPhotoUrl.split('/').pop() : userPhotoUrl}`} alt="User Avatar" className="w-full h-full object-cover" />
                     ) : user && user.imageUrl ? (
                       <img src={user.imageUrl} alt="User Avatar" className="w-full h-full object-cover" />
                     ) : (

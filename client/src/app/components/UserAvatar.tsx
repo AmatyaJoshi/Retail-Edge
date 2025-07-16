@@ -26,7 +26,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   useEffect(() => {
     if (!isLoaded || !user?.id) return;
     
-    fetch(`/api/user-profile?clerkId=${user.id}`)
+    const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+    fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         setUserData(data);
@@ -77,8 +78,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
     <div className="flex items-center gap-2">
       <Avatar className={`${sizeClasses[size]} ${className}`}>
         <AvatarImage 
-          src={userData?.photoUrl || undefined} 
+          src={userData?.photoUrl ? `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${userData.photoUrl.startsWith('http') ? userData.photoUrl.split('/').pop() : userData.photoUrl}` : undefined} 
           alt={getUserDisplayName()}
+          className="object-cover"
         />
         <AvatarFallback className={`${textSizeClasses[size]} font-semibold bg-blue-600 text-white`}>
           {getUserInitials()}

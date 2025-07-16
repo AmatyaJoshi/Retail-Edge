@@ -12,7 +12,7 @@ interface ProductDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product;
-  onUpdate: (productId: string, updates: Partial<Product>) => Promise<void>;
+  onUpdate: (productId: string, updates: Partial<Product> | FormData) => Promise<void>;
   onDelete: (productId: string) => Promise<void>;
 }
 
@@ -87,11 +87,17 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
     fileInputRef.current?.click();
   };
 
-  const handleSaveImage = () => {
-    if (pendingImage) {
+  const handleSaveImage = async () => {
+    if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[0]) {
+      const form = new FormData();
+      form.append('image', fileInputRef.current.files[0]);
+      await onUpdate(product.productId, form);
+      setImagePreview(URL.createObjectURL(fileInputRef.current.files[0]));
+      setPendingImage(null);
+    } else if (pendingImage) {
       setImagePreview(pendingImage);
       setPendingImage(null);
-      onUpdate(product.productId, { imageUrl: pendingImage });
+      await onUpdate(product.productId, { imageUrl: pendingImage });
     }
   };
 
@@ -195,7 +201,7 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
                 {pendingImage ? (
                   <img src={pendingImage} alt="Product preview" className="object-contain w-full h-full" />
                 ) : imagePreview ? (
-                  <img src={imagePreview} alt="Product" className="object-contain w-full h-full" />
+                  <img src={imagePreview.startsWith('http') ? `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/product-image/${imagePreview.split('/').pop()}` : imagePreview} alt="Product" className="object-contain w-full h-full" />
                 ) : (
                   <svg className={`w-36 h-36 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="16" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />

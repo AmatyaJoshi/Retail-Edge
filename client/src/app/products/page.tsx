@@ -87,26 +87,25 @@ const Products = () => {
     }
   };
 
-  const handleUpdateProduct = async (productId: string, updates: Partial<Product>) => {
+  const handleUpdateProduct = async (productId: string, updates: Partial<Product> | FormData) => {
     try {
-      // Optimistically update the selected product for immediate UI feedback
-      setSelectedProduct(prev => {
-        if (prev && prev.productId === productId) {
-          return { ...prev, ...updates };
-        }
-        return prev;
-      });
-
+      if (!(updates instanceof FormData)) {
+        setSelectedProduct(prev => {
+          if (prev && prev.productId === productId) {
+            return { ...prev, ...updates };
+          }
+          return prev;
+        });
+      }
       await updateProduct({
         productId,
-        updates
+        updates,
       });
-      refetch(); // This will re-fetch and ensure data consistency from the server
+      refetch();
     } catch (error) {
       console.error("Failed to update product:", error);
-      alert("Failed to update product."); // Show alert to user
-      // If optimistic update failed, revert to previous state or re-fetch immediately
-      refetch(); // Re-fetch to get the actual state from DB
+      alert("Failed to update product.");
+      refetch();
     }
   };
 
@@ -314,52 +313,58 @@ const Products = () => {
                         }
                       }}
                     >
-                      <div className="flex justify-center mb-2">
-                        <div className="w-[64px] h-[64px] bg-white dark:bg-gray-900 rounded-md flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
+                      {/* Product Image - Full width upper section */}
+                      <div className="w-full mb-3">
+                        <div className="w-full h-48 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
                           {product.imageUrl ? (
                             <Image
-                              src={product.imageUrl}
+                              src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/product-image/${product.imageUrl.startsWith('http') ? product.imageUrl.split('/').pop() : product.imageUrl}`}
                               alt={product.name}
-                              width={64}
-                              height={64}
-                              className="object-contain"
+                              width={192}
+                              height={192}
+                              className="object-cover w-full h-full"
+                              unoptimized
                             />
                           ) : (
                             <EyewearIcon />
                           )}
                         </div>
                       </div>
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 text-center truncate w-full" title={product.name}>
-                        {product.name}
-                      </h3>
-                      <p className="text-base font-medium text-blue-600 dark:text-blue-400 mt-1 truncate w-full text-center">
-                        ₹{product.price}
-                      </p>
-                      <div className="flex items-center justify-between w-full mt-2">
-                        <span className="text-xs text-gray-600 dark:text-gray-300 flex items-center truncate">
-                          Stock: {product.stockQuantity}
-                          {product.stockQuantity <= 10 && (
-                            <span className="ml-2 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-[11px] font-semibold shadow-sm border border-yellow-200 dark:border-yellow-800">Low</span>
+                      
+                      {/* Product Details */}
+                      <div className="w-full text-center">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 text-center truncate w-full mb-1" title={product.name}>
+                          {product.name}
+                        </h3>
+                        <p className="text-base font-medium text-blue-600 dark:text-blue-400 mb-2">
+                          ₹{product.price}
+                        </p>
+                        <div className="flex items-center justify-between w-full mb-3">
+                          <span className="text-xs text-gray-600 dark:text-gray-300 flex items-center truncate">
+                            Stock: {product.stockQuantity}
+                            {product.stockQuantity <= 10 && (
+                              <span className="ml-2 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-[11px] font-semibold shadow-sm border border-yellow-200 dark:border-yellow-800">Low</span>
+                            )}
+                          </span>
+                          {product.rating && (
+                            <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5">
+                              <Rating rating={product.rating} />
+                            </div>
                           )}
-                        </span>
-                        {product.rating && (
-                          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5">
-                            <Rating rating={product.rating} />
-                          </div>
+                        </div>
+                        <div className="w-full border-t border-gray-200 dark:border-gray-700 mb-3" />
+                        {!isSelectionMode && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleReduceStock(product);
+                            }}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+                          >
+                            Manage Stock
+                          </button>
                         )}
                       </div>
-                      <div className="w-full border-t border-gray-200 dark:border-gray-700 my-3" />
-                      {!isSelectionMode && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleReduceStock(product);
-                          }}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
-                        >
-                          Manage Stock
-                        </button>
-                      )}
                     </div>
                   </div>
                 ))

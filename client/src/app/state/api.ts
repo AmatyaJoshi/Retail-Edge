@@ -167,12 +167,23 @@ export const api = createApi({
       }),
       invalidatesTags: ["PurchaseOrders", "Products"],
     }),
-    updateProduct: build.mutation<Product, { productId: string; updates: Partial<Product> }>({
-      query: ({ productId, updates }) => ({
-        url: `/products/${productId}`,
-        method: "PUT",
-        body: updates,
-      }),
+    updateProduct: build.mutation<Product, { productId: string; updates: Partial<Product> | FormData }>({
+      query: ({ productId, updates }) => {
+        if (updates instanceof FormData) {
+          return {
+            url: `/products/${productId}`,
+            method: "PUT",
+            body: updates,
+          };
+        } else {
+          return {
+            url: `/products/${productId}`,
+            method: "PUT",
+            body: updates,
+            headers: { 'Content-Type': 'application/json' },
+          };
+        }
+      },
       invalidatesTags: ["Products", "DashboardMetrics"],
     }),
     getPendingExpenses: build.query<Expense[], void>({

@@ -43,7 +43,8 @@ const ProfilePage = () => {
   useEffect(() => {
     if (!isLoaded || !user?.id) return;
     setLoading(true);
-    fetch(`/api/user-profile?clerkId=${user.id}`)
+    const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+    fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         setUserData(data);
@@ -122,27 +123,53 @@ const ProfilePage = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const body = {
-        id: userData?.id,
-        phone: editPhone,
-        address: editAddress,
-        photoUrl: editPhoto,
-      };
-      const res = await fetch(`/api/user-profile`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        setEditOpen(false);
-        if (user?.id) {
-          const response = await fetch(`/api/user-profile?clerkId=${user.id}`);
-          if (response.ok) {
-            const data = await response.json();
-            setUserData(data);
+      const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+      if (fileInputRef.current && fileInputRef.current.files && fileInputRef.current.files[0]) {
+        const form = new FormData();
+        form.append('id', userData?.id || '');
+        form.append('phone', editPhone);
+        form.append('address', editAddress);
+        form.append('avatar', fileInputRef.current.files[0]);
+        const res = await fetch(`${backendUrl}/api/auth/user-profile`, {
+          method: 'PATCH',
+          body: form,
+          credentials: 'include',
+        });
+        if (res.ok) {
+          setEditOpen(false);
+          if (user?.id) {
+            const response = await fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`);
+            if (response.ok) {
+              const data = await response.json();
+              setUserData(data);
+            }
           }
+          window.dispatchEvent(new Event('profile-updated'));
         }
-        window.dispatchEvent(new Event('profile-updated'));
+      } else {
+        const body = {
+          id: userData?.id,
+          phone: editPhone,
+          address: editAddress,
+          photoUrl: editPhoto,
+        };
+        const res = await fetch(`${backendUrl}/api/auth/user-profile`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          credentials: 'include',
+        });
+        if (res.ok) {
+          setEditOpen(false);
+          if (user?.id) {
+            const response = await fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`);
+            if (response.ok) {
+              const data = await response.json();
+              setUserData(data);
+            }
+          }
+          window.dispatchEvent(new Event('profile-updated'));
+        }
       }
     } finally {
       setSaving(false);
@@ -180,7 +207,7 @@ const ProfilePage = () => {
             <div className="flex flex-col items-center px-4 py-6 border-b border-gray-100 dark:border-gray-800">
               <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-900 mb-4 overflow-hidden">
                 {userData.photoUrl ? (
-                  <img src={userData.photoUrl} alt="Profile" className="w-28 h-28 rounded-full object-cover" />
+                  <img src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${userData.photoUrl.startsWith('http') ? userData.photoUrl.split('/').pop() : userData.photoUrl}`} alt="Profile" className="w-28 h-28 rounded-full object-cover" />
                 ) : (
                   <span className="text-white font-bold text-4xl select-none">{getUserInitials()}</span>
                 )}

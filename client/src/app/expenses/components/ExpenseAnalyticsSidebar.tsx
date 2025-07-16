@@ -42,7 +42,7 @@ export const ExpenseAnalyticsSidebar = ({ summaries, isLoading }: ExpenseAnalyti
     .sort((a, b) => Number(b.amount) - Number(a.amount));
 
   return (
-    <Card className="sticky top-8 max-h-[700px] overflow-y-auto">
+    <Card className="sticky top-8 max-h-[700px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
       <CardHeader>
         <CardTitle className="text-xl">Expense Overview</CardTitle>
       </CardHeader>

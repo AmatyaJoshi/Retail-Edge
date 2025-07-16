@@ -3,6 +3,9 @@ import { sendEmailOTP, verifyEmailOTP, registerUser, loginUser, logoutUser } fro
 import { checkSession } from '../controllers/checkSessionController';
 import { PrismaClient } from '@prisma/client';
 import { diagnoseAppwriteConfiguration, testEmailOTPFlow } from '../lib/appwriteDiagnostics';
+import { uploadToAzure, deleteFromAzureByUrl } from '../lib/azureBlob';
+import path from 'path';
+import { UploadedFile } from 'express-fileupload';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -88,11 +91,9 @@ router.get('/user-role', async (req, res) => {
 router.get('/user-profile', async (req, res) => {
   try {
     const { clerkId } = req.query;
-    
     if (!clerkId) {
       return res.status(400).json({ error: 'clerkId is required' });
     }
-
     const user = await prisma.users.findUnique({
       where: { clerkId: clerkId as string },
       select: {
@@ -107,11 +108,9 @@ router.get('/user-profile', async (req, res) => {
         photoUrl: true
       }
     });
-
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
     res.json(user);
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -122,17 +121,30 @@ router.get('/user-profile', async (req, res) => {
 // PATCH user profile by id
 router.patch('/user-profile', async (req, res) => {
   try {
-    const { id, phone, address, photoUrl } = req.body;
+    let { id, phone, address, photoUrl } = req.body;
+    // Fetch the current user to get the old photoUrl
+    const currentUser = await prisma.users.findUnique({ where: { id } });
+    // Handle avatar file upload if present
+    if (req.files && req.files.avatar) {
+      // Delete old avatar if it exists
+      if (currentUser && currentUser.photoUrl) {
+        await deleteFromAzureByUrl(currentUser.photoUrl);
+      }
+      const file = req.files.avatar as UploadedFile;
+      if (!file.mimetype.startsWith('image/')) {
+        return res.status(400).json({ error: 'Only image files are allowed for avatar' });
+      }
+      const ext = path.extname(file.name);
+      const fileName = `user-avatar-${id}-${Date.now()}${ext}`;
+      // Use tempFilePath since express-fileupload is configured with useTempFiles: true
+      photoUrl = await uploadToAzure('user-avatars', file.tempFilePath, fileName, file.mimetype);
+    }
     if (!id) {
       return res.status(400).json({ error: 'id is required' });
     }
     const updatedUser = await prisma.users.update({
       where: { id },
-      data: {
-        phone,
-        address,
-        photoUrl
-      },
+      data: { phone, address, photoUrl },
       select: {
         id: true,
         firstName: true,

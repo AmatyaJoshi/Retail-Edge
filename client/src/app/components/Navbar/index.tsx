@@ -52,8 +52,9 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
   const fetchUserData = async () => {
       if (user?.id) {
         try {
+        const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
         // Fetch user profile data
-        const profileResponse = await fetch(`/api/user-profile?clerkId=${user.id}`);
+        const profileResponse = await fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`);
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
           setUserPhotoUrl(profileData.photoUrl || null);
@@ -223,7 +224,7 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
           >
             <div className={`w-10 h-10 rounded-full overflow-hidden border-2 ${isDarkMode ? "border-gray-600 bg-blue-600" : "border-gray-300 bg-blue-600"} flex items-center justify-center transition-all duration-200 shadow-sm`}>
               {userPhotoUrl ? (
-                <img src={userPhotoUrl} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${userPhotoUrl.startsWith('http') ? userPhotoUrl.split('/').pop() : userPhotoUrl}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
               <span className="text-white font-semibold text-sm">{getUserInitials()}</span>
               )}
@@ -247,7 +248,7 @@ const Navbar: React.FC<NavbarProps> = ({ showBackButton }) => {
               <div className="p-4 flex items-center space-x-3">
                 <div className={`w-12 h-12 rounded-full overflow-hidden border-2 ${isDarkMode ? "border-gray-600 bg-blue-600" : "border-gray-300 bg-blue-600"} flex items-center justify-center`}>
                   {userPhotoUrl ? (
-                    <img src={userPhotoUrl} alt="Profile" className="w-full h-full object-cover" />
+                    <img src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${userPhotoUrl.startsWith('http') ? userPhotoUrl.split('/').pop() : userPhotoUrl}`} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                   <span className="text-white font-semibold text-base">{getUserInitials()}</span>
                   )}

@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { generateSKU, generateUniqueBarcode, isSKUUnique, isBarcodeUnique } from "../lib/productUtils";
+import { uploadToAzure, deleteFromAzureByUrl } from '../lib/azureBlob';
+import path from 'path';
+import { UploadedFile } from 'express-fileupload';
 
 const prisma = new PrismaClient();
 
@@ -72,7 +75,20 @@ export const createProduct = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { productId, name, price, rating, stockQuantity, category, brand, sku, description, imageUrl, barcode } = req.body;
+    let { productId, name, price, rating, stockQuantity, category, brand, sku, description, imageUrl, barcode } = req.body;
+
+    // Handle image file upload if present
+    if (req.files && req.files.image) {
+      const file = req.files.image as UploadedFile;
+      if (!file.mimetype.startsWith('image/')) {
+        res.status(400).json({ error: 'Only image files are allowed for product image' });
+        return;
+      }
+      const ext = path.extname(file.name);
+      const fileName = `product-image-${name.replace(/\s+/g, '-')}-${Date.now()}${ext}`;
+      // Use tempFilePath since express-fileupload is configured with useTempFiles: true
+      imageUrl = await uploadToAzure('product-images', file.tempFilePath, fileName, file.mimetype);
+    }
 
     // Check if a product with the same name already exists
     let product = await prisma.products.findUnique({
@@ -96,6 +112,7 @@ export const createProduct = async (
         },
       });
       res.status(200).json({ message: "Product stock updated successfully", product });
+      return;
     } else {
       // Generate SKU and barcode if not provided
       let generatedSKU = sku;
@@ -151,10 +168,12 @@ export const createProduct = async (
         },
       });
       res.status(201).json({ message: "Product created successfully", product });
+      return;
     }
   } catch (error) {
     console.error('Error creating/updating product:', error);
     res.status(500).json({ message: "Error creating/updating product", error: error instanceof Error ? error.message : 'Unknown error' });
+    return;
   }
 };
 
@@ -187,7 +206,31 @@ export const updateProduct = async (
 ): Promise<void> => {
   try {
     const { productId } = req.params;
-    const { name, price, rating, stockQuantity, category, brand, sku, description, imageUrl, barcode } = req.body;
+    let { name, price, rating, stockQuantity, category, brand, sku, description, imageUrl, barcode } = req.body;
+
+    // Fetch the current product to get the old imageUrl
+    const currentProduct = await prisma.products.findUnique({ where: { productId } });
+
+    // Handle image file upload if present
+    if (req.files && req.files.image) {
+      // Delete old image if it exists
+      if (currentProduct && currentProduct.imageUrl) {
+        await deleteFromAzureByUrl(currentProduct.imageUrl);
+      }
+      const file = req.files.image as UploadedFile;
+      if (!file.mimetype.startsWith('image/')) {
+        res.status(400).json({ error: 'Only image files are allowed for product image' });
+        return;
+      }
+      const ext = path.extname(file.name);
+      const fileName = `product-image-${name?.replace(/\s+/g, '-') || productId}-${Date.now()}${ext}`;
+      imageUrl = await uploadToAzure('product-images', file.tempFilePath, fileName, file.mimetype);
+    }
+
+    // Handle image removal (imageUrl set to empty string)
+    if (imageUrl === "" && currentProduct && currentProduct.imageUrl) {
+      await deleteFromAzureByUrl(currentProduct.imageUrl);
+    }
 
     // Check if SKU or barcode already exists for another product
     if (sku) {
@@ -239,12 +282,14 @@ export const updateProduct = async (
     });
 
     res.status(200).json(updatedProduct);
+    return;
   } catch (error) {
     console.error('Error updating product:', error);
     res.status(500).json({
       message: "Error updating product",
       error: error instanceof Error ? error.message : 'Unknown error'
     });
+    return;
   }
 };
 

@@ -621,33 +621,41 @@ export default function POSSystem({
                 <div
                   key={product.id}
                   onClick={() => addToCart(product)}
-                  className="relative border border-gray-200 rounded-r-lg rounded-l-none p-2 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 flex flex-col bg-white shadow-md hover:shadow-lg transform will-change-transform hover:scale-105 hover:z-20 dark:bg-gray-800 dark:border-gray-600 hover:dark:bg-gray-700 hover:dark:border-blue-500"
+                  className="relative border border-gray-200 rounded-r-lg rounded-l-none p-3 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 flex flex-col bg-white shadow-md hover:shadow-lg transform will-change-transform hover:scale-105 hover:z-20 dark:bg-gray-800 dark:border-gray-600 hover:dark:bg-gray-700 hover:dark:border-blue-500"
                 >
-                  <div className="flex justify-center mb-2">
+                  {/* Product Image - Larger and more prominent */}
+                  <div className="flex justify-center mb-3">
                     {product.imageUrl ? (
-                    <Image
-                        src={product.imageUrl}
-                      alt={product.name}
-                      width={80}
-                      height={80}
-                      className="rounded-md object-contain shadow-sm"
-                    />
+                      <div className="w-full h-32 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/product-image/${product.imageUrl.startsWith('http') ? product.imageUrl.split('/').pop() : product.imageUrl}`}
+                          alt={product.name}
+                          width={128}
+                          height={128}
+                          className="object-cover w-full h-full"
+                          unoptimized
+                        />
+                      </div>
                     ) : (
-                    <div className="w-[80px] h-[80px] bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                      <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600">
                         <EyewearIcon />
-                    </div>
+                      </div>
                     )}
                   </div>
-                  <div className="font-bold text-base mb-1 text-gray-900 dark:text-gray-100">{product.name}</div>
-                  <div className="text-gray-600 text-xs mb-0.5 dark:text-gray-400 break-all">SKU: {product.barcode}</div>
-                  <div className="text-gray-600 text-xs mb-1 dark:text-gray-400">Category: {product.category}</div>
-                  <div className="mt-auto flex justify-between items-center">
-                    <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
-                      ₹{product.price}
-                    </span>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 ${product.stock < 5 ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400' : ''}`}> 
-                      {product.stock} in stock
-                    </span>
+                  
+                  {/* Product Details */}
+                  <div className="flex-1 flex flex-col">
+                    <div className="font-bold text-base mb-1 text-gray-900 dark:text-gray-100">{product.name}</div>
+                    <div className="text-gray-600 text-xs mb-0.5 dark:text-gray-400 break-all">SKU: {product.barcode}</div>
+                    <div className="text-gray-600 text-xs mb-2 dark:text-gray-400">Category: {product.category}</div>
+                    <div className="mt-auto flex justify-between items-center">
+                      <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
+                        ₹{product.price}
+                      </span>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 ${product.stock < 5 ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400' : ''}`}> 
+                        {product.stock} in stock
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))

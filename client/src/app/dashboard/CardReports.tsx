@@ -105,7 +105,7 @@ export default function CardReports() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
           <CardHeader>
             <CardTitle>Buyer Ranking by Purchases</CardTitle>
           </CardHeader>
@@ -115,7 +115,7 @@ export default function CardReports() {
             ) : error ? (
               <div className="text-red-500 text-center py-4">Error: {error}</div>
             ) : (
-              <div className="max-h-[500px] overflow-y-auto rounded-md border">
+              <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
                 <Table className="w-full">
                   <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
                     <TableRow>
@@ -141,14 +141,14 @@ export default function CardReports() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
           <CardHeader>
             <CardTitle>Product Return Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-md border">
+            <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-white dark:bg-gray-800">
                   <TableRow>
                     <TableHead>Product</TableHead>
                     <TableHead>Returns</TableHead>
@@ -171,14 +171,14 @@ export default function CardReports() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
           <CardHeader>
             <CardTitle>Sales by Payment Method</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-md border">
+            <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-white dark:bg-gray-800">
                   <TableRow>
                     <TableHead>Payment Method</TableHead>
                     <TableHead className="text-right">Total Sales</TableHead>
@@ -197,14 +197,14 @@ export default function CardReports() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
           <CardHeader>
             <CardTitle>Associate Sales Performance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-md border">
+            <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-white dark:bg-gray-800">
                   <TableRow>
                     <TableHead>Associate</TableHead>
                     <TableHead>Sales</TableHead>
@@ -227,14 +227,14 @@ export default function CardReports() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
           <CardHeader>
             <CardTitle>Low Stock Products</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-md border">
+            <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-white dark:bg-gray-800">
                   <TableRow>
                     <TableHead>Product</TableHead>
                     <TableHead>Current Stock</TableHead>
@@ -255,14 +255,14 @@ export default function CardReports() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-xl">
           <CardHeader>
             <CardTitle>Customer Feedback Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-md border">
+            <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-white dark:bg-gray-800">
                   <TableRow>
                     <TableHead>Date</TableHead>
                     <TableHead>Customer</TableHead>

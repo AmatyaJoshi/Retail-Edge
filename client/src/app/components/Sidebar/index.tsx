@@ -84,7 +84,8 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (user?.id) {
-        const res = await fetch(`/api/user-profile?clerkId=${user.id}`);
+        const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+        const res = await fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`);
         if (res.ok) {
           const data = await res.json();
           setUserRole(data.role || 'User');
