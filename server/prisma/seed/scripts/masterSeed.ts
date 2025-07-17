@@ -24,13 +24,9 @@ async function masterSeed() {
     
     // Reset database tables (optional - comment out if you want to keep existing data)
     console.log('Clearing database tables...');
-    await prisma.expenseByCategory.deleteMany({});
-    await prisma.expenseSummary.deleteMany({});
     await prisma.expenses.deleteMany({});
     console.log('Database tables cleared.');    // Define the order of seed scripts
     const seedScripts = [
-      path.join(__dirname, 'seedExpenseSummary.ts'),
-      path.join(__dirname, 'seedExpenseByCategory.ts'),
       path.join(__dirname, 'seedExpenses.ts'),
       path.join(__dirname, 'seedExpenseTransactions.ts'),
       // Add other seed scripts here in the correct order

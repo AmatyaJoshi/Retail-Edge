@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "ts-node prisma/seed.ts",
     "build": "rimraf dist && npx tsc",
-    "start": "npm run build && node dist/index.js",
+    "start": "npm run build && node dist/src/index.js",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "db:reset-seed": "prisma migrate reset --force --skip-seed && ts-node prisma/seed.ts"
   },

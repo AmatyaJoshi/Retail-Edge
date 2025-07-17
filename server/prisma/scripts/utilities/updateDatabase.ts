@@ -12,8 +12,6 @@ async function updateDatabase() {
     const salesData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'sales.json'), 'utf-8'));
     const prescriptionsData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'prescriptions.json'), 'utf-8'));
     const expensesData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'expenses.json'), 'utf-8'));
-    const expenseSummaryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'expenseSummary.json'), 'utf-8'));
-    const expenseByCategoryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'expenseByCategory.json'), 'utf-8'));
     const salesSummaryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'salesSummary.json'), 'utf-8'));
     const purchaseSummaryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'purchaseSummary.json'), 'utf-8'));
 
@@ -21,16 +19,13 @@ async function updateDatabase() {
 
     // Delete existing data in reverse order of dependencies
     console.log('Deleting existing data...');
-    await prisma.expenseByCategory.deleteMany();
-    await prisma.expenseSummary.deleteMany();
-    await prisma.expenses.deleteMany();
-    await prisma.salesSummary.deleteMany();
-    await prisma.purchaseSummary.deleteMany();
     await prisma.sales.deleteMany();
     await prisma.purchases.deleteMany();
     await prisma.prescriptions.deleteMany();
     await prisma.products.deleteMany();
     await prisma.customers.deleteMany();
+    await prisma.salesSummary.deleteMany();
+    await prisma.purchaseSummary.deleteMany();
 
     // Insert new data in order of dependencies
     console.log('Inserting new data...');
@@ -99,32 +94,6 @@ async function updateDatabase() {
         timestamp: new Date(expense.timestamp),
       })),
     });
-
-    // Insert Expense Summary
-    console.log('Inserting expense summary...');
-    for (const summary of expenseSummaryData) {
-      await prisma.expenseSummary.create({
-        data: {
-          expenseSummaryId: summary.expenseSummaryId,
-          totalExpenses: summary.totalExpenses,
-          date: new Date(summary.date),
-        },
-      });
-    }
-
-    // Insert Expense By Category
-    console.log('Inserting expense by category...');
-    for (const category of expenseByCategoryData) {
-      await prisma.expenseByCategory.create({
-        data: {
-          expenseByCategoryId: category.expenseByCategoryId,
-          expenseSummaryId: category.expenseSummaryId,
-          category: category.category,
-          amount: BigInt(category.amount),
-          date: new Date(), // Use current date since it's not in the seed data
-        },
-      });
-    }
 
     // Insert Sales Summary
     console.log('Inserting sales summary...');

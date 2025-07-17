@@ -1,35 +1,26 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 export class AuthService {
-  async createUser(name: string, email: string, password: string, role: string = 'USER') {
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
-    return prisma.persona.create({
+  async createUser(firstName: string, lastName: string | null, email: string, phone: string, role: string = 'USER', clerkId: string, appwriteId: string) {
+    return prisma.users.create({
       data: {
-        name,
+        firstName,
+        lastName,
         email,
-        password: hashedPassword,
+        phone,
         role,
+        clerkId,
+        appwriteId,
+        emailVerified: false,
       },
     });
   }
 
   async findUserByEmail(email: string) {
-    return prisma.persona.findUnique({
+    return prisma.users.findUnique({
       where: { email },
     });
-  }
-
-  async validateUser(email: string, password: string) {
-    const user = await this.findUserByEmail(email);
-    if (!user) return null;
-
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) return null;
-
-    return user;
   }
 } 
