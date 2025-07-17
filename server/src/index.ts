@@ -57,6 +57,14 @@ app.use(fileUpload({
   debug: process.env.NODE_ENV === 'development'
 }));
 
+// Serve static files from the frontend build (for static export)
+app.use(express.static(path.join(__dirname, '../../out')));
+
+// Fallback: serve index.html for any other route (for SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../out/index.html'));
+});
+
 /* MIDDLEWARES */
 // Middleware to check for initial session and set cookie
 app.use((req, res, next) => {
