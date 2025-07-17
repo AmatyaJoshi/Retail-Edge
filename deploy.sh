@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# Cleanup
+rm -rf node_modules
+rm -rf client/node_modules
+rm -rf server/node_modules
+rm -f node_modules.tar.gz
+rm -f client/node_modules.tar.gz
+rm -f server/node_modules.tar.gz
+
 # Build frontend
 cd client
 rm -rf node_modules
