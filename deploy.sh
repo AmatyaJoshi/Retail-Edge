@@ -3,6 +3,7 @@ set -e
 
 # Build frontend
 cd client
+rm -rf node_modules
 npm install
 npm run build
 npm run export
@@ -14,5 +15,6 @@ cp -r client/out server/out
 
 # Build backend
 cd server
+rm -rf node_modules
 npm install
 npm run build 
