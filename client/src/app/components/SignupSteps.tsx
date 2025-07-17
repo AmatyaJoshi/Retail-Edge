@@ -25,7 +25,6 @@ interface FormData {
   password: string;
   confirmPassword: string;
   role: Role;
-  shopCode?: string;
 }
 
 interface FormErrors {
@@ -48,7 +47,6 @@ export default function SignupSteps() {
     password: '',
     confirmPassword: '',
     role: 'Owner',
-    shopCode: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
@@ -139,9 +137,6 @@ export default function SignupSteps() {
         if (!formData.panCard.trim()) {
           newErrors.panCard = 'PAN card number is required';
         }
-        if (formData.role !== 'Owner' && !formData.shopCode?.trim()) {
-          newErrors.shopCode = 'Shop code is required for non-owner roles';
-        }
         break;
 
       case 3:
@@ -163,8 +158,17 @@ export default function SignupSteps() {
   };
 
   const handleNext = () => {
+    console.log('Next button clicked');
+    console.log('Current step:', currentStep);
+    console.log('Form data:', formData);
+    console.log('Email OTP verified:', emailOtpVerified);
+    console.log('Email OTP sent:', emailOtpSent);
+    
     if (validateStep(currentStep)) {
+      console.log('Validation passed, moving to next step');
       setCurrentStep(currentStep + 1);
+    } else {
+      console.log('Validation failed, errors:', errors);
     }
   };
 
@@ -292,15 +296,17 @@ export default function SignupSteps() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    
+    // Validate all steps and collect all errors
     const step1Valid = validateStep(1);
     const step2Valid = validateStep(2);
     const step3Valid = validateStep(3);
+    
     if (!step1Valid || !step2Valid || !step3Valid || !emailOtpVerified) {
-      setErrors({
-        submit: 'Please complete all required fields and verify your email correctly before creating your account'
-      });
+      // Don't set a generic error message, let individual field validations show their specific errors
       return;
     }
+    
     setLoading(true);
     try {
       // Only call backend registration API
@@ -313,9 +319,8 @@ export default function SignupSteps() {
         panCard: formData.panCard,
         password: formData.password,
         role: formData.role,
-        shopCode: formData.role !== 'Owner' ? formData.shopCode : undefined,
-        appwriteUserId: appwriteUserId, // Include Appwrite user ID
-        emailVerified: true // Email is already verified via Appwrite OTP
+        appwriteUserId: appwriteUserId,
+        emailVerified: true
       };
       const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register`, {
         method: 'POST',
@@ -338,7 +343,7 @@ export default function SignupSteps() {
       router.push('/auth/login');
     } catch (err: any) {
       console.error('Registration error:', err);
-      setErrors({ submit: err.message });
+      setErrors({ submit: err.message || 'Failed to create account. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -597,20 +602,6 @@ export default function SignupSteps() {
       case 3:
         return (
           <div className="space-y-4">
-            {(formData.role === 'Manager' || formData.role === 'Staff') && (
-              <div className="space-y-2">
-                <Label htmlFor="shopCode" className="text-base font-medium text-gray-700">Shop Code</Label>
-                <Input
-                  id="shopCode"
-                  value={formData.shopCode}
-                  onChange={(e) => setFormData({ ...formData, shopCode: e.target.value })}
-                  className="h-11 text-base"
-                  placeholder="Enter shop code"
-                />
-                {errors.shopCode && <p className="text-red-500 text-sm mt-1">{errors.shopCode}</p>}
-              </div>
-            )}
-
             <div className="space-y-2 relative">
               <Label htmlFor="password" className="flex items-center justify-between">
                 <span className="text-base font-medium text-gray-700">Password</span>
@@ -662,7 +653,19 @@ export default function SignupSteps() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  onChange={(e) => {
+                    const newConfirmPassword = e.target.value;
+                    setFormData({ ...formData, confirmPassword: newConfirmPassword });
+                    
+                    // Clear confirmPassword error if passwords now match
+                    if (newConfirmPassword && formData.password === newConfirmPassword) {
+                      setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors.confirmPassword;
+                        return newErrors;
+                      });
+                    }
+                  }}
                   className="h-11 text-base pr-12 border-gray-300 focus:border-blue-400 focus:ring focus:ring-blue-100 transition-all duration-200"
                   placeholder="Confirm your password"
                   autoComplete="new-password"

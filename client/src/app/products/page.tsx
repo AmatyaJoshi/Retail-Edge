@@ -2,8 +2,8 @@
 
 import { useCreateProductMutation, useGetProductsQuery, useUpdateProductMutation, useDeleteProductMutation } from "@/state/api";
 import type { Product, NewProduct } from "@/state/api";
-import { PlusCircleIcon, SearchIcon, ChevronLeft, ChevronRight, ArrowDownWideNarrow, ArrowUpWideNarrow, Printer } from "lucide-react";
-import { useState } from "react";
+import { PlusCircleIcon, SearchIcon, ChevronLeft, ChevronRight, ArrowDownWideNarrow, ArrowUpWideNarrow, Printer, ChevronDown } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import Header from "@/app/components/Header";
 import Rating from "@/app/components/Rating";
 import CreateProductModal from "./CreateProductModal";
@@ -35,6 +35,8 @@ const Products = () => {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   const {
     data: products,
@@ -49,6 +51,37 @@ const Products = () => {
 
   // Update page data for AI Assistant
   useProductsDataUpdater(products || [], 'Products');
+
+  // Use products directly for filtering and rendering, but normalize category for filtering and category list
+  const preferredOrder = ['frames', 'sunglasses', 'lenses', 'accessories'];
+  const categories = useMemo(() => {
+    if (!products) return ['all'];
+    const unique = Array.from(new Set(products.map(p => typeof p.category === 'string' ? p.category.toLowerCase() : 'uncategorized')));
+    const ordered = [
+      'all',
+      ...preferredOrder.filter(cat => unique.includes(cat)),
+      ...unique.filter(cat => !preferredOrder.includes(cat) && cat !== 'all').sort()
+    ];
+    return ordered;
+  }, [products]);
+
+  // Remove the handleSetCategory function since we're calling setFilterCategory directly
+
+  const filteredProducts = (products || []).filter(product => {
+    const productCategory = (product.category || 'uncategorized').toLowerCase();
+    const matchesCategory = filterCategory === 'all' || productCategory === filterCategory;
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.sku && product.sku.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (product.barcode && product.barcode.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
+
+  // Use filteredProducts for rendering and pagination as before
+  const totalPages = filteredProducts ? Math.ceil(filteredProducts.length / itemsPerPage) : 0;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = filteredProducts?.slice(startIndex, endIndex);
 
   const handleCreateProduct = async (productData: ProductFormData) => {
     try {
@@ -90,12 +123,12 @@ const Products = () => {
   const handleUpdateProduct = async (productId: string, updates: Partial<Product> | FormData) => {
     try {
       if (!(updates instanceof FormData)) {
-        setSelectedProduct(prev => {
-          if (prev && prev.productId === productId) {
-            return { ...prev, ...updates };
-          }
-          return prev;
-        });
+      setSelectedProduct(prev => {
+        if (prev && prev.productId === productId) {
+          return { ...prev, ...updates };
+        }
+        return prev;
+      });
       }
       await updateProduct({
         productId,
@@ -155,14 +188,17 @@ const Products = () => {
   };
 
   // Calculate pagination
-  const totalPages = products ? Math.ceil(products.length / itemsPerPage) : 0;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = products?.slice(startIndex, endIndex);
-
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
+  // Reset pagination when filterCategory changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterCategory]);
+
+  // Capitalize category names for display
+  const displayCategory = (cat: string) => cat === 'all' ? 'All Categories' : cat.charAt(0).toUpperCase() + cat.slice(1);
 
   if (isLoading) {
     return <div className="py-4">Loading...</div>;
@@ -186,7 +222,7 @@ const Products = () => {
         {/* Controls Card */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 mb-4 shadow-sm flex flex-col gap-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <div className="relative flex-grow max-w-xl">
+            <div className="relative flex-grow max-w-xl flex items-center gap-2">
               <input
                 className="w-full pl-8 pr-2 py-1.5 border border-gray-200 dark:border-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-white dark:bg-gray-900 shadow-sm font-sans text-sm transition focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="Search products..."
@@ -195,23 +231,72 @@ const Products = () => {
               />
               <SearchIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
             </div>
-            <div className="hidden md:block w-px h-7 bg-gray-100 dark:bg-gray-700 mx-2" />
-            <div className="flex gap-1 items-center">
-              <select
-                className="py-1 px-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none text-sm"
-                value={sortField}
-                onChange={(e) => setSortField(e.target.value)}
-              >
-                <option value="name">Sort by Name</option>
-                <option value="rating">Sort by Rating</option>
-                <option value="stockQuantity">Sort by Stock</option>
-              </select>
-              <button
-                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                className="p-1.5 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
-              >
-                {sortOrder === "asc" ? <ArrowUpWideNarrow className="w-4 h-4" /> : <ArrowDownWideNarrow className="w-4 h-4" />}
-              </button>
+            {/* Filter and Sort Controls */}
+            <div className="flex gap-2 items-center mt-2 md:mt-0">
+              {/* Category Filter Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  className="flex items-center justify-between px-4 py-2.5 rounded-full border-2 border-gray-200 dark:border-gray-600 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-100 font-semibold shadow-lg hover:shadow-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition-all duration-200 focus:outline-none text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900 dark:hover:to-blue-800 hover:border-blue-300 dark:hover:border-blue-500 hover:scale-105"
+                  onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                  style={{ minWidth: '160px' }}
+                >
+                  <span className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    {displayCategory(filterCategory)}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {showCategoryDropdown && (
+                  <div className="absolute left-0 mt-3 w-56 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-2xl shadow-2xl z-50 py-3 backdrop-blur-sm">
+                    <div className="px-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categories</span>
+                    </div>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => {
+                          setFilterCategory(cat.toLowerCase());
+                          setShowCategoryDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-3 text-sm rounded-xl mx-2 my-1 transition-all duration-200 font-medium hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900 dark:hover:to-blue-800 ${
+                        filterCategory === cat.toLowerCase() 
+                          ? 'bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800 dark:to-blue-700 text-blue-700 dark:text-blue-200 font-semibold shadow-md' 
+                          : 'text-gray-700 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-300'
+                      }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {filterCategory === cat.toLowerCase() && (
+                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                          )}
+                          <span className={filterCategory === cat.toLowerCase() ? 'ml-0' : 'ml-4'}>
+                            {displayCategory(cat)}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* Sort Controls (existing) */}
+              <div className="flex gap-1 items-center">
+                <select
+                  className="py-1 px-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none text-sm"
+                  value={sortField}
+                  onChange={(e) => setSortField(e.target.value)}
+                >
+                  <option value="name">Sort by Name</option>
+                  <option value="rating">Sort by Rating</option>
+                  <option value="stockQuantity">Sort by Stock</option>
+                </select>
+                <button
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  className="p-1.5 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 transition focus:outline-none"
+                >
+                  {sortOrder === "asc" ? <ArrowUpWideNarrow className="w-4 h-4" /> : <ArrowDownWideNarrow className="w-4 h-4" />}
+                </button>
+              </div>
               {!isSelectionMode ? (
                 <button
                   onClick={enterSelectionMode}
@@ -334,36 +419,36 @@ const Products = () => {
                       {/* Product Details */}
                       <div className="w-full text-center">
                         <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 text-center truncate w-full mb-1" title={product.name}>
-                          {product.name}
-                        </h3>
+                        {product.name}
+                      </h3>
                         <p className="text-base font-medium text-blue-600 dark:text-blue-400 mb-2">
-                          ₹{product.price}
-                        </p>
+                        ₹{product.price}
+                      </p>
                         <div className="flex items-center justify-between w-full mb-3">
-                          <span className="text-xs text-gray-600 dark:text-gray-300 flex items-center truncate">
-                            Stock: {product.stockQuantity}
-                            {product.stockQuantity <= 10 && (
-                              <span className="ml-2 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-[11px] font-semibold shadow-sm border border-yellow-200 dark:border-yellow-800">Low</span>
-                            )}
-                          </span>
-                          {product.rating && (
-                            <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5">
-                              <Rating rating={product.rating} />
-                            </div>
+                        <span className="text-xs text-gray-600 dark:text-gray-300 flex items-center truncate">
+                          Stock: {product.stockQuantity}
+                          {product.stockQuantity <= 10 && (
+                            <span className="ml-2 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-[11px] font-semibold shadow-sm border border-yellow-200 dark:border-yellow-800">Low</span>
                           )}
-                        </div>
-                        <div className="w-full border-t border-gray-200 dark:border-gray-700 mb-3" />
-                        {!isSelectionMode && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleReduceStock(product);
-                            }}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
-                          >
-                            Manage Stock
-                          </button>
+                        </span>
+                        {product.rating && (
+                          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5">
+                            <Rating rating={product.rating} />
+                          </div>
                         )}
+                      </div>
+                        <div className="w-full border-t border-gray-200 dark:border-gray-700 mb-3" />
+                      {!isSelectionMode && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReduceStock(product);
+                          }}
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
+                        >
+                          Manage Stock
+                        </button>
+                      )}
                       </div>
                     </div>
                   </div>
@@ -388,11 +473,12 @@ const Products = () => {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition ${
-                    currentPage === page
-                      ? "bg-blue-500 text-white"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  }`}
+                  className={`flex items-center justify-center border transition-all duration-200
+                    ${currentPage === page
+                      ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold shadow-lg scale-105 border-blue-400 dark:border-blue-700 ring-2 ring-blue-200 dark:ring-blue-800 z-10 rounded-full"
+                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"}
+                  `}
+                  style={currentPage === page ? { minWidth: '36px', minHeight: '36px', width: '36px', height: '36px', fontSize: '1rem', padding: 0 } : { minWidth: '36px', minHeight: '36px', width: '36px', height: '36px', fontSize: '1rem', padding: 0 }}
                 >
                   {page}
                 </button>

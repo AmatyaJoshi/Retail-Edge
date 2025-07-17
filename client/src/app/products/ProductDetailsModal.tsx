@@ -107,6 +107,10 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
     onUpdate(product.productId, { imageUrl: "" });
   };
 
+  const formatIndianCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(value);
+  };
+
   const renderEditableField = (
     field: string,
     label: string,
@@ -346,7 +350,14 @@ const ProductDetailsModal = ({ isOpen, onClose, product, onUpdate, onDelete }: P
               <div className={`border-b ${isDarkMode ? 'border-gray-600' : 'border-gray-100'} my-4`} />
 
               {/* Price */}
-              {renderEditableField('price', 'Price', ` 9${product.price.toFixed(2)}`, 'number', `text-2xl font-extrabold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`, { step: "0.01" })}
+              {renderEditableField('price', 'Price',
+                (editingField === 'price' || isEditing)
+                  ? (editValues.price ?? product.price)
+                  : formatIndianCurrency(product.price),
+                'number',
+                `text-2xl font-extrabold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`,
+                { step: "0.01" }
+              )}
 
               {/* Stock Quantity */}
               {renderEditableField('stockQuantity', 'Availability', product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of Stock', 'number', product.stockQuantity > 0 ? `text-base ${isDarkMode ? 'text-green-400' : 'text-green-700'} font-semibold` : `text-base ${isDarkMode ? 'text-red-400' : 'text-red-700'} font-semibold`, { step: "1", min: "0" })}

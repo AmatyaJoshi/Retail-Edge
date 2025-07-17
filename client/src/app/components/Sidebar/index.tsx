@@ -95,6 +95,17 @@ const Sidebar = () => {
     if (isLoaded && user) fetchUserRole();
   }, [user, isLoaded]);
 
+  // Helper function to check if navigation item should be visible based on user role
+  const isNavigationVisible = (href: string) => {
+    if (userRole === 'Staff') {
+      // Staff can only access: POS, Transactions, Settings, Profile
+      const allowedPaths = ['/pos', '/transactions', '/settings', '/profile'];
+      return allowedPaths.includes(href);
+    }
+    // All other roles (Owner, Manager, Admin) can access everything
+    return true;
+  };
+
   const toggleSidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
   };
@@ -153,54 +164,70 @@ const Sidebar = () => {
 
       {/* LINKS */}
       <div className="flex flex-col mt-2 flex-1">
-        <SidebarLink
-          href="/pos"
-          icon={Monitor}
-          label="POS"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/transactions"
-          icon={Receipt}
-          label="Transactions"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/dashboard"
-          icon={Layout}
-          label="Dashboard"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/inventory"
-          icon={Archive}
-          label="Inventory"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/associates"
-          icon={UserPlus}
-          label="Associates"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/products"
-          icon={Package}
-          label="Products"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/customers"
-          icon={Users}
-          label="Customers"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/expenses"
-          icon={CircleDollarSign}
-          label="Expenses"
-          isCollapsed={isSidebarCollapsed}
-        />
+        {isNavigationVisible('/pos') && (
+          <SidebarLink
+            href="/pos"
+            icon={Monitor}
+            label="POS"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/transactions') && (
+          <SidebarLink
+            href="/transactions"
+            icon={Receipt}
+            label="Transactions"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/dashboard') && (
+          <SidebarLink
+            href="/dashboard"
+            icon={Layout}
+            label="Dashboard"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/inventory') && (
+          <SidebarLink
+            href="/inventory"
+            icon={Archive}
+            label="Inventory"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/associates') && (
+          <SidebarLink
+            href="/associates"
+            icon={UserPlus}
+            label="Associates"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/products') && (
+          <SidebarLink
+            href="/products"
+            icon={Package}
+            label="Products"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/customers') && (
+          <SidebarLink
+            href="/customers"
+            icon={Users}
+            label="Customers"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/expenses') && (
+          <SidebarLink
+            href="/expenses"
+            icon={CircleDollarSign}
+            label="Expenses"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
         {/* Employees link for Owner/Manager only */}
         {(userRole === 'Owner' || userRole === 'Manager') && (
           <SidebarLink
@@ -210,12 +237,22 @@ const Sidebar = () => {
             isCollapsed={isSidebarCollapsed}
           />
         )}
-        <SidebarLink
-          href="/settings"
-          icon={Settings}
-          label="Settings"
-          isCollapsed={isSidebarCollapsed}
-        />
+        {isNavigationVisible('/settings') && (
+          <SidebarLink
+            href="/settings"
+            icon={Settings}
+            label="Settings"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
+        {isNavigationVisible('/profile') && (
+          <SidebarLink
+            href="/profile"
+            icon={UserCog}
+            label="Profile"
+            isCollapsed={isSidebarCollapsed}
+          />
+        )}
       </div>
 
       {/* FOOTER */}

@@ -177,9 +177,9 @@ export const api = createApi({
           };
         } else {
           return {
-            url: `/products/${productId}`,
-            method: "PUT",
-            body: updates,
+        url: `/products/${productId}`,
+        method: "PUT",
+        body: updates,
             headers: { 'Content-Type': 'application/json' },
           };
         }

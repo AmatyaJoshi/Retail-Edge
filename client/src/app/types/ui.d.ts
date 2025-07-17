@@ -11,19 +11,7 @@ declare module "@/components/ui/button" {
 }
 */
 
-declare module "@/components/ui/dialog" {
-  export interface DialogProps {
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-    children?: ReactNode
-  }
-  export const Dialog: React.FC<DialogProps>
-  export const DialogTrigger: React.FC<{ asChild?: boolean; children?: ReactNode }>
-  export const DialogContent: React.FC<{ className?: string; children?: ReactNode }>
-  export const DialogHeader: React.FC<{ className?: string; children?: ReactNode }>
-  export const DialogTitle: React.FC<{ className?: string; children?: ReactNode }>
-  export const DialogDescription: React.FC<{ className?: string; children?: ReactNode }>
-}
+// Removed Dialog* declarations to avoid redeclaration errors
 
 declare module "@/components/ui/dropdown-menu" {
   export interface DropdownMenuProps {

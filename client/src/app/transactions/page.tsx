@@ -293,86 +293,86 @@ const Transactions = () => {
       <div className="flex flex-col w-full flex-1 px-2 md:px-6 gap-2 min-h-0 h-full">
         <div className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col w-full bg-gray-50 dark:bg-gray-800 h-full min-h-[400px] flex-1 min-h-0">
           <div className="px-3 py-2">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div className="relative flex-grow max-w-xs">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="relative flex-grow max-w-xs">
+              <input
+                className="w-full pl-9 pr-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-gray-50 dark:bg-gray-900 shadow font-sans text-sm transition focus:outline-none dark:text-gray-100"
+                placeholder="Search sales..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
+            </div>
+            <div className="flex gap-1 items-center">
+              {/* Rows per page dropdown */}
+              <select
+                value={pageSize}
+                onChange={e => {
+                  const size = Number(e.target.value);
+                  setPageSize(size);
+                }}
+                className="py-1.5 px-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none mr-2"
+              >
+                {[5, 10, 25, 50].map(size => (
+                  <option key={size} value={size}>{size} rows</option>
+                ))}
+              </select>
+              <div className="relative">
                 <input
-                  className="w-full pl-9 pr-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-400 bg-gray-50 dark:bg-gray-900 shadow font-sans text-sm transition focus:outline-none dark:text-gray-100"
-                  placeholder="Search sales..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="py-1.5 pl-9 pr-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none appearance-none custom-date-input"
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 />
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
+                <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2"/></svg>
               </div>
-              <div className="flex gap-1 items-center">
-                {/* Rows per page dropdown */}
-                <select
-                  value={pageSize}
-                  onChange={e => {
-                    const size = Number(e.target.value);
-                    setPageSize(size);
-                  }}
-                  className="py-1.5 px-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none mr-2"
-                >
-                  {[5, 10, 25, 50].map(size => (
-                    <option key={size} value={size}>{size} rows</option>
-                  ))}
-                </select>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="py-1.5 pl-9 pr-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none appearance-none custom-date-input"
-                    style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
-                  />
-                  <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2"/></svg>
-                </div>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="py-1.5 pl-9 pr-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none appearance-none custom-date-input"
-                    style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
-                  />
-                  <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2"/></svg>
-                </div>
-                {/* Sort Button */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowSortDropdown((prev) => !prev)}
-                    className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1 text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap shadow-sm cursor-pointer text-sm"
-                  >
-                    <ArrowUpDown className="w-4 h-4" />
-                    Sort
-                  </button>
-                  {showSortDropdown && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
-                      <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('date')}>Date</button>
-                      <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('amount')}>Amount</button>
-                      <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('customer')}>Customer</button>
-                    </div>
-                  )}
-                </div>
-                {/* Columns Button */}
+              <div className="relative">
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="py-1.5 pl-9 pr-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none appearance-none custom-date-input"
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                />
+                <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="2"/></svg>
+              </div>
+              {/* Sort Button */}
+              <div className="relative">
                 <button
-                  onClick={() => setShowColumnModal(true)}
+                  onClick={() => setShowSortDropdown((prev) => !prev)}
                   className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1 text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap shadow-sm cursor-pointer text-sm"
                 >
-                  <Columns className="w-4 h-4" />
-                  Columns
+                  <ArrowUpDown className="w-4 h-4" />
+                  Sort
                 </button>
-                {/* Export Button (moved to right of Columns) */}
-                <button
-                  onClick={handleExport}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-sm text-sm"
-                >
-                  <Upload className="w-4 h-4" />
-                  Export
-                </button>
+                {showSortDropdown && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
+                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('date')}>Date</button>
+                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('amount')}>Amount</button>
+                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => handleSort('customer')}>Customer</button>
+                  </div>
+                )}
               </div>
+              {/* Columns Button */}
+              <button
+                onClick={() => setShowColumnModal(true)}
+                className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1 text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap shadow-sm cursor-pointer text-sm"
+              >
+                <Columns className="w-4 h-4" />
+                Columns
+              </button>
+              {/* Export Button (moved to right of Columns) */}
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-sm text-sm"
+              >
+                <Upload className="w-4 h-4" />
+                Export
+              </button>
             </div>
           </div>
+        </div>
           {/* Main Content: DataTable Table Rows Only (Scrollable) */}
           <div className="flex-1 min-h-[120px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-b-0 custom-scrollbar w-full shadow-lg bg-gray-50 dark:bg-gray-800 rounded-t-xl flex flex-col justify-end" style={{ height: '100%' }}>
             <DataTable
@@ -387,15 +387,15 @@ const Transactions = () => {
           </div>
           {/* Pagination/Slider pinned to bottom, no top border */}
           <div className="w-full px-4 py-2 bg-white dark:bg-gray-800 rounded-b-xl border-x border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
-            <DataTable
-              columns={columns}
-              data={filteredSales}
-              searchKey="customer"
-              pageSize={pageSize}
-              onPageSizeChange={setPageSize}
-              hideToolbar
+          <DataTable
+            columns={columns}
+            data={filteredSales}
+            searchKey="customer"
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            hideToolbar
               showOnlyPagination
-            />
+          />
           </div>
         </div>
       </div>

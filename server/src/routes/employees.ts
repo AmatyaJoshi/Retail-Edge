@@ -2,6 +2,9 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import clerk from '@clerk/clerk-sdk-node';
 import { getAppwriteUsers } from '../lib/appwriteAuth';
+import { uploadToAzure, deleteFromAzureByUrl } from '../lib/azureBlob';
+import path from 'path';
+import { UploadedFile } from 'express-fileupload';
 const prisma = new PrismaClient();
 const router = express.Router();
 
@@ -52,7 +55,24 @@ router.patch('/:id', async (req, res) => {
   if (currentUser.role === 'Manager' && (user.role === 'Owner' || user.id === currentUser.id)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
-  const { firstName, lastName, phone, address, photoUrl } = req.body;
+  let { firstName, lastName, phone, address, photoUrl } = req.body;
+
+  // Handle avatar file upload if present
+  if (req.files && req.files.avatar) {
+    // Delete old avatar if it exists
+    if (user.photoUrl) {
+      await deleteFromAzureByUrl(user.photoUrl);
+    }
+    const file = req.files.avatar as UploadedFile;
+    if (!file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ error: 'Only image files are allowed for avatar' });
+    }
+    const ext = path.extname(file.name);
+    const fileName = `user-avatar-${id}-${Date.now()}${ext}`;
+    // Use tempFilePath since express-fileupload is configured with useTempFiles: true
+    photoUrl = await uploadToAzure('user-avatars', file.tempFilePath, fileName, file.mimetype);
+  }
+
   const updated = await prisma.users.update({
     where: { id },
     data: { firstName, lastName, phone, address, photoUrl },

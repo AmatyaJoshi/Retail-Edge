@@ -3,7 +3,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import EmployeeModal from './EmployeeModal';
-import { ArrowUpRightFromSquare } from 'lucide-react';
+import { ArrowUpRightFromSquare, AlertTriangle } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
+import UserAvatar from '../components/UserAvatar';
 
 interface Employee {
   id: string;
@@ -34,6 +36,7 @@ const ROLE_LABELS: Record<string, string> = {
 const ENABLED_ROLES = ['Owner', 'Admin', 'Manager', 'Staff'];
 
 const EmployeesPage = () => {
+  const { user } = useUser();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +104,13 @@ const EmployeesPage = () => {
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     setShowDeleteConfirm(true);
+  };
+
+  // Check if the user is trying to delete their own account
+  const isDeletingOwnAccount = () => {
+    if (!user || !deletingId) return false;
+    const employeeToDelete = employees.find(emp => emp.id === deletingId);
+    return employeeToDelete?.email === user.emailAddresses[0]?.emailAddress;
   };
 
   const confirmDelete = async () => {
@@ -185,6 +195,15 @@ const EmployeesPage = () => {
       a.download = `${role.toLowerCase()}-employees.json`;
       a.click();
       URL.revokeObjectURL(url);
+    }
+  };
+
+  // Add a callback for when the employee modal saves successfully
+  const handleEmployeeModalSave = (updatedEmployee: Employee) => {
+    fetchEmployees();
+    // If the updated employee is the current user, dispatch profile-updated event
+    if (user && updatedEmployee.email === user.emailAddresses[0]?.emailAddress) {
+      window.dispatchEvent(new Event('profile-updated'));
     }
   };
 
@@ -326,10 +345,12 @@ const EmployeesPage = () => {
                             <tr key={emp.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 bg-white dark:bg-gray-800`}>
                               <td className="px-6 py-4 text-center">
                                 <div className="flex items-center justify-start">
-                                  <div className="flex-shrink-0 h-10 w-10">
-                                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-                                      {emp.firstName.charAt(0)}{emp.lastName.charAt(0)}
-                                    </div>
+                                  <div className="flex-shrink-0">
+                                    <UserAvatar 
+                                      user={emp} 
+                                      size="md" 
+                                      className="flex-shrink-0"
+                                    />
                                   </div>
                                   <div className="ml-4">
                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{emp.firstName} {emp.lastName}</div>
@@ -407,13 +428,50 @@ const EmployeesPage = () => {
       </div>
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-xs text-center">
-            <h2 className="text-lg font-semibold mb-4 dark:text-gray-100">Delete Employee</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-300">Are you sure you want to delete this employee?</p>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-lg text-center border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Delete Employee</h2>
+            
+            {isDeletingOwnAccount() ? (
+              <>
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <div className="flex items-center justify-center mb-3">
+                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400 mr-2" />
+                    <span className="text-red-800 dark:text-red-200 font-semibold">Warning: You are deleting your own account!</span>
+                  </div>
+                  <p className="text-red-700 dark:text-red-300 text-sm leading-relaxed">
+                    This action will immediately log you out and permanently delete your account. 
+                    <strong> This action is irreversible and cannot be undone.</strong> 
+                    You will lose access to all data and will need to be re-invited if you want to rejoin the system.
+                  </p>
+                </div>
+                <p className="mb-8 text-gray-600 dark:text-gray-300 text-base">
+                  Are you absolutely sure you want to delete your own account?
+                </p>
+              </>
+            ) : (
+              <p className="mb-8 text-gray-600 dark:text-gray-300 text-base">
+                Are you sure you want to delete this employee?
+              </p>
+            )}
+            
             <div className="flex justify-center gap-4">
-              <button className="px-4 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
-              <button className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-900" onClick={confirmDelete}>Delete</button>
+              <button 
+                className="px-6 py-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 font-medium" 
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className={`px-6 py-3 rounded-lg text-white transition-colors duration-200 font-medium ${
+                  isDeletingOwnAccount() 
+                    ? 'bg-red-700 hover:bg-red-800 dark:bg-red-800 dark:hover:bg-red-900' 
+                    : 'bg-red-600 hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-900'
+                }`} 
+                onClick={confirmDelete}
+              >
+                {isDeletingOwnAccount() ? 'Delete My Account' : 'Delete'}
+              </button>
             </div>
           </div>
         </div>
@@ -422,10 +480,8 @@ const EmployeesPage = () => {
       <EmployeeModal
         employee={selectedEmployee}
         isOpen={showEmployeeModal}
-        onClose={() => {
-          setShowEmployeeModal(false);
-          setSelectedEmployee(null);
-        }}
+        onClose={() => setShowEmployeeModal(false)}
+        onSaveSuccess={handleEmployeeModalSave}
       />
       {/* Role Change Confirmation Modal */}
       {confirmRoleChange && (

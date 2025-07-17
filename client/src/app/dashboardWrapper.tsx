@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Navbar from "@/app/components/Navbar";
 import Sidebar from "@/app/components/Sidebar";
+import RouteProtection from "@/app/components/RouteProtection";
 import StoreProvider, { useAppSelector } from "./redux";
 import { NotificationProvider, useNotifications } from "./contexts/NotificationContext";
 import { usePathname } from "next/navigation";
@@ -77,7 +78,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <StoreProvider>
-      <DashboardLayout>{children}</DashboardLayout>
+      <RouteProtection>
+        <DashboardLayout>{children}</DashboardLayout>
+      </RouteProtection>
     </StoreProvider>
   );
 };

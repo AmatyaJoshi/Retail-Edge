@@ -1,96 +1,74 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
-import { useState, useEffect } from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import React from 'react';
 
 interface UserAvatarProps {
+  user: {
+    firstName?: string;
+    lastName?: string;
+    photoUrl?: string;
+  };
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
-  showName?: boolean;
 }
 
-interface UserData {
-  photoUrl?: string;
-}
+const UserAvatar: React.FC<UserAvatarProps> = ({ user, size = 'md', className = '' }) => {
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'sm':
+        return 'h-8 w-8 text-xs';
+      case 'md':
+        return 'h-10 w-10 text-sm';
+      case 'lg':
+        return 'h-12 w-12 text-base';
+      case 'xl':
+        return 'h-16 w-16 text-xl';
+      default:
+        return 'h-10 w-10 text-sm';
+    }
+  };
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ 
-  size = 'md', 
-  className = '',
-  showName = false 
-}) => {
-  const { user, isLoaded } = useUser();
-  const [userData, setUserData] = useState<UserData | null>(null);
-
-  // Fetch user data to get photoUrl
-  useEffect(() => {
-    if (!isLoaded || !user?.id) return;
-    
-    const backendUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
-    fetch(`${backendUrl}/api/auth/user-profile?clerkId=${user.id}`)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        setUserData(data);
-      })
-      .catch(() => {
-        // Silently handle error
-      });
-  }, [user, isLoaded]);
-
-  // Get user initials for avatar fallback
-  const getUserInitials = () => {
-    if (!user) return 'U';
+  const getInitials = () => {
     const firstName = user.firstName || '';
     const lastName = user.lastName || '';
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U';
+    const firstInitial = firstName.charAt(0) || '';
+    const lastInitial = lastName.charAt(0) || '';
+    const initials = `${firstInitial}${lastInitial}`.toUpperCase();
+    return initials || 'U';
   };
 
-  // Get user display name
-  const getUserDisplayName = () => {
-    if (!user) return 'User';
-    const firstName = user.firstName || '';
-    const lastName = user.lastName || '';
-    return `${firstName} ${lastName}`.trim() || user.emailAddresses[0]?.emailAddress || 'User';
-  };
+  // Use backend proxy endpoint for avatars, matching profile page
+  let avatarSrc: string | null = null;
+  if (user.photoUrl && typeof user.photoUrl === 'string' && user.photoUrl.trim() !== '') {
+    if (user.photoUrl.startsWith('blob:')) {
+      avatarSrc = user.photoUrl;
+    } else {
+      let filename = user.photoUrl;
+      if (user.photoUrl.startsWith('http')) {
+        // Extract filename from Azure URL
+        const parts = user.photoUrl.split('/');
+        filename = parts[parts.length - 1] || '';
+      }
+      avatarSrc = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${filename}`;
+    }
+  }
 
-  // Size classes
-  const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-10 h-10',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16'
-  };
-
-  const textSizeClasses = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base',
-    xl: 'text-lg'
-  };
-
-  if (!isLoaded) {
+  if (avatarSrc && avatarSrc.trim() !== '') {
     return (
-      <div className={`${sizeClasses[size]} rounded-full bg-gray-200 animate-pulse ${className}`} />
+      <div className={`relative ${getSizeClasses()} ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={avatarSrc}
+          alt={`${user.firstName || ''} ${user.lastName || ''}`}
+          className="rounded-full object-cover w-full h-full"
+        />
+      </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Avatar className={`${sizeClasses[size]} ${className}`}>
-        <AvatarImage 
-          src={userData?.photoUrl ? `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/user-avatar/${userData.photoUrl.startsWith('http') ? userData.photoUrl.split('/').pop() : userData.photoUrl}` : undefined} 
-          alt={getUserDisplayName()}
-          className="object-cover"
-        />
-        <AvatarFallback className={`${textSizeClasses[size]} font-semibold bg-blue-600 text-white`}>
-          {getUserInitials()}
-        </AvatarFallback>
-      </Avatar>
-      {showName && (
-        <span className="text-sm font-medium text-gray-700">
-          {getUserDisplayName()}
-        </span>
-      )}
+    <div className={`${getSizeClasses()} rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-sm ${className}`}>
+      {getInitials()}
     </div>
   );
 };

@@ -130,8 +130,18 @@ export default function POSSystem({
     }));
   }, [apiProducts]);
 
-  // Get unique categories from products
-  const categories = useMemo(() => ['all', ...new Set(products.map(p => typeof p.category === 'string' ? p.category : 'uncategorized'))], [products]);
+  // Custom order for categories
+  const preferredOrder = ['frames', 'sunglasses', 'lenses', 'accessories'];
+  const categories = useMemo(() => {
+    if (!products) return ['all'];
+    const unique = Array.from(new Set(products.map(p => typeof p.category === 'string' ? p.category.toLowerCase() : 'uncategorized')));
+    const ordered = [
+      'all',
+      ...preferredOrder.filter(cat => unique.includes(cat)),
+      ...unique.filter(cat => !preferredOrder.includes(cat) && cat !== 'all').sort()
+    ];
+    return ordered;
+  }, [products]);
 
   // Focus on barcode input on component mount
   useEffect(() => {
@@ -147,16 +157,19 @@ export default function POSSystem({
     }
   }, [error]);
 
+  // When setting the filter, always use lowercase
+  const handleSetCategory = (cat: string) => {
+    setFilterCategory(cat.toLowerCase());
+  };
+
   // Filter products based on search term and category
   const filteredProducts = products.filter(product => {
+    const productCategory = (product.category || 'uncategorized').toLowerCase();
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.barcode.includes(searchTerm);
-
     const matchesCategory =
-      filterCategory === 'all' ||
-      (product.category || 'uncategorized') === filterCategory;
-
+      filterCategory === 'all' || productCategory === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -577,7 +590,7 @@ export default function POSSystem({
               {categories.map(category => (
                 <button
                   key={category}
-                  onClick={() => setFilterCategory(category)}
+                  onClick={() => handleSetCategory(category)}
                   className={`px-3 py-2 rounded-lg text-xs whitespace-nowrap border shadow transition-all duration-200 font-medium
                     ${filterCategory === category
                       ? 'bg-blue-600 text-white border-blue-600 shadow-md'
@@ -627,34 +640,34 @@ export default function POSSystem({
                   <div className="flex justify-center mb-3">
                     {product.imageUrl ? (
                       <div className="w-full h-32 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <Image
+                    <Image
                           src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001'}/api/product-image/${product.imageUrl.startsWith('http') ? product.imageUrl.split('/').pop() : product.imageUrl}`}
-                          alt={product.name}
+                      alt={product.name}
                           width={128}
                           height={128}
                           className="object-cover w-full h-full"
                           unoptimized
-                        />
+                    />
                       </div>
                     ) : (
                       <div className="w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center border border-gray-200 dark:border-gray-600">
                         <EyewearIcon />
-                      </div>
+                    </div>
                     )}
                   </div>
                   
                   {/* Product Details */}
                   <div className="flex-1 flex flex-col">
-                    <div className="font-bold text-base mb-1 text-gray-900 dark:text-gray-100">{product.name}</div>
-                    <div className="text-gray-600 text-xs mb-0.5 dark:text-gray-400 break-all">SKU: {product.barcode}</div>
+                  <div className="font-bold text-base mb-1 text-gray-900 dark:text-gray-100">{product.name}</div>
+                  <div className="text-gray-600 text-xs mb-0.5 dark:text-gray-400 break-all">SKU: {product.barcode}</div>
                     <div className="text-gray-600 text-xs mb-2 dark:text-gray-400">Category: {product.category}</div>
-                    <div className="mt-auto flex justify-between items-center">
-                      <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
-                        ₹{product.price}
-                      </span>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 ${product.stock < 5 ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400' : ''}`}> 
-                        {product.stock} in stock
-                      </span>
+                  <div className="mt-auto flex justify-between items-center">
+                    <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
+                      ₹{product.price}
+                    </span>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 ${product.stock < 5 ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400' : ''}`}> 
+                      {product.stock} in stock
+                    </span>
                     </div>
                   </div>
                 </div>

@@ -183,30 +183,30 @@ const NotificationDropdown = () => {
                       
                       {/* Action Buttons */}
                       <div className="flex items-center gap-3 mt-3">
-                        {!notification.read && (
-                          <button
-                            onClick={() => markAsRead(notification.id)}
+                    {!notification.read && (
+                      <button
+                        onClick={() => markAsRead(notification.id)}
                             className={`text-xs font-medium flex items-center gap-1 transition-colors ${
                               isDarkMode 
                                 ? 'text-blue-400 hover:text-blue-300' 
                                 : 'text-blue-600 hover:text-blue-700'
                             }`}
-                          >
+                      >
                             <Check className="w-3 h-3" />
-                            Mark as read
-                          </button>
-                        )}
-                        <button
-                          onClick={() => removeNotification(notification.id)}
+                        Mark as read
+                      </button>
+                    )}
+                    <button
+                      onClick={() => removeNotification(notification.id)}
                           className={`text-xs font-medium flex items-center gap-1 transition-colors ${
                             isDarkMode 
                               ? 'text-red-400 hover:text-red-300' 
                               : 'text-red-600 hover:text-red-700'
                           }`}
-                        >
+                    >
                           <Trash2 className="w-3 h-3" />
-                          Remove
-                        </button>
+                      Remove
+                    </button>
                       </div>
                     </div>
                   </div>

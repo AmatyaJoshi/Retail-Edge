@@ -6,6 +6,7 @@ import { diagnoseAppwriteConfiguration, testEmailOTPFlow } from '../lib/appwrite
 import { uploadToAzure, deleteFromAzureByUrl } from '../lib/azureBlob';
 import path from 'path';
 import { UploadedFile } from 'express-fileupload';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -60,7 +61,7 @@ router.post('/verify-email-otp', verifyEmailOTP);
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
-router.get('/check-session', checkSession);
+router.get('/check-session', ClerkExpressWithAuth(), checkSession);
 
 // Get user role by clerkId
 router.get('/user-role', async (req, res) => {

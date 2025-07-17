@@ -203,155 +203,155 @@ export function DataTable<TData, TValue>({
   }
   // Only render the default full table+pagination if both are false
   if (!showOnlyTableRows && !showOnlyPagination) {
-    return (
-      <div className="flex flex-col w-full">
-        {!hideToolbar && (
-          <div className="flex items-center py-2 w-full gap-1">
-            <Input
-              placeholder={`Filter ${searchKey}s...`}
-              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn(searchKey)?.setFilterValue(event.target.value)
-              }
-              className="max-w-xs h-8 text-sm px-2"
-            />
-            <div className="ml-auto flex items-center gap-1">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 px-2 text-sm">
-                    <ArrowUpDown className="h-4 w-4" />
-                    Sort
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {table
-                    .getAllColumns()
-                    .filter((column) => column.getCanSort() && column.id !== "actions")
-                    .map((column) => {
-                      return (
-                        <DropdownMenuCheckboxItem
-                          key={column.id}
-                          className="capitalize"
-                          checked={column.getIsSorted() !== false}
-                          onCheckedChange={() => column.toggleSorting()}
-                        >
-                          {column.id}
-                        </DropdownMenuCheckboxItem>
-                      );
-                    })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 px-2 text-sm">
-                    <Columns className="h-4 w-4" />
-                    Columns
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {table
-                    .getAllColumns()
-                    .filter(
-                      (column) => column.getCanHide() && column.id !== "actions"
-                    )
-                    .map((column) => {
-                      return (
-                        <DropdownMenuCheckboxItem
-                          key={column.id}
-                          className="capitalize"
-                          checked={column.getIsVisible()}
-                          onCheckedChange={(value) =>
-                            column.toggleVisibility(!!value)
-                          }
-                        >
-                          {column.id}
-                        </DropdownMenuCheckboxItem>
-                      );
-                    })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        )}
-        <div className="rounded-md border w-full overflow-y-auto custom-scrollbar h-[340px] bg-transparent">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
+  return (
+    <div className="flex flex-col w-full">
+      {!hideToolbar && (
+        <div className="flex items-center py-2 w-full gap-1">
+          <Input
+            placeholder={`Filter ${searchKey}s...`}
+            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(searchKey)?.setFilterValue(event.target.value)
+            }
+            className="max-w-xs h-8 text-sm px-2"
+          />
+          <div className="ml-auto flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 px-2 text-sm">
+                  <ArrowUpDown className="h-4 w-4" />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanSort() && column.id !== "actions")
+                  .map((column) => {
                     return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsSorted() !== false}
+                        onCheckedChange={() => column.toggleSorting()}
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
                     );
                   })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.length ? (
-                table.getRowModel().rows.map((row: any) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    onClick={() => onRowClick && onRowClick(row.original)}
-                    className={`border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900 ${onRowClick ? "cursor-pointer" : ""}`}
-                  >
-                    {row.getVisibleCells().map((cell: any) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-center w-full px-4 py-1 bg-white rounded-b-xl mt-2 dark:bg-gray-800 dark:text-gray-100">
-          <div className="flex items-center gap-4">
-            <button
-              className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
-              onClick={() => {
-                setPagination((prev) => ({ ...prev, pageIndex: Math.max(0, prev.pageIndex - 1) }));
-                if (table.previousPage) table.previousPage();
-              }}
-              disabled={pagination.pageIndex === 0}
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-sm text-gray-700 dark:text-gray-100">
-              <span className="font-semibold">{pagination.pageIndex + 1}</span> / {Math.ceil(data.length / pagination.pageSize) || 1}
-            </span>
-            <button
-              className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
-              onClick={() => {
-                setPagination((prev) => ({ ...prev, pageIndex: Math.min(Math.ceil(data.length / pagination.pageSize) - 1, prev.pageIndex + 1) }));
-                if (table.nextPage) table.nextPage();
-              }}
-              disabled={pagination.pageIndex + 1 >= Math.ceil(data.length / pagination.pageSize)}
-              aria-label="Next page"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-1 h-8 px-2 text-sm">
+                  <Columns className="h-4 w-4" />
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) => column.getCanHide() && column.id !== "actions"
+                  )
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
+      )}
+      <div className="rounded-md border w-full overflow-y-auto custom-scrollbar h-[340px] bg-transparent">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row: any) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={() => onRowClick && onRowClick(row.original)}
+                  className={`border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900 ${onRowClick ? "cursor-pointer" : ""}`}
+                >
+                  {row.getVisibleCells().map((cell: any) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
-    );
+      <div className="flex items-center justify-center w-full px-4 py-1 bg-white rounded-b-xl mt-2 dark:bg-gray-800 dark:text-gray-100">
+        <div className="flex items-center gap-4">
+          <button
+            className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+            onClick={() => {
+              setPagination((prev) => ({ ...prev, pageIndex: Math.max(0, prev.pageIndex - 1) }));
+              if (table.previousPage) table.previousPage();
+            }}
+            disabled={pagination.pageIndex === 0}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-sm text-gray-700 dark:text-gray-100">
+            <span className="font-semibold">{pagination.pageIndex + 1}</span> / {Math.ceil(data.length / pagination.pageSize) || 1}
+          </span>
+          <button
+            className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+            onClick={() => {
+              setPagination((prev) => ({ ...prev, pageIndex: Math.min(Math.ceil(data.length / pagination.pageSize) - 1, prev.pageIndex + 1) }));
+              if (table.nextPage) table.nextPage();
+            }}
+            disabled={pagination.pageIndex + 1 >= Math.ceil(data.length / pagination.pageSize)}
+            aria-label="Next page"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
   }
   return null;
 } 

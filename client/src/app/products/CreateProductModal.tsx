@@ -38,6 +38,10 @@ const PRODUCT_CATEGORIES = [
   'Other'
 ];
 
+const formatIndianCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(value);
+};
+
 const CreateProductModal = ({
   isOpen,
   onClose,
@@ -509,6 +513,10 @@ const CreateProductModal = ({
                     required
                   />
                 </div>
+                {/* Show formatted price below the input */}
+                <div className="text-sm mt-1 text-blue-600 dark:text-blue-300">
+                  {formData.price > 0 && `Formatted: ${formatIndianCurrency(formData.price)}`}
+                </div>
                 {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
               </div>
 
@@ -590,20 +598,20 @@ const CreateProductModal = ({
                   </button>
                   {imagePreview && (
                     <div className="absolute bottom-4 left-4 flex gap-2">
-                      <button
-                        type="button"
-                        onClick={handleSaveImage}
-                        className="bg-green-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-green-600"
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleRemoveImage}
-                        className="bg-red-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-red-600"
-                      >
-                        Remove
-                      </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveImage}
+                          className="bg-green-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-green-600"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="bg-red-500 text-white rounded-full px-4 py-2 text-sm font-semibold shadow hover:bg-red-600"
+                        >
+                          Remove
+                        </button>
                     </div>
                   )}
                 </div>

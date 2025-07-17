@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAppSelector } from "@/state/hooks";
+import UserAvatar from '../components/UserAvatar';
+import PhotoAdjustModal from '../components/ui/PhotoAdjustModal';
 
 interface Employee {
   id: string;
@@ -17,13 +19,17 @@ interface EmployeeModalProps {
   employee: Employee | null;
   isOpen: boolean;
   onClose: () => void;
+  onSaveSuccess?: (updatedEmployee: Employee) => void;
 }
 
-const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, isOpen, onClose }) => {
+const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, isOpen, onClose, onSaveSuccess }) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const [isEditing, setIsEditing] = useState(false);
   const [editedEmployee, setEditedEmployee] = useState<Employee | null>(employee);
   const [saving, setSaving] = useState(false);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
+  const [showPhotoAdjust, setShowPhotoAdjust] = useState(false);
+  const [rawPhoto, setRawPhoto] = useState<string | null>(null);
 
   React.useEffect(() => {
     setEditedEmployee(employee);
@@ -42,24 +48,93 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, isOpen, onClose
     setEditedEmployee(prev => prev ? { ...prev, [field]: value } : prev);
   };
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+      // Show crop modal
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setRawPhoto(ev.target?.result as string);
+        setShowPhotoAdjust(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePhotoAdjustSave = (cropped: Blob | string) => {
+    if (cropped instanceof Blob) {
+      const file = new File([cropped], 'profile-photo.png', { type: 'image/png' });
+      setSelectedPhotoFile(file);
+      const url = URL.createObjectURL(file);
+      setEditedEmployee(prev => prev ? { ...prev, photoUrl: url } : prev);
+    } else {
+      setEditedEmployee(prev => prev ? { ...prev, photoUrl: cropped } : prev);
+    }
+    setShowPhotoAdjust(false);
+    setRawPhoto(null);
+  };
+
+  const handleRemovePhoto = () => {
+    setEditedEmployee(prev => {
+      if (!prev) return prev;
+      const { photoUrl, ...rest } = prev;
+      return rest;
+    });
+    setSelectedPhotoFile(null);
+  };
+
   const handleSave = async () => {
     if (!editedEmployee || !employee) return;
     setSaving(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/employees/${employee.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: editedEmployee.firstName,
-          lastName: editedEmployee.lastName,
-          email: editedEmployee.email,
-          phone: editedEmployee.phone,
-          address: editedEmployee.address
-        })
-      });
+      let res;
+      if (selectedPhotoFile) {
+        const form = new FormData();
+        form.append('firstName', editedEmployee.firstName);
+        form.append('lastName', editedEmployee.lastName);
+        form.append('email', editedEmployee.email);
+        form.append('phone', editedEmployee.phone);
+        if (editedEmployee.address) form.append('address', editedEmployee.address);
+        form.append('avatar', selectedPhotoFile);
+        res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/employees/${employee.id}`, {
+          method: 'PATCH',
+          body: form,
+        });
+      } else {
+        res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/employees/${employee.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: editedEmployee.firstName,
+            lastName: editedEmployee.lastName,
+            email: editedEmployee.email,
+            phone: editedEmployee.phone,
+            address: editedEmployee.address,
+          })
+        });
+      }
       if (!res.ok) throw new Error('Failed to update employee');
+      // Get updated employee data
+      const updated = await res.json();
+      setEditedEmployee(updated);
+      Object.assign(employee, updated);
+      setSelectedPhotoFile(null);
       setIsEditing(false);
-      onClose();
+      // Call onSaveSuccess so parent can refetch list
+      if (onSaveSuccess) onSaveSuccess(updated);
+      // Don't close immediately, let user see the updated avatar
+      setTimeout(() => onClose(), 1000);
     } catch (err: any) {
       alert(err.message || 'Error updating employee');
     } finally {
@@ -70,14 +145,23 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, isOpen, onClose
   if (!isOpen || !employee) return null;
 
   return (
-    <div className={`fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 ${isDarkMode ? 'dark' : ''}`} onClick={onClose}>
+    <div
+      className={`fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 ${isDarkMode ? 'dark' : ''}`}
+    >
       <div className={`rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white border-gray-200 text-gray-900'}`} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className={`flex items-center justify-between p-6 border-b sticky top-0 rounded-t-2xl ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
           <div className="flex items-center space-x-4">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-              {employee.firstName.charAt(0)}{employee.lastName.charAt(0)}
-            </div>
+                            <UserAvatar 
+                  user={{
+                    ...((editedEmployee || employee) ?? {}),
+                    photoUrl: selectedPhotoFile
+                      ? editedEmployee?.photoUrl || employee.photoUrl || '' // Show base64 preview when file is selected
+                      : (editedEmployee?.photoUrl ?? employee.photoUrl ?? ''),
+                  }}
+                  size="xl" 
+                  className="flex-shrink-0"
+                />
             <div>
               <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{employee.firstName} {employee.lastName}</h2>
               <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>{employee.role}</p>
@@ -95,6 +179,57 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, isOpen, onClose
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar p-6 space-y-6">
+          {/* Profile Picture */}
+          <div>
+            <h3 className={`text-lg font-semibold mb-4 flex items-center ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+              <svg className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Profile Picture
+            </h3>
+            <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded-lg p-6`}>
+              <div className="flex items-center space-x-6">
+                <UserAvatar 
+                  user={{
+                    ...((editedEmployee || employee) ?? {}),
+                    photoUrl: selectedPhotoFile
+                      ? editedEmployee?.photoUrl || employee.photoUrl || '' // Show base64 preview when file is selected
+                      : (editedEmployee?.photoUrl ?? employee.photoUrl ?? ''),
+                  }}
+                  size="xl" 
+                  className="flex-shrink-0"
+                />
+                <div className="flex-1">
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
+                    Upload a profile picture to personalize your account. Supported formats: JPG, PNG, GIF (max 5MB).
+                  </p>
+                  {isEditing ? (
+                    <div className="flex space-x-3">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className={`block w-full text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-700 ${isDarkMode ? 'file:bg-blue-700 file:hover:bg-blue-800' : 'file:bg-blue-600 file:hover:bg-blue-700'}`}
+                      />
+                      {editedEmployee?.photoUrl && (
+                        <button
+                          onClick={handleRemovePhoto}
+                          className="px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Click "Edit Employee" to update profile picture
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Personal Information */}
           <div>
             <h3 className={`text-lg font-semibold mb-4 flex items-center ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
@@ -250,6 +385,14 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, isOpen, onClose
           )}
         </div>
       </div>
+      {showPhotoAdjust && rawPhoto && (
+        <PhotoAdjustModal
+          open={showPhotoAdjust}
+          image={rawPhoto}
+          onClose={() => { setShowPhotoAdjust(false); setRawPhoto(null); }}
+          onSave={handlePhotoAdjustSave}
+        />
+      )}
     </div>
   );
 };

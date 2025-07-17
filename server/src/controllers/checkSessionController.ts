@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { getAuth } from '@clerk/nextjs/server';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 
 const prisma = new PrismaClient();
 
@@ -24,58 +24,33 @@ export const checkSession = async (req: Request, res: Response) => {
       });
     }
     
-    // Check for Clerk session cookie
-    const clerkSessionCookie = req.cookies['__session'];
-    
-    if (clerkSessionCookie) {
-      try {
-        // Get user data from Clerk session
-        const { userId } = await getAuth(req);
-        
-        if (!userId) {
-          console.log('No valid Clerk user ID found');
-          return res.status(401).json({ 
-            success: false, 
-            message: 'Invalid session token',
-            requiresReauthentication: true
-          });
-        }
-        
-        // Try to get user from database using the Clerk user ID
-        const user = await prisma.users.findFirst({
-          where: { clerkId: userId }
+    // ClerkExpressWithAuth middleware attaches auth info to req.auth
+    const auth = (req as any).auth;
+    if (auth && auth.userId) {
+      const userId = auth.userId;
+      // Try to get user from database using the Clerk user ID
+      const user = await prisma.users.findFirst({
+        where: { clerkId: userId }
+      });
+      if (user) {
+        // Return success with user data from our database
+        return res.status(200).json({
+          success: true,
+          message: 'Session valid',
+          user: user
         });
-        
-        if (user) {
-          // Return success with user data from our database
-          return res.status(200).json({
-            success: true,
-            message: 'Session valid',
-            user: user
-          });
-        } else {
-          // If no user in our database but valid Clerk session, it means the user 
-          // is in process of registering and hasn't completed yet
-          console.log('Valid Clerk session but user not yet in database - still in registration flow');
-          return res.status(200).json({ 
-            success: true, 
-            message: 'Valid Clerk session, but user registration incomplete',
-            registrationIncomplete: true,
-            clerkUserId: userId
-          });
-        }
-      } catch (clerkError) {
-        console.error('Clerk session validation error:', clerkError);
-        return res.status(401).json({ 
-          success: false, 
-          message: 'Session expired or invalid',
-          error: 'Session validation failed',
-          requiresReauthentication: true,
-          sessionExpired: true
+      } else {
+        // If no user in our database but valid Clerk session, it means the user 
+        // is in process of registering and hasn't completed yet
+        console.log('Valid Clerk session but user not yet in database - still in registration flow');
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Valid Clerk session, but user registration incomplete',
+          registrationIncomplete: true,
+          clerkUserId: userId
         });
       }
     }
-
     // No valid Clerk session found
     console.log('No valid session found');
     return res.status(401).json({ success: false, message: 'No active session' });

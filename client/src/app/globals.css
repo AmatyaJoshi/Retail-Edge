@@ -281,3 +281,8 @@ body,
 .dark .custom-scrollbar {
   scrollbar-color: #374151 #1f2937; /* thumb track */
 }
+
+/* Ensure pointer events are always enabled for Radix dialog content (fixes cropper modal closing issue) */
+[data-radix-dialog-content] {
+  pointer-events: auto !important;
+}
