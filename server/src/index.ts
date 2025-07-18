@@ -110,11 +110,11 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from the frontend build - AFTER API routes
-app.use(express.static(path.join(__dirname, '../../out')));
+app.use(express.static(path.join(__dirname, '../out')));
 
 // Fallback: serve index.html for any other route (for SPA) - AFTER API routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../out/index.html'));
+  res.sendFile(path.join(__dirname, '../out/index.html'));
 });
 
 // Error handling middleware

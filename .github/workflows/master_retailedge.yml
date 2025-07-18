@@ -28,6 +28,10 @@ jobs:
           cd client
           npm ci
           npm run build
+          echo "Frontend build completed. Checking out directory:"
+          ls -la out/ || echo "out directory not found in client"
+          echo "Contents of out directory:"
+          ls -la out/ 2>/dev/null || echo "Could not list out directory"
 
       - name: Install and build backend
         run: |
@@ -40,7 +44,12 @@ jobs:
       - name: Copy frontend build to backend
         run: |
           # Copy the static export to server/out
+          echo "Copying frontend build to backend..."
           cp -r client/out server/
+          echo "Checking if copy was successful:"
+          ls -la server/out/ || echo "server/out directory not found"
+          echo "Contents of server/out:"
+          ls -la server/out/ 2>/dev/null || echo "Could not list server/out directory"
 
       - name: Create node_modules.tar.gz for Azure
         run: |
@@ -60,6 +69,11 @@ jobs:
           
           # Copy deploy.sh to deployment root
           cp deploy.sh deployment/
+          
+          # Ensure out directory exists in deployment
+          ls -la deployment/
+          echo "Checking if out directory exists:"
+          ls -la deployment/out/ || echo "out directory not found"
 
       - name: Zip deployment package
         run: |
