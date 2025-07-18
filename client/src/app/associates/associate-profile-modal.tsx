@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAssociates } from "@/hooks/use-associates";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, UserPlus, Mail, Phone, MessageSquare, MoreVertical, Calendar, CreditCard, Package, History, Save, X, AlertCircle, DollarSign, RotateCw, ShoppingCart, Clock, Banknote } from "lucide-react";
+import { Pencil, Trash2, UserPlus, Mail, Phone, MessageSquare, Calendar, CreditCard, Package, History, Save, X, AlertCircle, DollarSign, RotateCw, ShoppingCart, Clock, Banknote } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";

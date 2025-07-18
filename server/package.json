@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "ts-node prisma/seed.ts",
     "build": "rimraf dist && npx tsc",
-    "start": "npm run build && node dist/src/index.js",
+    "start": "node dist/src/index.js",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "db:reset-seed": "prisma migrate reset --force --skip-seed && ts-node prisma/seed.ts"
   },
@@ -20,7 +20,7 @@
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
     "@clerk/clerk-react": "^5.32.3",
-    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@clerk/clerk-sdk-node": "^4.13.22",
     "@prisma/client": "^6.9.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-switch": "^1.2.5",
@@ -57,6 +57,7 @@
     "prisma": "^6.9.0",
     "resend": "^3.0.0",
     "rimraf": "^6.0.1",
+    "snakecase-keys": "^8.1.0",
     "uuid": "^11.1.0",
     "zod": "^3.25.57"
   },

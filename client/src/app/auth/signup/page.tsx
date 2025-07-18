@@ -1,14 +1,14 @@
 'use client';
 
 import SignupSteps from '@/components/SignupSteps';
-import styles from './auth.module.css';
 import { useSignUp, useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentYear } from '@/app/lib/utils';
+import Image from 'next/image';
 
 export default function SignupPage() {
-  const { signUp, isLoaded } = useSignUp();
+  const { isLoaded } = useSignUp();
   const { isSignedIn } = useUser();
   const router = useRouter();
 
@@ -28,11 +28,11 @@ export default function SignupPage() {
           <div className="hidden lg:flex flex-col justify-center items-start text-white space-y-10 flex-1">
             <div className="space-y-6 flex flex-col items-start">
               <div className="relative group flex flex-col items-start mb-2">
-                <img
+                <Image
                   src="/retail-edge-logo-dark.svg"
                   alt="Retail Edge Logo"
-                  className="w-64 h-auto object-contain"
-                  style={{ padding: 0, margin: 0 }}
+                  width={256}
+                  height={64}
                 />
               </div>
               <p className="text-base font-medium text-slate-100 tracking-normal leading-snug mt-2 mb-0">
@@ -41,11 +41,11 @@ export default function SignupPage() {
             </div>
             <div className="space-y-4 flex flex-col items-start">
               <div className="relative group flex flex-col items-start">
-                <img
+                <Image
                   src="/vision-loop-logo-dark.svg"
                   alt="Vision Loop Logo"
-                  className="w-40 h-auto object-contain"
-                  style={{ padding: 0, margin: 0 }}
+                  width={160}
+                  height={64}
                 />
               </div>
               <p className="text-base font-normal text-slate-100/80 tracking-normal leading-tight mt-1 mb-0">

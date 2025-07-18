@@ -54,7 +54,7 @@ const getDashboardMetrics = async (req, res) => {
         const popularProducts = Object.values(productSales)
             .sort((a, b) => b.revenue - a.revenue)
             .slice(0, 15)
-            .map(product => ({
+            .map((product) => ({
             ...product,
             revenueChange: 0, // TODO: Calculate change from previous period
             quantityChange: 0, // TODO: Calculate change from previous period
@@ -115,7 +115,7 @@ const getDashboardMetrics = async (req, res) => {
             }
             return acc;
         }, {});
-        const repeatCustomers = Object.values(customerOrderCounts).filter(count => count > 1).length;
+        const repeatCustomers = Object.values(customerOrderCounts).filter((count) => count > 1).length;
         const repeatCustomerPercentage = totalCustomers > 0 ? (repeatCustomers / totalCustomers) * 100 : 0;
         // Get pending orders count
         const pendingOrders = await prisma.purchaseOrder.count({

@@ -57,13 +57,27 @@ app.use(fileUpload({
   debug: process.env.NODE_ENV === 'development'
 }));
 
-// Serve static files from the frontend build (for static export)
-app.use(express.static(path.join(__dirname, '../../out')));
-
-// Fallback: serve index.html for any other route (for SPA)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../out/index.html'));
-});
+/* API ROUTES - These must come BEFORE static file serving */
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/prescriptions", prescriptionRoutes);
+app.use('/api/sales', salesRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/associates', associatesRoutes);
+app.use('/api/communications', communicationsRoutes);
+app.use('/api/contacts', contactsRoutes);
+app.use('/api/transactions', transactionsRoutes);
+app.use('/api/analytics', analyticsRoutes);
+// Register expense transactions routes as part of expenses
+app.use("/api/expenses/transactions", expenseTransactionsRoutes);
+app.use('/api/barcode', barcodeRoutes);
+app.use('/api/employees', employeesRoutes);
+app.use('/api/store', storeRoutes);
+app.use('/api/ai-assistant', aiAssistantRoutes);
+app.use('/api/product-image', productImageRoutes);
+app.use('/api/user-avatar', userAvatarRoutes);
 
 /* MIDDLEWARES */
 // Middleware to check for initial session and set cookie
@@ -95,27 +109,14 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ROUTES */
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/customers", customerRoutes);
-app.use("/api/expenses", expenseRoutes);
-app.use("/api/prescriptions", prescriptionRoutes);
-app.use('/api/sales', salesRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/associates', associatesRoutes);
-app.use('/api/communications', communicationsRoutes);
-app.use('/api/contacts', contactsRoutes);
-app.use('/api/transactions', transactionsRoutes);
-app.use('/api/analytics', analyticsRoutes);
-// Register expense transactions routes as part of expenses
-app.use("/api/expenses/transactions", expenseTransactionsRoutes);
-app.use('/api/barcode', barcodeRoutes);
-app.use('/api/employees', employeesRoutes);
-app.use('/api/store', storeRoutes);
-app.use('/api/ai-assistant', aiAssistantRoutes);
-app.use('/api/product-image', productImageRoutes);
-app.use('/api/user-avatar', userAvatarRoutes);
+// Serve static files from the frontend build - AFTER API routes
+const staticPath = path.join(process.cwd(), 'server', 'out');
+app.use(express.static(staticPath));
+
+// Fallback: serve index.html for any other route (for SPA) - AFTER API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(staticPath, 'index.html'));
+});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -129,6 +130,31 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 /* SERVER */
 const startServer = async (port: number): Promise<void> => {
   try {
+    // Debug: Log the current working directory and static file path
+    console.log('=== SERVER STARTUP DEBUG ===');
+    console.log('Current working directory:', process.cwd());
+    console.log('Static files path:', path.join(process.cwd(), 'out'));
+    console.log('Checking if out directory exists:');
+    try {
+      const fs = require('fs');
+      const outPath = path.join(process.cwd(), 'out');
+      console.log('Attempting to read directory:', outPath);
+      const files = fs.readdirSync(outPath);
+      console.log('Files in out directory:', files);
+      console.log('Number of files:', files.length);
+    } catch (error) {
+      console.log('Error reading out directory:', error instanceof Error ? error.message : String(error));
+      console.log('Let\'s check what\'s in the current directory:');
+      try {
+        const fs = require('fs');
+        const currentFiles = fs.readdirSync(process.cwd());
+        console.log('Files in current directory:', currentFiles);
+      } catch (dirError) {
+        console.log('Error reading current directory:', dirError instanceof Error ? dirError.message : String(dirError));
+      }
+    }
+    console.log('=== END SERVER STARTUP DEBUG ===');
+    
     await new Promise((resolve, reject) => {
       const server = app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
