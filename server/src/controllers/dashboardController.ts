@@ -22,7 +22,7 @@ export const getDashboardMetrics = async (
     // Get total products count and inventory value
     const products = await prisma.products.findMany();
     const totalProducts = products.length;
-    const inventoryValue = products.reduce((sum, product) => sum + (product.price * product.stockQuantity), 0);
+    const inventoryValue = products.reduce((sum: number, product: any) => sum + (product.price * product.stockQuantity), 0);
 
     // Get sales data for the period
     const sales = await prisma.sales.findMany({
@@ -41,12 +41,12 @@ export const getDashboardMetrics = async (
     }
 
     // Calculate total sales and average order value
-    const totalSales = sales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+    const totalSales = sales.reduce((sum: number, sale: any) => sum + sale.totalAmount, 0);
     const totalOrders = sales.length;
     const averageOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
 
     // Get popular products by revenue and quantity
-    const productSales = sales.reduce((acc, sale) => {
+    const productSales = sales.reduce((acc: Record<string, { productId: string; name: string; revenue: number; quantity: number }>, sale: any) => {
       const productId = sale.productId;
       if (!acc[productId]) {
         acc[productId] = {
@@ -61,17 +61,17 @@ export const getDashboardMetrics = async (
       return acc;
     }, {} as Record<string, { productId: string; name: string; revenue: number; quantity: number }>);
 
-    const popularProducts = Object.values(productSales)
-      .sort((a, b) => b.revenue - a.revenue)
+    const popularProducts = (Object.values(productSales) as { productId: string; name: string; revenue: number; quantity: number }[])
+      .sort((a: { productId: string; name: string; revenue: number; quantity: number }, b: { productId: string; name: string; revenue: number; quantity: number }) => b.revenue - a.revenue)
       .slice(0, 15)
-      .map(product => ({
+      .map((product: { productId: string; name: string; revenue: number; quantity: number }) => ({
         ...product,
         revenueChange: 0, // TODO: Calculate change from previous period
         quantityChange: 0, // TODO: Calculate change from previous period
       }));
 
     // Get sales summary by date
-    const salesByDate = sales.reduce((acc, sale) => {
+    const salesByDate = sales.reduce((acc: Record<string, { totalValue: number; orderCount: number; customerCount: Set<string> }>, sale: any) => {
       const date = sale.timestamp.toISOString().split('T')[0];
       if (!acc[date]) {
         acc[date] = {
@@ -88,7 +88,7 @@ export const getDashboardMetrics = async (
       return acc;
     }, {} as Record<string, { totalValue: number; orderCount: number; customerCount: Set<string> }>);
 
-    const salesSummary = Object.entries(salesByDate).map(([date, data]) => ({
+    const salesSummary = (Object.entries(salesByDate) as [string, { totalValue: number; orderCount: number; customerCount: Set<string> }][]).map(([date, data]: [string, { totalValue: number; orderCount: number; customerCount: Set<string> }]) => ({
       date,
       totalValue: data.totalValue,
       orderCount: data.orderCount,
@@ -97,7 +97,7 @@ export const getDashboardMetrics = async (
     }));
 
     // Get category analysis
-    const categoryAnalysis = products.reduce((acc, product) => {
+    const categoryAnalysis = products.reduce((acc: Record<string, { category: string; revenue: number; quantity: number; productCount: number }>, product: any) => {
       const category = product.category;
       if (!acc[category]) {
         acc[category] = {
@@ -124,14 +124,14 @@ export const getDashboardMetrics = async (
     });
 
     // Get repeat customers count
-    const customerOrderCounts = sales.reduce((acc, sale) => {
+    const customerOrderCounts = sales.reduce((acc: Record<string, number>, sale: any) => {
       if (sale.customerId) {
         acc[sale.customerId] = (acc[sale.customerId] || 0) + 1;
       }
       return acc;
     }, {} as Record<string, number>);
 
-    const repeatCustomers = Object.values(customerOrderCounts).filter(count => count > 1).length;
+    const repeatCustomers = (Object.values(customerOrderCounts) as number[]).filter((count: number) => count > 1).length;
     const repeatCustomerPercentage = totalCustomers > 0 ? (repeatCustomers / totalCustomers) * 100 : 0;
 
     // Get pending orders count

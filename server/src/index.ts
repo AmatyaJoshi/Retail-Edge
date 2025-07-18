@@ -57,13 +57,27 @@ app.use(fileUpload({
   debug: process.env.NODE_ENV === 'development'
 }));
 
-// Serve static files from the frontend build (for static export)
-app.use(express.static(path.join(__dirname, '../../out')));
-
-// Fallback: serve index.html for any other route (for SPA)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../out/index.html'));
-});
+/* API ROUTES - These must come BEFORE static file serving */
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/prescriptions", prescriptionRoutes);
+app.use('/api/sales', salesRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/associates', associatesRoutes);
+app.use('/api/communications', communicationsRoutes);
+app.use('/api/contacts', contactsRoutes);
+app.use('/api/transactions', transactionsRoutes);
+app.use('/api/analytics', analyticsRoutes);
+// Register expense transactions routes as part of expenses
+app.use("/api/expenses/transactions", expenseTransactionsRoutes);
+app.use('/api/barcode', barcodeRoutes);
+app.use('/api/employees', employeesRoutes);
+app.use('/api/store', storeRoutes);
+app.use('/api/ai-assistant', aiAssistantRoutes);
+app.use('/api/product-image', productImageRoutes);
+app.use('/api/user-avatar', userAvatarRoutes);
 
 /* MIDDLEWARES */
 // Middleware to check for initial session and set cookie
@@ -95,27 +109,13 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ROUTES */
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/customers", customerRoutes);
-app.use("/api/expenses", expenseRoutes);
-app.use("/api/prescriptions", prescriptionRoutes);
-app.use('/api/sales', salesRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/associates', associatesRoutes);
-app.use('/api/communications', communicationsRoutes);
-app.use('/api/contacts', contactsRoutes);
-app.use('/api/transactions', transactionsRoutes);
-app.use('/api/analytics', analyticsRoutes);
-// Register expense transactions routes as part of expenses
-app.use("/api/expenses/transactions", expenseTransactionsRoutes);
-app.use('/api/barcode', barcodeRoutes);
-app.use('/api/employees', employeesRoutes);
-app.use('/api/store', storeRoutes);
-app.use('/api/ai-assistant', aiAssistantRoutes);
-app.use('/api/product-image', productImageRoutes);
-app.use('/api/user-avatar', userAvatarRoutes);
+// Serve static files from the frontend build (for static export) - AFTER API routes
+app.use(express.static(path.join(__dirname, '../../out')));
+
+// Fallback: serve index.html for any other route (for SPA) - AFTER API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../out/index.html'));
+});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
