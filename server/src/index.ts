@@ -110,11 +110,25 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from the frontend build (for static export) - AFTER API routes
-app.use(express.static(path.join(__dirname, '../../out')));
+// Commented out since we're only deploying the API backend
+// app.use(express.static(path.join(__dirname, '../../out')));
 
 // Fallback: serve index.html for any other route (for SPA) - AFTER API routes
+// Commented out since we're only deploying the API backend
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../../out/index.html'));
+// });
+
+// Simple response for non-API routes (since we're only deploying the API)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../out/index.html'));
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.status(200).json({ 
+    message: 'Retail Edge API Server',
+    status: 'running',
+    note: 'This is the API backend. Frontend should be deployed separately.'
+  });
 });
 
 // Error handling middleware
