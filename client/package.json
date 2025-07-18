@@ -83,6 +83,7 @@
     "redux-persist": "^6.0.0",
     "snakecase-keys": "^8.1.0",
     "sonner": "^2.0.5",
+    "swr": "^2.3.4",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
@@ -126,5 +127,8 @@
     "tw-animate-css": "^1.3.4",
     "tw-colors": "^3.3.2",
     "typescript": "^5"
+  },
+  "overrides": {
+    "swr": "^2.3.4"
   }
 }
