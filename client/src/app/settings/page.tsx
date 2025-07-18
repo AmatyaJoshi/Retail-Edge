@@ -28,7 +28,6 @@ import {
   Monitor,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useTranslations } from "next-intl";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // Eyewear SVG icon from svgrepo.com
@@ -145,7 +144,7 @@ const categorySectionMap = {
 };
 
 const Settings = () => {
-  const t = useTranslations();
+  // const t = useTranslations(); // Removed next-intl usage
   const [store, setStore] = useState<Record<string, string>>(initialStoreState);
   const [storeLogo, setStoreLogo] = useState<File | null>(null);
   const [storeLogoPreview, setStoreLogoPreview] = useState<string | null>(null);
@@ -255,7 +254,7 @@ const Settings = () => {
           <span className="font-medium text-white">Back</span>
         </button>
           <div className="p-4 border-b border-gray-200 flex items-center">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('settings')}</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Settings</h2>
           </div>
           <div className="flex-1 overflow-y-auto">
             <nav className="p-4 space-y-1">
@@ -277,7 +276,7 @@ const Settings = () => {
               className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium">{t('logout')}</span>
+              <span className="font-medium">Logout</span>
             </button>
           </div>
         </aside>

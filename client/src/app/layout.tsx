@@ -8,8 +8,6 @@ import ConditionalAIAssistant from "./components/ConditionalAIAssistant";
 import { AIAssistantProvider } from "./contexts/AIAssistantContext";
 import { PageDataProvider } from "./contexts/PageDataContext";
 import { ClerkProvider } from '@clerk/nextjs';
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale } from 'next-intl/server';
 import ReduxProvider from './providers/ReduxProvider';
 import DarkModeSync from './components/DarkModeSync';
 
@@ -34,28 +32,24 @@ export function generateStaticParams() {
   ];
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
-  const messages = (await import(`./messages/${locale}.json`)).default;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <html lang={locale}>
+      <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <ReduxProvider>
             <DarkModeSync />
-            <NextIntlClientProvider locale={locale} messages={messages}>
-              <ReactQueryProvider>
-                <PageDataProvider>
-                  <AIAssistantProvider>
-                    <ClientLayout>
-                      {children}
-                    </ClientLayout>
-                    <ConditionalAIAssistant />
-                  </AIAssistantProvider>
-                </PageDataProvider>
-                <Toaster />
-              </ReactQueryProvider>
-            </NextIntlClientProvider>
+            <ReactQueryProvider>
+              <PageDataProvider>
+                <AIAssistantProvider>
+                  <ClientLayout>
+                    {children}
+                  </ClientLayout>
+                  <ConditionalAIAssistant />
+                </AIAssistantProvider>
+              </PageDataProvider>
+              <Toaster />
+            </ReactQueryProvider>
           </ReduxProvider>
         </body>
       </html>

@@ -1,6 +1,5 @@
 "use client";
-import React from 'react';
-import { useLocale } from 'next-intl';
+import React, { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   DropdownMenu,
@@ -34,10 +33,11 @@ const LANGUAGES = [
 ];
 
 const LanguageSwitcher: React.FC = () => {
-  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const current = LANGUAGES.find(l => l.code === locale) ?? LANGUAGES[0];
+  // Default to 'en' if no locale in path
+  const currentLocale = pathname?.split('/')[1] || 'en';
+  const current = LANGUAGES.find(l => l.code === currentLocale) ?? LANGUAGES[0];
 
   const handleSelect = (code: string) => {
     if (!pathname) return;
@@ -58,27 +58,27 @@ const LanguageSwitcher: React.FC = () => {
           <ChevronDown className="w-3 h-3 text-gray-400" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent>
         <div className="w-48 max-h-48 overflow-y-auto custom-scrollbar">
           {LANGUAGES.map(lang => (
             <button
               key={lang.code}
               onClick={() => handleSelect(lang.code)}
               className={`w-full flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                locale === lang.code 
+                currentLocale === lang.code 
                   ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200' 
                   : 'text-gray-700 dark:text-gray-300'
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className={`font-medium ${locale === lang.code ? 'text-blue-700 dark:text-blue-200' : 'text-gray-700 dark:text-gray-300'}`}>
+                <span className={`font-medium ${currentLocale === lang.code ? 'text-blue-700 dark:text-blue-200' : 'text-gray-700 dark:text-gray-300'}`}>
                   {lang.code.toUpperCase()}
                 </span>
-                <span className={`text-xs ${locale === lang.code ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>
+                <span className={`text-xs ${currentLocale === lang.code ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>
                   {lang.label}
                 </span>
               </div>
-              {locale === lang.code && (
+              {currentLocale === lang.code && (
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
               )}
             </button>

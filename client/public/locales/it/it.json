@@ -1,0 +1,19 @@
+{
+  "welcome": "Benvenuto",
+  "settings": "Impostazioni",
+  "logout": "Disconnettersi",
+  "profile": "Profilo",
+  "language": "Lingua",
+  "save": "Salva",
+  "cancel": "Annulla",
+  "general": "Generale",
+  "appearance": "Aspetto",
+  "notifications": "Notifiche",
+  "security": "Sicurezza",
+  "billing": "Fatturazione",
+  "store": "Negozio",
+  "localization": "Localizzazione",
+  "pos": "POS",
+  "inventory": "Inventario",
+  "back": "Indietro"
+} 

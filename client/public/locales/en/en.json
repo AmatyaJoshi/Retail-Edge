@@ -1,0 +1,19 @@
+{
+  "welcome": "Welcome",
+  "settings": "Settings",
+  "logout": "Logout",
+  "profile": "Profile",
+  "language": "Language",
+  "save": "Save",
+  "cancel": "Cancel",
+  "general": "General",
+  "appearance": "Appearance",
+  "notifications": "Notifications",
+  "security": "Security",
+  "billing": "Billing",
+  "store": "Store",
+  "localization": "Localization",
+  "pos": "POS",
+  "inventory": "Inventory",
+  "back": "Back"
+} 
