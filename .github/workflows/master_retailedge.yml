@@ -23,13 +23,6 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Install and build frontend
-        run: |
-          cd client
-          npm ci
-          npm run build
-          npm run export
-
       - name: Install and build backend
         run: |
           cd server
@@ -37,11 +30,6 @@ jobs:
           npm run build
           # Generate Prisma client for production
           npx prisma generate
-
-      - name: Copy frontend static export to backend
-        run: |
-          rm -rf server/out
-          cp -r client/out server/
 
       - name: Create node_modules.tar.gz for Azure
         run: |
