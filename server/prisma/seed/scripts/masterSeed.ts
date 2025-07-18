@@ -24,8 +24,6 @@ async function masterSeed() {
     
     // Reset database tables (optional - comment out if you want to keep existing data)
     console.log('Clearing database tables...');
-    await prisma.expenseByCategory.deleteMany({});
-    await prisma.expenseSummary.deleteMany({});
     await prisma.expenses.deleteMany({});
     console.log('Database tables cleared.');    // Define the order of seed scripts
     const seedScripts = [

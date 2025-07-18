@@ -24,7 +24,6 @@ async function seedExpenseTransactions() {
     for (const transaction of expenseTransactionsData) {
       await prisma.expenseTransactions.create({
         data: {
-          id: transaction.id,
           expenseId: transaction.expenseId,
           type: transaction.type,
           amount: transaction.amount,
