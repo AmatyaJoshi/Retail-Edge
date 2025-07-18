@@ -110,14 +110,30 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from the frontend build - AFTER API routes
-// Use path relative to the project root (where the compiled server runs from)
+// The server runs from /home/site/wwwroot/server, so we need to look for out in the same directory
 const staticPath = path.join(process.cwd(), 'out');
+const parentStaticPath = path.join(process.cwd(), '..', 'out');
+
+// Try to serve from current directory first, then parent directory
 app.use(express.static(staticPath));
+app.use(express.static(parentStaticPath));
 
 // Fallback: serve index.html for any other route (for SPA) - AFTER API routes
 app.get('*', (req, res) => {
   const indexPath = path.join(staticPath, 'index.html');
   console.log('Serving index.html from:', indexPath);
+  
+  // Check if the file exists, if not try parent directory
+  const fs = require('fs');
+  if (!fs.existsSync(indexPath)) {
+    const parentIndexPath = path.join(process.cwd(), '..', 'out', 'index.html');
+    console.log('File not found, trying parent directory:', parentIndexPath);
+    if (fs.existsSync(parentIndexPath)) {
+      console.log('Found file in parent directory, serving from there');
+      return res.sendFile(parentIndexPath);
+    }
+  }
+  
   res.sendFile(indexPath);
 });
 
