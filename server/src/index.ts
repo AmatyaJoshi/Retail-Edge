@@ -110,31 +110,68 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from the frontend build - AFTER API routes
-// The server runs from /home/site/wwwroot/server, so we need to look for out in the same directory
-const staticPath = path.join(process.cwd(), 'out');
-const parentStaticPath = path.join(process.cwd(), '..', 'out');
+// Try multiple possible locations for the frontend files
+const possiblePaths = [
+  path.join(process.cwd(), 'out'),
+  path.join(process.cwd(), '..', 'out'),
+  path.join(process.cwd(), '..', '..', 'out'),
+  path.join(process.cwd(), 'public'),
+  path.join(process.cwd(), '..', 'public')
+];
 
-// Try to serve from current directory first, then parent directory
-app.use(express.static(staticPath));
-app.use(express.static(parentStaticPath));
+// Serve static files from all possible locations
+possiblePaths.forEach(staticPath => {
+  app.use(express.static(staticPath));
+});
 
-// Fallback: serve index.html for any other route (for SPA) - AFTER API routes
+// Fallback: serve a simple HTML page for any other route
 app.get('*', (req, res) => {
-  const indexPath = path.join(staticPath, 'index.html');
-  console.log('Serving index.html from:', indexPath);
-  
-  // Check if the file exists, if not try parent directory
+  // Try to find index.html in any of the possible paths
   const fs = require('fs');
-  if (!fs.existsSync(indexPath)) {
-    const parentIndexPath = path.join(process.cwd(), '..', 'out', 'index.html');
-    console.log('File not found, trying parent directory:', parentIndexPath);
-    if (fs.existsSync(parentIndexPath)) {
-      console.log('Found file in parent directory, serving from there');
-      return res.sendFile(parentIndexPath);
+  let foundPath = null;
+  
+  for (const staticPath of possiblePaths) {
+    const indexPath = path.join(staticPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      foundPath = indexPath;
+      break;
     }
   }
   
-  res.sendFile(indexPath);
+  if (foundPath) {
+    console.log('Serving index.html from:', foundPath);
+    res.sendFile(foundPath);
+  } else {
+    // If no index.html found, serve a simple message
+    console.log('No index.html found, serving fallback page');
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Retail Edge - Backend Running</title>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .status { color: green; font-size: 24px; margin: 20px 0; }
+            .api-link { margin: 20px 0; }
+            a { color: #007bff; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Retail Edge</h1>
+            <div class="status">✅ Backend Server is Running</div>
+            <p>The backend API is working correctly. The frontend files are not being served properly.</p>
+            <div class="api-link">
+              <a href="/api/dashboard">Test API: Dashboard</a>
+            </div>
+            <p>Check the deployment logs for frontend build issues.</p>
+          </div>
+        </body>
+      </html>
+    `);
+  }
 });
 
 // Error handling middleware

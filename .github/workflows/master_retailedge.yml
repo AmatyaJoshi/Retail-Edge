@@ -24,35 +24,10 @@ jobs:
           node-version: '20.x'
           cache: 'npm'
 
-      - name: Cache frontend dependencies
-        uses: actions/cache@v4
-        with:
-          path: client/node_modules
-          key: ${{ runner.os }}-frontend-${{ hashFiles('client/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-frontend-
-
-      - name: Install frontend dependencies
+      - name: Skip frontend build
         run: |
-          cd client
-          npm ci
-
-      - name: Cache frontend build
-        uses: actions/cache@v4
-        with:
-          path: client/.next
-          key: ${{ runner.os }}-frontend-build-${{ hashFiles('client/**/*.{js,ts,tsx,jsx,json}') }}
-          restore-keys: |
-            ${{ runner.os }}-frontend-build-
-
-      - name: Build frontend
-        run: |
-          cd client
-          npm run build
-          echo "Frontend build completed. Checking out directory:"
-          ls -la out/ || echo "out directory not found in client"
-          echo "Contents of out directory:"
-          ls -la out/ 2>/dev/null || echo "Could not list out directory"
+          echo "Skipping frontend build - deploying backend only"
+          echo "The server will serve a fallback page instead of the full frontend"
 
       - name: Cache backend dependencies
         uses: actions/cache@v4
@@ -82,15 +57,9 @@ jobs:
           # Generate Prisma client for production
           npx prisma generate
 
-      - name: Copy frontend build to backend
+      - name: Skip frontend copy
         run: |
-          # Copy the static export to server/out
-          echo "Copying frontend build to backend..."
-          cp -r client/out server/
-          echo "Checking if copy was successful:"
-          ls -la server/out/ || echo "server/out directory not found"
-          echo "Contents of server/out:"
-          ls -la server/out/ 2>/dev/null || echo "Could not list server/out directory"
+          echo "Skipping frontend copy - no frontend files to copy"
 
       - name: Create node_modules.tar.gz for Azure
         run: |
@@ -111,10 +80,8 @@ jobs:
           # Copy deploy.sh to deployment root
           cp deploy.sh deployment/
           
-          # Ensure out directory exists in deployment
-          ls -la deployment/
-          echo "Checking if out directory exists:"
-          ls -la deployment/out/ || echo "out directory not found"
+          # No frontend files to check
+          echo "Deployment package created successfully"
 
       - name: Zip deployment package
         run: |
