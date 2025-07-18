@@ -110,7 +110,7 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from the frontend build - AFTER API routes
-const staticPath = path.join(process.cwd(), 'out');
+const staticPath = path.join(process.cwd(), 'server', 'out');
 app.use(express.static(staticPath));
 
 // Fallback: serve index.html for any other route (for SPA) - AFTER API routes
