@@ -31,11 +31,6 @@ async function masterSeed() {
         await prisma.expenses.deleteMany({});
         console.log('Database tables cleared.'); // Define the order of seed scripts
         const seedScripts = [
-<<<<<<< HEAD
-            path_1.default.join(__dirname, 'seedExpenseSummary.ts'),
-            path_1.default.join(__dirname, 'seedExpenseByCategory.ts'),
-=======
->>>>>>> 581caa7250838cf65b426bbe56781d490c34cc5c
             path_1.default.join(__dirname, 'seedExpenses.ts'),
             path_1.default.join(__dirname, 'seedExpenseTransactions.ts'),
             // Add other seed scripts here in the correct order

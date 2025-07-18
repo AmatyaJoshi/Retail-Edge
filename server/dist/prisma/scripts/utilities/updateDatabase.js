@@ -45,30 +45,18 @@ async function updateDatabase() {
         const salesData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'sales.json'), 'utf-8'));
         const prescriptionsData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'prescriptions.json'), 'utf-8'));
         const expensesData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'expenses.json'), 'utf-8'));
-<<<<<<< HEAD
-        const expenseSummaryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'expenseSummary.json'), 'utf-8'));
-=======
->>>>>>> 581caa7250838cf65b426bbe56781d490c34cc5c
         const salesSummaryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'salesSummary.json'), 'utf-8'));
         const purchaseSummaryData = JSON.parse(fs.readFileSync(path.join(__dirname, 'seedData', 'purchaseSummary.json'), 'utf-8'));
         console.log('Starting database update...');
         // Delete existing data in reverse order of dependencies
         console.log('Deleting existing data...');
-<<<<<<< HEAD
         await prisma.salesSummary.deleteMany();
         await prisma.purchaseSummary.deleteMany();
-=======
->>>>>>> 581caa7250838cf65b426bbe56781d490c34cc5c
         await prisma.sales.deleteMany();
         await prisma.purchases.deleteMany();
         await prisma.prescriptions.deleteMany();
         await prisma.products.deleteMany();
         await prisma.customers.deleteMany();
-<<<<<<< HEAD
-=======
-        await prisma.salesSummary.deleteMany();
-        await prisma.purchaseSummary.deleteMany();
->>>>>>> 581caa7250838cf65b426bbe56781d490c34cc5c
         // Insert new data in order of dependencies
         console.log('Inserting new data...');
         // Insert Users first

@@ -59,8 +59,6 @@ app.use((0, express_fileupload_1.default)({
     responseOnLimit: 'File size limit has been reached',
     debug: process.env.NODE_ENV === 'development'
 }));
-<<<<<<< HEAD
-=======
 /* API ROUTES - These must come BEFORE static file serving */
 app.use("/api/dashboard", dashboardRoutes_1.default);
 app.use("/api/products", productRoutes_1.default);
@@ -82,7 +80,6 @@ app.use('/api/store', storeRoutes_1.default);
 app.use('/api/ai-assistant', aiAssistant_1.default);
 app.use('/api/product-image', productImage_1.default);
 app.use('/api/user-avatar', userAvatar_1.default);
->>>>>>> 581caa7250838cf65b426bbe56781d490c34cc5c
 /* MIDDLEWARES */
 // Middleware to check for initial session and set cookie
 app.use((req, res, next) => {
@@ -110,36 +107,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-<<<<<<< HEAD
-/* ROUTES */
-app.use("/api/dashboard", dashboardRoutes_1.default);
-app.use("/api/products", productRoutes_1.default);
-app.use("/api/customers", customerRoutes_1.default);
-app.use("/api/expenses", expenseRoutes_1.default);
-app.use("/api/prescriptions", prescriptionRoutes_1.default);
-app.use('/api/sales', salesRoutes_1.default);
-app.use('/api/auth', authRoutes_1.default);
-app.use('/api/associates', associates_1.default);
-app.use('/api/communications', communications_1.default);
-app.use('/api/contacts', contacts_1.default);
-app.use('/api/transactions', transactions_1.default);
-app.use('/api/analytics', analytics_1.default);
-// Register expense transactions routes as part of expenses
-app.use("/api/expenses/transactions", expenseTransactionsRoutes_1.default);
-app.use('/api/barcode', barcode_1.default);
-app.use('/api/employees', employees_1.default);
-app.use('/api/store', storeRoutes_1.default);
-app.use('/api/ai-assistant', aiAssistant_1.default);
-app.use('/api/product-image', productImage_1.default);
-app.use('/api/user-avatar', userAvatar_1.default);
-=======
-// Serve static files from the frontend build (for static export) - AFTER API routes
-app.use(express_1.default.static(path_1.default.join(__dirname, '../../out')));
-// Fallback: serve index.html for any other route (for SPA) - AFTER API routes
-app.get('*', (req, res) => {
-    res.sendFile(path_1.default.join(__dirname, '../../out/index.html'));
-});
->>>>>>> 581caa7250838cf65b426bbe56781d490c34cc5c
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Server error:', err);
