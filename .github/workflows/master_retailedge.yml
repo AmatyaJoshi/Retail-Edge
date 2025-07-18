@@ -22,21 +22,62 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
+          cache: 'npm'
 
-      - name: Install and build frontend
+      - name: Cache frontend dependencies
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-frontend-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-
+
+      - name: Install frontend dependencies
         run: |
           cd client
           npm ci
+
+      - name: Cache frontend build
+        uses: actions/cache@v4
+        with:
+          path: client/.next
+          key: ${{ runner.os }}-frontend-build-${{ hashFiles('client/**/*.{js,ts,tsx,jsx,json}') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-build-
+
+      - name: Build frontend
+        run: |
+          cd client
           npm run build
           echo "Frontend build completed. Checking out directory:"
           ls -la out/ || echo "out directory not found in client"
           echo "Contents of out directory:"
           ls -la out/ 2>/dev/null || echo "Could not list out directory"
 
-      - name: Install and build backend
+      - name: Cache backend dependencies
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-backend-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-
+
+      - name: Install backend dependencies
         run: |
           cd server
           npm ci
+
+      - name: Cache Prisma client
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules/.prisma
+          key: ${{ runner.os }}-prisma-${{ hashFiles('server/prisma/schema.prisma') }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-
+
+      - name: Build backend
+        run: |
+          cd server
           npm run build
           # Generate Prisma client for production
           npx prisma generate
