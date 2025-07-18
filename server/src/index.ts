@@ -110,11 +110,15 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from the frontend build - AFTER API routes
-app.use(express.static(path.join(__dirname, '../out')));
+// Use path relative to the project root (where the compiled server runs from)
+const staticPath = path.join(process.cwd(), 'out');
+app.use(express.static(staticPath));
 
 // Fallback: serve index.html for any other route (for SPA) - AFTER API routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../out/index.html'));
+  const indexPath = path.join(staticPath, 'index.html');
+  console.log('Serving index.html from:', indexPath);
+  res.sendFile(indexPath);
 });
 
 // Error handling middleware
@@ -129,6 +133,19 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 /* SERVER */
 const startServer = async (port: number): Promise<void> => {
   try {
+    // Debug: Log the current working directory and static file path
+    console.log('Current working directory:', process.cwd());
+    console.log('Static files path:', path.join(process.cwd(), 'out'));
+    console.log('Checking if out directory exists:');
+    try {
+      const fs = require('fs');
+      const outPath = path.join(process.cwd(), 'out');
+      const files = fs.readdirSync(outPath);
+      console.log('Files in out directory:', files);
+    } catch (error) {
+      console.log('Error reading out directory:', error instanceof Error ? error.message : String(error));
+    }
+    
     await new Promise((resolve, reject) => {
       const server = app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
