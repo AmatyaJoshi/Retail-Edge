@@ -102,7 +102,9 @@ const Sidebar = () => {
       const allowedPaths = ['/pos', '/transactions', '/settings', '/profile'];
       return allowedPaths.includes(href);
     }
-    // All other roles (Owner, Manager, Admin) can access everything
+    // For Owner, Manager, Admin: hide profile link
+    if (href === '/profile') return false;
+    // All other roles (Owner, Manager, Admin) can access everything else
     return true;
   };
 

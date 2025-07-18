@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useClerk } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 // Eyewear SVG icon from svgrepo.com
 const EyewearIcon = () => (
@@ -145,6 +147,8 @@ const categorySectionMap = {
 
 const Settings = () => {
   // const t = useTranslations(); // Removed next-intl usage
+  const { signOut } = useClerk();
+  const router = useRouter();
   const [store, setStore] = useState<Record<string, string>>(initialStoreState);
   const [storeLogo, setStoreLogo] = useState<File | null>(null);
   const [storeLogoPreview, setStoreLogoPreview] = useState<string | null>(null);
@@ -237,8 +241,9 @@ const Settings = () => {
   }, [activeCategory, searchTerm]);
 
   const handleLogout = () => {
-    // Implement logout logic
-    toast.success("Logged out successfully!");
+    signOut(() => {
+      window.location.href = '/auth/login';
+    });
   };
 
   return (
@@ -253,7 +258,7 @@ const Settings = () => {
           </svg>
           <span className="font-medium text-white">Back</span>
         </button>
-          <div className="p-4 border-b border-gray-200 flex items-center">
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Settings</h2>
           </div>
           <div className="flex-1 overflow-y-auto">
