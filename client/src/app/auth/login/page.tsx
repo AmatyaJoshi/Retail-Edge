@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import EyeIcon from "@/components/ui/EyeIcon";
-import styles from './auth.module.css';
 import { useSignIn, useUser, useClerk } from '@clerk/nextjs';
 import { getCurrentYear } from '@/app/lib/utils';
 
