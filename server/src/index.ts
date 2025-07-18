@@ -134,17 +134,29 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 const startServer = async (port: number): Promise<void> => {
   try {
     // Debug: Log the current working directory and static file path
+    console.log('=== SERVER STARTUP DEBUG ===');
     console.log('Current working directory:', process.cwd());
     console.log('Static files path:', path.join(process.cwd(), 'out'));
     console.log('Checking if out directory exists:');
     try {
       const fs = require('fs');
       const outPath = path.join(process.cwd(), 'out');
+      console.log('Attempting to read directory:', outPath);
       const files = fs.readdirSync(outPath);
       console.log('Files in out directory:', files);
+      console.log('Number of files:', files.length);
     } catch (error) {
       console.log('Error reading out directory:', error instanceof Error ? error.message : String(error));
+      console.log('Let\'s check what\'s in the current directory:');
+      try {
+        const fs = require('fs');
+        const currentFiles = fs.readdirSync(process.cwd());
+        console.log('Files in current directory:', currentFiles);
+      } catch (dirError) {
+        console.log('Error reading current directory:', dirError instanceof Error ? dirError.message : String(dirError));
+      }
     }
+    console.log('=== END SERVER STARTUP DEBUG ===');
     
     await new Promise((resolve, reject) => {
       const server = app.listen(port, () => {

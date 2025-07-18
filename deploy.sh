@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
 
-# Start the backend server (assumes everything is already built and installed)
-# Server files are now in the root directory, not in server/
+# Start the backend server from the server directory
+cd server
 npm start 
