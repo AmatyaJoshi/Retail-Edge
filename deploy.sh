@@ -2,5 +2,5 @@
 set -e
 
 # Start the backend server (assumes everything is already built and installed)
-cd server
+# Server files are now in the root directory, not in server/
 npm start 
