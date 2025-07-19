@@ -6,7 +6,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import Header from "@/app/components/Header";
 import { useAppSelector } from "@/app/redux";
-import { Search, Download, ArrowUpDown, Columns, XCircle, Upload } from "lucide-react";
+import { Search, Download, ArrowUpDown, Columns, XCircle, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import axios from "axios";
 import { format } from "date-fns";
 import { Box, Typography, Button } from '@mui/material';
@@ -54,6 +54,7 @@ const Transactions = () => {
   });
   // Add pagination state
   const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(0);
   // Add state and handler for sort dropdown at the top of the component
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const handleSort = (key: string) => {
@@ -97,7 +98,13 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchSales();
+    setCurrentPage(0); // Reset to first page when date range changes
   }, [startDate, endDate]);
+
+  // Reset to first page when search query changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery]);
 
   const handleExport = () => {
     const csvContent = [
@@ -219,6 +226,21 @@ const Transactions = () => {
     );
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredSales.length / pageSize);
+  const startIndex = currentPage * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedSales = filteredSales.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(Math.max(0, Math.min(newPage, totalPages - 1)));
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(0); // Reset to first page when changing page size
+  };
+
   // Column management modal component
   const ColumnManagementModal = () => {
     if (!showColumnModal) return null;
@@ -309,7 +331,7 @@ const Transactions = () => {
                 value={pageSize}
                 onChange={e => {
                   const size = Number(e.target.value);
-                  setPageSize(size);
+                  handlePageSizeChange(size);
                 }}
                 className="py-1.5 px-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-100 font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 text-sm transition focus:outline-none mr-2"
               >
@@ -377,25 +399,37 @@ const Transactions = () => {
           <div className="flex-1 min-h-[120px] overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-b-0 custom-scrollbar w-full shadow-lg bg-gray-50 dark:bg-gray-800 rounded-t-xl flex flex-col justify-end" style={{ height: '100%' }}>
             <DataTable
               columns={columns}
-              data={filteredSales}
+              data={paginatedSales}
               searchKey="customer"
               pageSize={pageSize}
-              onPageSizeChange={setPageSize}
+              onPageSizeChange={handlePageSizeChange}
               hideToolbar
               showOnlyTableRows
             />
           </div>
           {/* Pagination/Slider pinned to bottom, no top border */}
           <div className="w-full px-4 py-2 bg-white dark:bg-gray-800 rounded-b-xl border-x border-b border-gray-200 dark:border-gray-700 flex items-center justify-center">
-          <DataTable
-            columns={columns}
-            data={filteredSales}
-            searchKey="customer"
-            pageSize={pageSize}
-            onPageSizeChange={setPageSize}
-            hideToolbar
-              showOnlyPagination
-          />
+            <div className="flex items-center gap-4">
+              <button
+                className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm text-gray-700 dark:text-gray-100">
+                <span className="font-semibold">{currentPage + 1}</span> / {Math.max(1, totalPages)}
+              </span>
+              <button
+                className="rounded-full px-3 py-1 bg-gray-100 text-gray-700 hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage + 1 >= totalPages}
+                aria-label="Next page"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
