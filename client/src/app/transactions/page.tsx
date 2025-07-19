@@ -64,7 +64,7 @@ const Transactions = () => {
   const fetchSales = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_ENDPOINTS.base}/sales`, {
+      const response = await axios.get(`${API_ENDPOINTS.base}${API_ENDPOINTS.sales}`, {
         params: {
           startDate,
           endDate
