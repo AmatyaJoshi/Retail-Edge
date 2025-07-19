@@ -52,7 +52,9 @@ app.use(cors({
       'https://retail-edge-git-master-amatyajoshi.vercel.app',
       'https://retail-edge-amatyajoshi.vercel.app',
       'https://retail-edge-h8rpk8pvh-amatya-joshis-projects.vercel.app',
-      'https://retail-edge-f29b5i427-amatya-joshis-projects.vercel.app'
+      'https://retail-edge-f29b5i427-amatya-joshis-projects.vercel.app',
+      'https://retailedge.tech',
+      'https://www.retailedge.tech'
     ];
     
     // Allow any Vercel deployment
