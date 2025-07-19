@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://retailedge-a5cjedgcfdbucug8.southindia-01.azurewebsites.net/api';
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl }),

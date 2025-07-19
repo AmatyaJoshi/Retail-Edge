@@ -21,7 +21,7 @@ model Customers {
 
 model Prescriptions {
   id         String    @id @default(uuid())
-  customerId     String
+  customerId String
   date       DateTime
   expiryDate DateTime
   rightEye   Json
@@ -77,92 +77,91 @@ model Purchases {
 }
 
 model Expenses {
-  expenseId        String               @id
-  categoryId       String               
-  amount           Float
-  timestamp        DateTime
-  description      String?
-  status           String               @default("approved")
-  vendor           String?              @default("Unknown Vendor")
-  dueDate          DateTime?
-  paymentStatus    String               @default("PENDING")  
-  paidAmount       Float                @default(0)
-  lastPaymentDate  DateTime?
-  transactionType  String               @default("ON_DEMAND") 
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  transactions     ExpenseTransactions[] @relation("ExpenseTransactions")
-  allocations      BudgetAllocations[]
-  category         ExpenseCategories    @relation(fields: [categoryId], references: [categoryId])
+  expenseId       String                @id
+  categoryId      String
+  amount          Float
+  timestamp       DateTime
+  description     String?
+  status          String                @default("approved")
+  vendor          String?               @default("Unknown Vendor")
+  dueDate         DateTime?
+  paymentStatus   String                @default("PENDING")
+  paidAmount      Float                 @default(0)
+  lastPaymentDate DateTime?
+  transactionType String                @default("ON_DEMAND")
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  allocations     BudgetAllocations[]
+  transactions    ExpenseTransactions[] @relation("ExpenseTransactions")
+  category        ExpenseCategories     @relation(fields: [categoryId], references: [categoryId])
 }
 
-
 model ExpenseCategories {
-  categoryId       String              @id
-  name             String
-  description      String?
-  isActive         Boolean             @default(true)
-  displayOrder     Int                 @default(0) 
-  color            String?             
-  icon             String?             
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  expenses         Expenses[]
-  
+  categoryId   String     @id
+  name         String
+  description  String?
+  isActive     Boolean    @default(true)
+  displayOrder Int        @default(0)
+  color        String?
+  icon         String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  expenses     Expenses[]
+
   @@map("ExpenseCategories")
 }
 
 model ExpenseTransactions {
-  expenseTransactionId String     @id @default(uuid())
-  expenseId     String
-  type          String     @default("EXPENSE")
-  amount        Float
-  paymentMethod String     
-  reference     String?    
-  status        String     @default("COMPLETED")
-  date          DateTime
-  notes         String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  transactionType String     @default("ON_DEMAND")
-  categoryId    String?
-  expense       Expenses   @relation("ExpenseTransactions", fields: [expenseId], references: [expenseId], onDelete: Cascade)
+  expenseTransactionId String   @id @default(uuid())
+  expenseId            String
+  type                 String   @default("EXPENSE")
+  amount               Float
+  paymentMethod        String
+  reference            String?
+  status               String   @default("COMPLETED")
+  date                 DateTime
+  notes                String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  transactionType      String   @default("ON_DEMAND")
+  categoryId           String?
+  expense              Expenses @relation("ExpenseTransactions", fields: [expenseId], references: [expenseId], onDelete: Cascade)
 }
 
 model Budgets {
-  budgetId          String              @id
-  categoryId        String
-  name              String
-  description       String?
-  amount            Float
-  period            String              
-  startDate         DateTime
-  endDate           DateTime
-  fiscalYear        Int
-  status            String              @default("ACTIVE")
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  allocations       BudgetAllocations[]
-  
+  budgetId    String              @id
+  categoryId  String
+  name        String
+  description String?
+  amount      Float
+  period      String
+  startDate   DateTime
+  endDate     DateTime
+  fiscalYear  Int
+  status      String              @default("ACTIVE")
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  allocations BudgetAllocations[]
+
   @@map("Budgets")
 }
 
 model BudgetAllocations {
-  allocationId      String              @id
-  budgetId          String
-  expenseId         String
-  amount            Float
-  status            String              @default("PENDING") 
-  allocatedAt       DateTime
-  directPayment     Boolean             @default(false)     
-  paymentMethod     String?                                 
-  paymentReference  String?                                 
-  notes             String?                                 
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  budget            Budgets             @relation(fields: [budgetId], references: [budgetId])
-  expense           Expenses            @relation(fields: [expenseId], references: [expenseId])
-  
+  allocationId     String   @id
+  budgetId         String
+  expenseId        String
+  amount           Float
+  status           String   @default("PENDING")
+  allocatedAt      DateTime
+  directPayment    Boolean  @default(false)
+  paymentMethod    String?
+  paymentReference String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  budget           Budgets  @relation(fields: [budgetId], references: [budgetId])
+  expense          Expenses @relation(fields: [expenseId], references: [expenseId])
+
   @@map("BudgetAllocations")
 }
 
@@ -296,7 +295,7 @@ model Document {
   uploadDate  DateTime    @default(now())
   notes       String?
   createdAt   DateTime    @default(now())
-  updatedAt   DateTime   @updatedAt
+  updatedAt   DateTime    @updatedAt
   associate   Associates? @relation("AssociateDocuments", fields: [associateId], references: [associateId])
   contract    Contract?   @relation(fields: [contractId], references: [id])
 
@@ -319,38 +318,38 @@ model AssociateCommunication {
 }
 
 model Stores {
-  id                    String   @id @default(uuid())
-  name                  String
-  owner                 String
-  address               String?
-  phone                 String?
-  email                 String?
-  website               String?
-  supportEmail          String?
-  supportPhone          String?
-  logoUrl               String?
-  logoDarkUrl           String?
-  timezone              String?
-  currency              String?
-  language              String?
-  dateFormat            String?
-  numberFormat          String?
-  gstNumber             String?
-  taxId                 String?
-  invoicePrefix         String?
-  receiptFooter         String?
-  defaultPaymentMethod  String?
-  taxRate               Float?
-  lowStockThreshold     Int?
-  autoReorder           Boolean? @default(false)
-  sessionTimeout        Int?     @default(30)
-  enable2FA             Boolean? @default(false)
-  roleBasedAccess       Boolean? @default(true)
-  notificationEmail     String?
-  sendLowStockEmail     Boolean? @default(false)
-  notes                 String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                   String   @id @default(uuid())
+  name                 String
+  owner                String
+  address              String?
+  phone                String?
+  email                String?
+  website              String?
+  supportEmail         String?
+  supportPhone         String?
+  logoUrl              String?
+  logoDarkUrl          String?
+  timezone             String?
+  currency             String?
+  language             String?
+  dateFormat           String?
+  numberFormat         String?
+  gstNumber            String?
+  taxId                String?
+  invoicePrefix        String?
+  receiptFooter        String?
+  defaultPaymentMethod String?
+  taxRate              Float?
+  lowStockThreshold    Int?
+  autoReorder          Boolean? @default(false)
+  sessionTimeout       Int?     @default(30)
+  enable2FA            Boolean? @default(false)
+  roleBasedAccess      Boolean? @default(true)
+  notificationEmail    String?
+  sendLowStockEmail    Boolean? @default(false)
+  notes                String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 enum PartnerType {
@@ -394,4 +393,3 @@ enum SaleStatus {
   COMPLETED
   CANCELLED
 }
-

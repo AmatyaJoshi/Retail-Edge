@@ -4,14 +4,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "ts-node prisma/seed.ts",
+    "seed": "ts-node prisma/seed/index.ts",
     "build": "rimraf dist && npx tsc",
     "start": "node dist/src/index.js",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
-    "db:reset-seed": "prisma migrate reset --force --skip-seed && ts-node prisma/seed.ts"
+    "db:reset-seed": "prisma migrate reset --force --skip-seed && ts-node prisma/seed/index.ts",
+    "migrate-data": "ts-node prisma/scripts/migrateData.ts"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed/index.ts"
   },
   "keywords": [],
   "author": "",

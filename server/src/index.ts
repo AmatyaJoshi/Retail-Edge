@@ -39,15 +39,34 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser()); // Add cookie parser middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://localhost:3001', 
-    'http://127.0.0.1:3000', 
-    'http://127.0.0.1:3001',
-    'https://retail-edge.vercel.app',
-    'https://retail-edge-git-master-amatyajoshi.vercel.app',
-    'https://retail-edge-amatyajoshi.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000', 
+      'http://localhost:3001', 
+      'http://127.0.0.1:3000', 
+      'http://127.0.0.1:3001',
+      'https://retail-edge.vercel.app',
+      'https://retail-edge-git-master-amatyajoshi.vercel.app',
+      'https://retail-edge-amatyajoshi.vercel.app',
+      'https://retail-edge-h8rpk8pvh-amatya-joshis-projects.vercel.app',
+      'https://retail-edge-f29b5i427-amatya-joshis-projects.vercel.app'
+    ];
+    
+    // Allow any Vercel deployment
+    if (origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is in allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
   credentials: true,

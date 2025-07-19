@@ -76,7 +76,7 @@ async function main() {
     console.log('All tables cleared successfully');
 
     // Read JSON files
-    const seedDataPath = path.join(__dirname, 'seedData');
+    const seedDataPath = path.join(__dirname, 'data');
     const associates = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'associates.json'), 'utf-8'));
     const associateContacts = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'associateContacts.json'), 'utf-8'));
     const associateTransactions = JSON.parse(fs.readFileSync(path.join(seedDataPath, 'associateTransactions.json'), 'utf-8'));

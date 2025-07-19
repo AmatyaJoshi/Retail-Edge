@@ -1,5 +1,5 @@
 export const API_ENDPOINTS = {
-  base: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api',
+  base: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://retailedge.azurewebsites.net/api',
   products: '/products',
   customers: '/customers',
   transactions: '/transactions',
