@@ -14,6 +14,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, onClose }) 
     if (!scanning) return;
     const codeReader = new BrowserMultiFormatReader();
     let active = true;
+    let stream: MediaStream | null = null;
     codeReader.decodeFromVideoDevice(undefined, videoRef.current!, (result) => {
       if (result && active) {
         onDetected(result.getText());
@@ -21,9 +22,23 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, onClose }) 
         setScanning(false);
         setTimeout(onClose, 400); // allow a short delay for feedback
       }
+    }).then((ctrl) => {
+      // Save the stream for cleanup
+      if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
+        stream = videoRef.current.srcObject;
+      }
     });
     return () => {
       active = false;
+      // Stop all video tracks to release the camera
+      if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
     };
   }, [onDetected, onClose, scanning]);
 
