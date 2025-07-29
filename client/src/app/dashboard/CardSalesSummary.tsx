@@ -80,14 +80,10 @@ const CardSalesSummary = () => {
           </div>
         </div>
         <div className="grid gap-4 flex-grow">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <p className={isDarkMode ? "text-base md:text-lg font-medium text-gray-400" : "text-base md:text-lg font-medium text-gray-500"}>Total Sales</p>
               <p className="text-2xl font-bold">{formatIndianNumber(totalSales)}</p>
-            </div>
-            <div>
-              <p className={isDarkMode ? "text-base md:text-lg font-medium text-gray-400" : "text-base md:text-lg font-medium text-gray-500"}>Average Change</p>
-              <p className="text-2xl font-bold">{averageChange.toFixed(1)}%</p>
             </div>
             <div>
               <p className={isDarkMode ? "text-base md:text-lg font-medium text-gray-400" : "text-base md:text-lg font-medium text-gray-500"}>Highest Sales</p>

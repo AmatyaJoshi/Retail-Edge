@@ -89,6 +89,30 @@ export default function POSSystem({
   onCustomerChange,
   onPrescriptionOpen
 }: POSSystemProps) {
+  // Resizable right panel state
+  const [rightPanelWidth, setRightPanelWidth] = useState<number>(420); // px
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+  const rightPanelMin = 320;
+  const rightPanelMax = 700;
+  // Mouse event handlers for resizing
+  useEffect(() => {
+    if (!isResizing) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      // Calculate new width from mouse X position (relative to window)
+      const container = document.getElementById('pos-main-container');
+      if (!container) return;
+      const containerRect = container.getBoundingClientRect();
+      const newWidth = containerRect.right - e.clientX;
+      setRightPanelWidth(Math.max(rightPanelMin, Math.min(newWidth, rightPanelMax)));
+    };
+    const handleMouseUp = () => setIsResizing(false);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
   // State management with proper types
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -369,6 +393,11 @@ export default function POSSystem({
   const confirmCancelSale = () => {
     setShowCancelConfirmation(false);
     setShowInvoice(false);
+    clearCart();
+    setInvoiceDetails({ invoiceNumber: '', date: new Date().toISOString().split('T')[0] });
+    if (onCustomerChange) {
+      onCustomerChange();
+    }
   };
 
   const handlePrintInvoice = () => {
@@ -378,19 +407,148 @@ export default function POSSystem({
   const handlePrintModalPrint = () => {
     const printContents = document.getElementById('invoice-print-modal');
     if (printContents) {
-      const printWindow = window.open('', '', 'width=400,height=600');
+      const printWindow = window.open('', '', 'width=900,height=1200');
       if (printWindow) {
-        printWindow.document.write('<html><head><title>Print Invoice</title>');
-        printWindow.document.write('<link rel="stylesheet" href="/globals.css" />');
-        printWindow.document.write('</head><body >');
-        printWindow.document.write(printContents.innerHTML);
-        printWindow.document.write('</body></html>');
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Print Invoice - Vision Loop Opticals</title>
+              <style>
+                @media print {
+                  @page {
+                    size: A4;
+                    margin: 20mm 15mm 20mm 15mm;
+                  }
+                  body {
+                    font-family: Arial, sans-serif;
+                    font-size: 13px;
+                    color: #000;
+                    background: #fff;
+                    margin: 0;
+                    padding: 0;
+                  }
+                  #invoice-print-modal {
+                    width: 100%;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background: #fff;
+                    padding: 0;
+                  }
+                  table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 12px;
+                  }
+                  th, td {
+                    border: 1px solid #222;
+                    padding: 6px 8px;
+                    text-align: left;
+                    font-size: 13px;
+                  }
+                  th {
+                    background: #f2f2f2;
+                    font-weight: bold;
+                  }
+                  .section-title {
+                    font-size: 15px;
+                    font-weight: bold;
+                    margin: 18px 0 6px 0;
+                    border-bottom: 2px solid #222;
+                    padding-bottom: 2px;
+                  }
+                  .invoice-header {
+                    font-size: 20px;
+                    font-weight: bold;
+                    margin-bottom: 8px;
+                  }
+                  .invoice-label {
+                    font-weight: bold;
+                  }
+                  .totals-table th, .totals-table td {
+                    border: none;
+                    text-align: right;
+                    padding: 4px 8px;
+                  }
+                  .totals-table tr:last-child td {
+                    font-size: 15px;
+                    font-weight: bold;
+                    border-top: 2px solid #222;
+                  }
+                  .print\\:hidden {
+                    display: none !important;
+                  }
+                }
+                body {
+                  font-family: Arial, sans-serif;
+                  font-size: 13px;
+                  color: #000;
+                  background: #fff;
+                  margin: 0;
+                  padding: 0;
+                }
+                #invoice-print-modal {
+                  width: 100%;
+                  max-width: 800px;
+                  margin: 0 auto;
+                  background: #fff;
+                  padding: 0;
+                }
+                table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-bottom: 12px;
+                }
+                th, td {
+                  border: 1px solid #222;
+                  padding: 6px 8px;
+                  text-align: left;
+                  font-size: 13px;
+                }
+                th {
+                  background: #f2f2f2;
+                  font-weight: bold;
+                }
+                .section-title {
+                  font-size: 15px;
+                  font-weight: bold;
+                  margin: 18px 0 6px 0;
+                  border-bottom: 2px solid #222;
+                  padding-bottom: 2px;
+                }
+                .invoice-header {
+                  font-size: 20px;
+                  font-weight: bold;
+                  margin-bottom: 8px;
+                }
+                .invoice-label {
+                  font-weight: bold;
+                }
+                .totals-table th, .totals-table td {
+                  border: none;
+                  text-align: right;
+                  padding: 4px 8px;
+                }
+                .totals-table tr:last-child td {
+                  font-size: 15px;
+                  font-weight: bold;
+                  border-top: 2px solid #222;
+                }
+                .print\\:hidden {
+                  display: none !important;
+                }
+              </style>
+            </head>
+            <body>
+              ${printContents.innerHTML}
+            </body>
+          </html>
+        `);
         printWindow.document.close();
         printWindow.focus();
         setTimeout(() => {
           printWindow.print();
           printWindow.close();
-        }, 300);
+        }, 500);
       }
     }
   };
@@ -454,7 +612,6 @@ export default function POSSystem({
         invoiceNumber: '',
         date: getFormattedDate(),
       });
-
       // Reset customer selection
       if (onCustomerChange) {
         onCustomerChange();
@@ -543,9 +700,10 @@ export default function POSSystem({
       `}</style>
 
       {/* Main POS Interface */}
-      <div className="flex flex-1 w-full h-full min-h-0 overflow-hidden pt-20">
+      <div id="pos-main-container" className="flex flex-1 w-full h-full min-h-0 overflow-hidden pt-20">
         {/* Left side - Products */}
-        <div className="flex-[2.2] flex flex-col bg-gray-50 dark:bg-gray-900 border-l border-gray-300 dark:border-gray-700 shadow-lg rounded-r-xl min-w-0 overflow-hidden p-4">
+        <div id="pos-left-panel" className="flex flex-col bg-gray-50 dark:bg-gray-900 min-w-0 overflow-hidden p-4"
+          style={{ flexBasis: `calc(100% - ${rightPanelWidth}px)`, minWidth: 0, transition: isResizing ? 'none' : 'flex-basis 0.2s', borderLeft: 'none', borderTopLeftRadius: 0, boxShadow: 'none', paddingLeft: 0 }}>
           {/* Search and Barcode */}
           <div className="mb-3 flex flex-col gap-2">
             <div className="flex-1">
@@ -688,8 +846,19 @@ export default function POSSystem({
           </div>
         </div>
 
+        {/* Drag handle for resizing */}
+        <div
+          className="w-2 cursor-col-resize bg-gray-300 dark:bg-gray-700 hover:bg-blue-400 dark:hover:bg-blue-500 transition-colors duration-150 select-none z-30 flex items-center justify-center"
+          style={{ marginLeft: -6, marginRight: -6, borderRadius: 4, width: 12, minWidth: 8, maxWidth: 16, cursor: 'col-resize', userSelect: isResizing ? 'none' : 'auto', height: '100%' }}
+          onMouseDown={() => setIsResizing(true)}
+        >
+          <div className="w-1 h-16 bg-gray-400 dark:bg-gray-500 rounded-full" />
+        </div>
         {/* Right side - Cart and Checkout */}
-        <div className="flex-[1] w-full max-w-md bg-white dark:bg-gray-800 flex flex-col border-l border-gray-200 dark:border-gray-700 min-h-0 overflow-hidden overflow-x-hidden rounded-l-xl shadow-xl p-4 border dark:border-gray-700">
+        <div
+          className="bg-white dark:bg-gray-800 flex flex-col border-l border-gray-200 dark:border-gray-700 min-h-0 overflow-hidden overflow-x-hidden rounded-l-xl shadow-xl p-4 border dark:border-gray-700"
+          style={{ width: rightPanelWidth, minWidth: rightPanelMin, maxWidth: rightPanelMax, transition: isResizing ? 'none' : 'width 0.2s', flexShrink: 0 }}
+        >
           {showInvoice ? (
             <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar max-h-[calc(100vh-120px)]">
               <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Invoice</h2>

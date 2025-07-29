@@ -21,6 +21,28 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOption, setSortOption] = useState('name-asc');
 
+  // Helper function to get initials from name
+  const getInitials = (name: string) => {
+    if (!name || typeof name !== 'string') {
+      return '?';
+    }
+    
+    const names = name.trim().split(' ').filter(n => n.length > 0);
+    
+    if (names.length === 0) {
+      return '?';
+    }
+    
+    if (names.length === 1) {
+      return names[0]?.charAt(0).toUpperCase() || '?';
+    }
+    
+    const firstName = names[0]?.charAt(0).toUpperCase() || '?';
+    const lastName = names[names.length - 1]?.charAt(0).toUpperCase() || '?';
+    
+    return firstName + lastName;
+  };
+
   // Close AddCustomerModal if parent modal closes
   useEffect(() => {
     if (!isOpen) {
@@ -79,7 +101,7 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
           <div className="fixed inset-0 bg-black/50 backdrop-blur-md" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
+        <div className="fixed inset-0 overflow-hidden">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
@@ -90,9 +112,9 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-600 p-8 w-full max-w-4xl mx-auto transform transition-all duration-300 ease-in-out">
-                <div className="flex justify-between items-center mb-8 border-b-2 border-gray-200 dark:border-gray-700 pb-6">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Select Customer</h2>
+              <Dialog.Panel className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-600 p-8 w-full max-w-4xl mx-auto h-[90vh] max-h-[800px] min-h-[600px] flex flex-col transform transition-all duration-300 ease-in-out">
+                <div className="flex justify-between items-center mb-6 border-b-2 border-gray-200 dark:border-gray-700 pb-4 flex-shrink-0">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Select Customer</h2>
                   <button
                     type="button"
                     className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
@@ -100,9 +122,9 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                   >
                     <X className="h-7 w-7" aria-hidden="true" />
                   </button>
-      </div>
-      
-                <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                </div>
+                
+                <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 flex-shrink-0">
                   <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -129,35 +151,37 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                   </div>
                 </div>
                 
-                <div className="max-h-96 overflow-y-auto border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-inner bg-gray-50 dark:bg-gray-700 custom-scrollbar">
+                <div className="flex-1 border-2 border-gray-200 dark:border-gray-600 rounded-xl shadow-inner bg-gray-50 dark:bg-gray-700 custom-scrollbar overflow-hidden flex flex-col min-h-0">
                   {
                     filteredCustomers.length > 0 ? (
-          <ul className="divide-y divide-gray-200 dark:divide-gray-600">
-            {filteredCustomers.map(customer => (
-              <li 
-                            key={customer.customerId}
-                            className="p-5 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer transition-all duration-200 flex items-center gap-4 rounded-xl bg-white dark:bg-gray-800 shadow-lg m-3 border-2 border-gray-100 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 hover:scale-105"
-                            onClick={() => {
-                              onCustomerSelect(customer);
-                              onClose();
-                            }}
-              >
-                            <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-2xl flex-shrink-0 shadow-md">
-                              {customer.name.charAt(0).toUpperCase()}
-                            </div>
-                  <div className="flex-1 min-w-0">
-                              <p className="font-bold text-gray-900 dark:text-gray-100 text-xl truncate">{customer.name}</p>
-                              <p className="text-base text-gray-600 dark:text-gray-400 truncate">
-                                {customer.email}
-                                {customer.email && customer.phone ? ' - ' : ''}
-                                {customer.phone}
-                              </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-                      <div className="flex flex-col items-center justify-center p-8 text-gray-500 dark:text-gray-400">
+                      <div className="flex-1 overflow-y-auto">
+                        <ul className="divide-y divide-gray-200 dark:divide-gray-600 p-3">
+                          {filteredCustomers.map(customer => (
+                            <li 
+                              key={customer.customerId}
+                              className="p-5 hover:bg-blue-50 dark:hover:bg-gray-600 cursor-pointer transition-all duration-200 flex items-center gap-4 rounded-xl bg-white dark:bg-gray-800 shadow-lg mb-3 border-2 border-gray-100 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500"
+                              onClick={() => {
+                                onCustomerSelect(customer);
+                                onClose();
+                              }}
+                            >
+                              <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-lg flex-shrink-0 shadow-md">
+                                {getInitials(customer.name)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-gray-900 dark:text-gray-100 text-xl truncate">{customer.name}</p>
+                                <p className="text-base text-gray-600 dark:text-gray-400 truncate">
+                                  {customer.email}
+                                  {customer.email && customer.phone ? ' - ' : ''}
+                                  {customer.phone}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center p-8 text-gray-500 dark:text-gray-400">
                         <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4 dark:bg-gray-600">
                           <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -168,9 +192,9 @@ const CustomerSelection: React.FC<CustomerSelectionProps> = ({ onCustomerSelect,
                       </div>
                     )
                   }
-      </div>
-      
-                <div className="mt-8 flex justify-end">
+                </div>
+                
+                <div className="mt-6 flex justify-end flex-shrink-0">
         <button
                     onClick={() => setIsModalOpen(true)}
                     className="flex items-center space-x-3 px-6 py-4 bg-blue-600 dark:bg-blue-500 text-white rounded-xl shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 transform hover:scale-105 font-semibold"

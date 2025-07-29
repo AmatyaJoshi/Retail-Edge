@@ -10,7 +10,8 @@ interface Buyer {
 }
 
 const fetchBuyerRankingData = async (): Promise<Buyer[]> => {
-  const response = await fetch('http://localhost:3001/api/customers/ranking');
+  // Use a relative path so it works in both local and production environments
+  const response = await fetch('/api/customers/ranking');
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -115,7 +116,7 @@ export default function CardReports() {
             ) : error ? (
               <div className="text-red-500 text-center py-4">Error: {error}</div>
             ) : (
-              <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
+              <div className="h-[288px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
                 <Table className="w-full">
                   <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
                     <TableRow>
@@ -146,7 +147,7 @@ export default function CardReports() {
             <CardTitle>Product Return Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[500px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
+              <div className="h-[320px] overflow-y-auto rounded-md border bg-white dark:bg-gray-800 custom-scrollbar dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               <Table>
                 <TableHeader className="bg-white dark:bg-gray-800">
                   <TableRow>

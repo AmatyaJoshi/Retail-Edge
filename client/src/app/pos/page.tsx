@@ -142,16 +142,13 @@ export default function Home() {
       />
       
       {/* Prescription Modal */}
-      {showPrescriptionModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <PrescriptionForm
-            customerId={selectedCustomer.customerId}
-            existingPrescription={selectedCustomer.prescription}
-            onSave={handleSavePrescription}
-            onCancel={() => setShowPrescriptionModal(false)}
-          />
-        </div>
-      )}
+      <PrescriptionForm
+        isOpen={showPrescriptionModal && !!selectedCustomer}
+        customerId={selectedCustomer?.customerId || ''}
+        existingPrescription={selectedCustomer?.prescription}
+        onSave={handleSavePrescription}
+        onCancel={() => setShowPrescriptionModal(false)}
+      />
     </main>
   );
 }
