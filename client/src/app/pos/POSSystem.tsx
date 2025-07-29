@@ -394,7 +394,7 @@ export default function POSSystem({
     setShowCancelConfirmation(false);
     setShowInvoice(false);
     clearCart();
-    setInvoiceDetails({ invoiceNumber: '', date: new Date().toISOString().split('T')[0] });
+    setInvoiceDetails({ invoiceNumber: '', date: (new Date().toISOString().split('T')[0] || '') });
     if (onCustomerChange) {
       onCustomerChange();
     }
