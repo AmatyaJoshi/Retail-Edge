@@ -10,7 +10,8 @@ interface Buyer {
 }
 
 const fetchBuyerRankingData = async (): Promise<Buyer[]> => {
-  const response = await fetch('/dashboard/api/customers/ranking/');
+  const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || '';
+  const response = await fetch(`${baseUrl}/dashboard/api/customers/ranking/`);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
