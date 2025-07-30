@@ -11,7 +11,8 @@ interface Buyer {
 
 const fetchBuyerRankingData = async (): Promise<Buyer[]> => {
   const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || '';
-  const response = await fetch(`${baseUrl}/dashboard/api/customers/ranking/`);
+  // The correct Express route is /api/customers/ranking
+  const response = await fetch(`${baseUrl}/api/customers/ranking`);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
