@@ -10,8 +10,7 @@ interface Buyer {
 }
 
 const fetchBuyerRankingData = async (): Promise<Buyer[]> => {
-  // Use a relative path so it works in both local and production environments
-  const response = await fetch('/api/customers/ranking');
+  const response = await fetch('/dashboard/api/customers/ranking/');
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
