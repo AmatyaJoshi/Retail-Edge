@@ -1,6 +1,20 @@
 ﻿# Retail Edge
 
+
 A complete, full-stack, cloud-native retail management platform for modern businesses. Retail Edge goes beyond POS, delivering advanced analytics, real-time dashboards, multimodal AI/LLM chatbot support, and enterprise-grade security. Built with a modular Next.js frontend and decoupled Express backend, it leverages PostgreSQL (Supabase), Azure Blob Storage, and multi-provider authentication for seamless, scalable operations. Automated CI/CD, robust RBAC/IAM, and a rich, responsive UI/UX make it a resilient, future-ready solution.
+
+## Screenshots
+
+Paste your application screenshots in the `client/public` directory (e.g., `client/public/screenshots/`).
+Reference them below using Markdown:
+
+```
+![Dashboard](client/public/screenshots/dashboard.png)
+![POS Interface](client/public/screenshots/pos.png)
+![AI Assistant Chatbot](client/public/screenshots/ai-assistant.png)
+```
+
+_Replace the filenames above with your actual screenshot filenames._
 
 ## Key Features
 
@@ -144,8 +158,6 @@ cd ../server && npm install
 ### Video Walkthroughs
 Access video walkthroughs of the application here: [Google Drive - Retail Edge Walkthroughs](https://drive.google.com/drive/folders/1TYpqoC4Jt7eVSf80Lwgo8bHr9dJkI0Nt?usp=sharing)
 
-## Database Migration
-- See the README section above for migration steps from Supabase to DigitalOcean PostgreSQL.
 
 ## Contributing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
