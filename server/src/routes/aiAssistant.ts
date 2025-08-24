@@ -84,7 +84,7 @@ Keep your responses concise, professional, and focused on helping the user achie
         lastError = error;
       }
     }
-    return res.status(503).json({ error: 'All AI models are currently unavailable. Please try again later.', details: lastError });
+  return res.status(503).json({ error: 'All AI models are currently unavailable. Please try again later.', details: lastError });
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error', details: error instanceof Error ? error.message : error });
   }
