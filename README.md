@@ -3,19 +3,6 @@
 
 A complete, full-stack, cloud-native retail management platform for modern businesses. Retail Edge goes beyond POS, delivering advanced analytics, real-time dashboards, multimodal AI/LLM chatbot support, and enterprise-grade security. Built with a modular Next.js frontend and decoupled Express backend, it leverages PostgreSQL (Supabase), Azure Blob Storage, and multi-provider authentication for seamless, scalable operations. Automated CI/CD, robust RBAC/IAM, and a rich, responsive UI/UX make it a resilient, future-ready solution.
 
-## Screenshots
-
-Paste your application screenshots in the `client/public` directory (e.g., `client/public/screenshots/`).
-Reference them below using Markdown:
-
-```
-![Dashboard](client/public/screenshots/dashboard.png)
-![POS Interface](client/public/screenshots/pos.png)
-![AI Assistant Chatbot](client/public/screenshots/ai-assistant.png)
-```
-
-_Replace the filenames above with your actual screenshot filenames._
-
 ## Key Features
 
 - Modular, decoupled architecture: Next.js frontend & Express backend with REST APIs
