@@ -47,14 +47,16 @@ const SidebarLink = ({
   return (
     <Link href={href}>
       <div
-        className={`cursor-pointer flex items-center w-full ${isCollapsed ? "justify-center py-4" : "justify-start px-6 py-4"}
-          transition-colors gap-3 rounded-lg
-          hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-700 dark:hover:text-blue-200
-          ${isActive ? "bg-blue-200 text-blue-900 dark:bg-blue-900 dark:text-blue-100" : ""}
+        className={`cursor-pointer flex items-center w-full ${isCollapsed ? "justify-center py-4 mx-2" : "justify-start px-6 py-4 mx-2"}
+          transition-all duration-200 gap-3 rounded-lg
+          ${isActive 
+            ? "bg-blue-500 text-white shadow-md border-l-4 border-blue-700 dark:bg-blue-600 dark:border-blue-400" 
+            : "hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-700 dark:hover:text-blue-200 text-gray-700 dark:text-gray-300"
+          }
         `}
       >
-        <Icon className="w-6 h-6 text-gray-700 dark:!text-gray-300" />
-        <span className={`${isCollapsed ? "hidden" : "block text-base font-semibold tracking-wide text-gray-700 dark:text-gray-300"}`}>
+        <Icon className={`w-6 h-6 ${isActive ? "text-white" : "text-gray-700 dark:text-gray-300"}`} />
+        <span className={`${isCollapsed ? "hidden" : "block text-base font-semibold tracking-wide"}`}>
           {label}
         </span>
       </div>
