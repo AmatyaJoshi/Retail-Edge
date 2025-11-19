@@ -47,32 +47,25 @@ const SidebarLink = ({
   return (
     <Link href={href}>
       <div
-        className={`cursor-pointer flex items-center w-full ${isCollapsed ? "justify-center py-4 mx-2" : "justify-start px-6 py-4 mx-2"}
-          transition-all duration-200 gap-3 rounded-lg
+        className={`cursor-pointer flex items-center transition-all duration-200 gap-3 rounded-lg
           ${isActive 
-            ? "bg-blue-500 text-white shadow-md border-l-4 border-blue-700 dark:bg-blue-600 dark:border-blue-400" 
-            : "hover:bg-gray-100 hover:text-blue-600 dark:hover:bg-gray-700 dark:hover:text-blue-200 text-gray-700 dark:text-gray-300"
+            ? isCollapsed 
+              ? "justify-center py-4 mx-1 bg-blue-500 text-white shadow-lg"
+              : "justify-start px-4 py-3 mx-3 bg-blue-500 text-white shadow-lg rounded-lg font-semibold"
+            : isCollapsed
+              ? "justify-center py-4 mx-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+              : "justify-start px-4 py-3 mx-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
           }
         `}
       >
-        <Icon className={`w-6 h-6 ${isActive ? "text-white" : "text-gray-700 dark:text-gray-300"}`} />
-        <span className={`${isCollapsed ? "hidden" : "block text-base font-semibold tracking-wide"}`}>
+        <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? "text-white" : "text-gray-700 dark:text-gray-300"}`} />
+        <span className={`${isCollapsed ? "hidden" : "block text-base font-semibold tracking-wide whitespace-nowrap"}`}>
           {label}
         </span>
       </div>
     </Link>
   );
 };
-
-// Eyewear SVG icon from svgrepo.com
-const EyewearIcon = () => (
-  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="16" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
-    <circle cx="48" cy="40" r="12" stroke="currentColor" strokeWidth="2" fill="none" />
-    <path d="M4 40c0-6 4-12 12-12m32 0c8 0 12 6 12 12" stroke="currentColor" strokeWidth="2" fill="none" />
-    <path d="M28 40h8" stroke="currentColor" strokeWidth="2" fill="none" />
-  </svg>
-);
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
