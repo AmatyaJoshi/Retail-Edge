@@ -3,12 +3,12 @@ import express from 'express';
 const router = express.Router();
 
 const MODEL_FALLBACKS = [
-  'deepseek/deepseek-chat-v3-0324:free',
-  'meta-llama/llama-4-maverick:free',
-  'google/gemini-2.0-flash-exp:free',
-  'qwen/qwen-2.5-72b-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
-  'microsoft/mai-ds-r1:free'
+  'openrouter/owl-alpha',
+  'poolside/laguna-xs.2:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'liquid/lfm-2.5-1.2b-thinking:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'openai/gpt-oss-120b:free'
 ];
 
 async function tryModel(model: string, messages: any[], apiKey: string) {
